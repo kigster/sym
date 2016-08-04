@@ -35,33 +35,21 @@ Or install it with `gem` command:
 
 ## Usage
 
-### Generating a Secret 
+### Secret Explained 
 
 The library relies on a secret that must be stored somewhere safely on your local system, for example it can be in the keychain on Mac OSX.
 
-First we must generate the secret we'll use, and store it safely.
+You can use one key for all encrypted fields, or many keys – perhaps one per deployment environment, etc. While you can have per-field secrets, it seems like an overkill.
 
 __NOTE: never check in the secret into git.__
 
-```ruby
-require 'secrets-cipher-base64'
-
-# Generate a secret that you must store in your keychain or somewhere safe.
-# NEVER put the secret into your git repo.
- 
-puts Secrets::Cipher::Secret.new
-
-# Then save the output in your keychain:
-# Then when needed to retrieve it, 
-```
-
+We'll show how to generate a secret down below.
 
 ### Storing the Secret
 
 How you store the secret, is up to you, but here is one way that leverages Mac OS-X Keychain to store the key. In fact you can store multiple keys if you like. In the example below we'll store two seperate secrets, one for staging and one for production:
 
 In your terminal, type these two commands. Note that the `-s` parameter is something you might want to customize, and make it easy to find. For example, instead of using `production` you could use `big-corp-django-secret-production`. The name should be such that it's easy to find once you open KeyChain Editor later.
-
 
 ```bash
 security add-generic-password -a $USER -D "secret-cipher-base64" -s "staging"
@@ -70,7 +58,7 @@ security add-generic-password -a $USER -D "secret-cipher-base64" -s "production"
 
 This step does not actually store any key, it simply creates a KeyChain placeholder for it. We'll generate and add the key next.
 
-Finally, to make this a bit more efficient, I recommend listing the key names in an environment variable set in your `~/.bashrc` file, for example:
+Finally, to make this a bit more efficient, I recommend listing the key names in an array-type environment variable set in your `~/.bashrc` file, for example:
 
 ```bash
 # ~/.bashrc
@@ -86,9 +74,20 @@ for secret_name in ${secret_names[@]}; do
 done
 ```
 
-### Generate Secrets
+### Generating Secrets
  
-Generating secret is easy with this library. Once the gem is installed you will be able to run an executable `secrets-cipher-base64`:
+Generating secret is easy with this library. 
+
+You can do so programmatically, or using the command line.
+
+In ruby you would do the following:
+
+```ruby
+require 'secrets-cipher-base64'
+@secret = Secrets::Cipher::Base64.generate
+```
+
+Once the gem is installed you will be able to run an executable `secrets-cipher-base64`:
 
 ```bash
 secrets-cipher-base64 --generate-secret | pbcopy
@@ -128,9 +127,12 @@ With this out of the way, we just need to type `load_secrets` in Terminal to get
 
 ### Encrypting Data
 
+So how would we use this library to encrypt and decrypt values?
+
+Hopefully this is a very simple integration for most.
+
 ```ruby
-module CustomLib
-  class Encryption
+  class MyModel
     include Secrets::Cipher::Base64
     secret ENV['secret_production']
     
@@ -146,8 +148,6 @@ module CustomLib
       # saves the encrypted version @secure_value
     end
   end
-end
-
 ```
 
 ## Development
