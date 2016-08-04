@@ -1,5 +1,6 @@
 require 'require_dir'
-require_relative 'base64/class_extensions'
+require_relative 'base64/extensions/class_methods'
+require_relative 'base64/extensions/instance_methods'
 
 module Secrets
   module Cipher
@@ -9,8 +10,8 @@ module Secrets
 
       def self.included(klazz)
         klazz.instance_eval do
-          include ::Secrets::Cipher::Base64::InstanceMethods
-          extend ::Secrets::Cipher::Base64::ClassMethods
+          include ::Secrets::Cipher::Base64::Extensions::InstanceMethods
+          extend ::Secrets::Cipher::Base64::Extensions::ClassMethods
 
           class << self
             def secret(value = nil)
@@ -19,17 +20,16 @@ module Secrets
             end
           end
         end
-
       end
 
       class << self
         attr_accessor :secret
-        self.include(InstanceMethods)
+        include ::Secrets::Cipher::Base64::Extensions::ClassMethods
       end
-
+      include ::Secrets::Cipher::Base64::Extensions::InstanceMethods
     end
   end
 end
 
-Secrets::Cipher::Base64.dir 'base64'
+Secrets::Cipher::Base64.dir_r 'base64'
 

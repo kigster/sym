@@ -16,17 +16,15 @@ module Secrets
         attr_accessor :encrypted, :decrypted, :secret
 
         def initialize(encrypted: nil, decrypted: nil, secret: nil)
-          unless secret
-            self.secret = self.class.generate_secret
-            secret = self.secret
-          end
+          self.secret = secret
+          self.secret ||= self.class.create_secret
 
           if encrypted
             self.encrypted = encrypted
-            self.decrypted = decr(encrypted, secret)
+            self.decrypted = decr(encrypted, self.secret)
           elsif decrypted
             self.decrypted = decrypted
-            self.encrypted = encr(decrypted, secret)
+            self.encrypted = encr(decrypted, self.secret)
           else
             raise UsageError.new
           end
