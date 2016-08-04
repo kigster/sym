@@ -13,13 +13,18 @@ module Secrets
 
         include Secrets::Cipher::Base64
 
-        attr_accessor :iv, :encrypted, :decrypted
+        attr_accessor :encrypted, :decrypted, :secret
 
         def initialize(encrypted: nil, decrypted: nil, secret: nil)
-          if encrypted && secret
+          unless secret
+            self.secret = self.class.generate_secret
+            secret = self.secret
+          end
+
+          if encrypted
             self.encrypted = encrypted
             self.decrypted = decr(encrypted, secret)
-          elsif decrypted && secret
+          elsif decrypted
             self.decrypted = decrypted
             self.encrypted = encr(decrypted, secret)
           else
