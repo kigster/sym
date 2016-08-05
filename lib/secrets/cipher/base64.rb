@@ -10,8 +10,8 @@ module Secrets
       extend RequireDir
       init(__FILE__)
 
-      NEWLINE_SEP= '%'
-      FIELD_SEP= '@'
+      NEWLINE_SEP= '㎏'
+      FIELD_SEP= '%'
 
       def self.included(klazz)
         klazz.instance_eval do

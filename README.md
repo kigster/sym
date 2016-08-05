@@ -130,7 +130,7 @@ function load_secrets() {
 
 With this out of the way, we just need to type `load_secrets` in Terminal to get our keys automatically exported.
 
-### Encrypting Data
+### Encrypting & Decrypting Scalar Data
 
 So how would we use this library to encrypt and decrypt values?
 
@@ -151,6 +151,32 @@ Hopefully this is a very simple integration for most.
   end
 ```
 
+### Encrypting and Decrypting Hashes (and YAML)
+
+A ruby class `Secrets::Cipher::Base64::EncryptedHash` is offered so that you can encrypt values in a hash, and later decrypt them.
+
+Here is a simple way to encrypt and decrypt a hash in ruby:
+
+```ruby
+    hash = {
+        'name'     => { 'first'         => 'Bill', 
+                        'last'          => 'Clinton' },                        
+        'address'  => { 'street1'       => '1 Market Street, Apt 000',
+                        'street2'       => nil,
+                        'city'          => 'San Francisco',
+                        'state'         => 'CA',
+                        'zip'           => 94107,
+                        'home_address?' => true },                       
+        'password' => "goddamnhrc"
+      }
+    }
+    hash_encrypted    = EncryptedHash.new(hash).encrypt(secret)
+    hash_decrypted    = hash_encrypted.decrypt(secret)
+
+    yaml_encrypted    = hash_encrypted.to_hash.to_yaml
+    yaml_decrypted    = hash_decrypted.to_hash.to_yaml
+```
+
 ### Command Line Tool
 
 The library installs a command line tool that can be used to encrypt/decrypt data or to generate a new secret.
@@ -158,30 +184,45 @@ The library installs a command line tool that can be used to encrypt/decrypt dat
 Here is the full help message for the `secrets` tool:
 
 ```bash
-Usage: secrets [ -g | [ -e | -d  -s secret -p phrase ]] [-v] [-V] [-h]
-
-Examples:
-    # generate a new secret:
-    export SECRET=$(secrets -g)
-
-    # encrypt a plain text string with the secret:
-    export ENCRYPTED=$(secrets -e -p "secret string" -s $SECRET)
-    
-    # decrypt a previously encrypted phrase:
-    secrets -d $ENCRYPTED -s $SECRET
-    # should print "secret string"
+Usage: 
+    secrets [options]
 
 Options:
     -V, --version            print the version
     -p, --phrase    [string] specify a string to encrypt/decrypt
+    -y, --yaml      [file]   yaml file to encr/decr; use "-" for STDIN/OUT
+    
 Modes:
     -e, --encrypt            encrypt
     -d, --decrypt            decrypt
     -g, --generate           generate new secret
     -h, --help               show help
+    
 Flags:
     -v, --verbose            show additional info
     -s, --secret    [secret] specify a secret
+```
+
+#### CLI Examples
+
+```bash
+  # generate a new secret:
+  > export SECRET=$(secrets -g)
+  > echo $SECRET
+  75ngenJpB6zL47/8Wo7Ne6JN1pnOsqNEcIqblItpfg4=
+
+  # encrypt a plain text string with the secret:
+  > export ENCRYPTED=$(secrets -e -p "secret string" -s $SECRET)
+  > echo $ENCRYPTED
+  Y09MNDUyczU1S0UvelgrLzV0RTYxZz09CkBDMEw4Q0R0TmpnTm9md1QwNUNy%T013PT0K%
+
+  # decrypt a previously encrypted phrase:
+  > secrets -d -p $ENCRYPTED -s $SECRET
+  secret string
+  
+  # encrypt a YAML file:
+  secret -e -s $SECRET -y secrets.yaml > encrypted-secrets.yml
+  secret -d -s $SECRET -y encrypted-secrets.yml > decrypted-secrets.yml
 ```
 
 ## Development

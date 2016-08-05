@@ -22,6 +22,7 @@ Gem::Specification.new do |spec|
   spec.add_dependency 'colored2'
   spec.add_dependency 'slop'
   spec.add_dependency 'hashie'
+  spec.add_dependency 'activesupport'
 
   spec.add_development_dependency 'codeclimate-test-reporter'
   spec.add_development_dependency 'bundler', '~> 1.12'

@@ -3,7 +3,7 @@ require 'slop'
 require 'hashie/mash'
 require 'secrets/cipher/base64'
 require 'secrets/cipher/base64/encrypted_data'
-
+require 'yaml'
 module Secrets
   module Cipher
     module Base64
@@ -23,7 +23,6 @@ module Secrets
         end
 
         def run
-
           result = if config.help or config.keys.all? { |k| !config[k]}
                      opts.to_s
                    elsif config.version
@@ -41,6 +40,13 @@ module Secrets
                        decrypted: decrypted,
                        secret:    config.secret
                      ).send(accessor)
+                   elsif config.secret && config.yaml
+                     contents = config.yaml.eql?('-') ? STDIN.read : File.read(config.yaml)
+                     e_hash = EncryptedHash.new(YAML.load(contents))
+                     action = { config.encrypt => :encrypt, config.decrypt => :decrypt }[true]
+                     puts e_hash.send(action, config.secret).to_hash.to_yaml
+                   else
+                     opts.to_s
                    end
           output.call(result)
         rescue OpenSSL::Cipher::CipherError => e
@@ -63,23 +69,28 @@ module Secrets
 
         def parse(arguments)
           Slop.parse(arguments) do |o|
-            o.banner = 'Usage: secrets [ -g | [ -e | -d  -s secret -p phrase ]] [-v] [-V] [-h] '
+            o.banner = 'Usage: secrets [options]'
             o.separator ''
             o.separator 'Examples:'
-            o.separator '  # generate a new secret:'
-            o.separator '  export SECRET=$(secrets -g)'.bold.green
+            o.separator '  # generate a new secret:'.yellow
+            o.separator '  > export SECRET=$(secrets -g)'.bold.green
+            o.separator '  > echo $SECRET'.bold.green
+            o.separator '  75ngenJpB6zL47/8Wo7Ne6JN1pnOsqNEcIqblItpfg4='.bold.blue
             o.separator ''
-            o.separator '  # encrypt a plain text string with the secret:'
-            o.separator '  export ENCRYPTED=$(secrets -e -p "secret string" -s $SECRET)'.bold.green
+            o.separator '  # encrypt a plain text string with the secret:'.yellow
+            o.separator '  > export ENCRYPTED=$(secrets -e -p "secret string" -s $SECRET)'.bold.green
+            o.separator '  > echo $ENCRYPTED'.bold.green
+            o.separator '  Y09MNDUyczU1S0UvelgrLzV0RTYxZz09CkBDMEw4Q0R0TmpnTm9md1QwNUNy%T013PT0K%'.bold.blue
             o.separator ''
-            o.separator '  # decrypt a previously encrypted phrase:'
-            o.separator '  secrets -d $ENCRYPTED -s $SECRET'.bold.green
-            o.separator '  # should print "secret string"'
+            o.separator '  # decrypt a previously encrypted phrase:'.yellow
+            o.separator '  > secrets -d -p $ENCRYPTED -s $SECRET'.bold.green
+            o.separator '  secret string'.bold.blue
 
             o.separator ''
             o.separator 'Options:'
             o.string    '-s', '--secret',      '[secret] specify a secret'
             o.string    '-p', '--phrase',      '[string] specify a string to encrypt/decrypt'
+            o.string    '-y', '--yaml',        '[file]   yaml file to encr/decr; use "-" for STDIN/OUT'
             o.separator 'Modes:'
             o.bool      '-e', '--encrypt',     '         encrypt'
             o.bool      '-d', '--decrypt',     '         decrypt'
