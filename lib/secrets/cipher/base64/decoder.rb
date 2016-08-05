@@ -9,8 +9,8 @@ module Secrets
 
         # Returns an array of [ encrypted_data, iv ]
         def decode
-          result = ::Base64.decode64(self.encoded_data.gsub('%', "\n")).
-            split(/\n\n/).
+          result = ::Base64.decode64(self.encoded_data.gsub(NEWLINE_SEP, "\n")).
+            split(/#{FIELD_SEP}/).
             map{ |v| ::Base64.decode64(v) }
 
           self.encrypted_data, self.iv = result

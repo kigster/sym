@@ -1,4 +1,6 @@
 require 'require_dir'
+require 'colored2'
+
 require_relative 'base64/extensions/class_methods'
 require_relative 'base64/extensions/instance_methods'
 
@@ -7,6 +9,9 @@ module Secrets
     module Base64
       extend RequireDir
       init(__FILE__)
+
+      NEWLINE_SEP= '%'
+      FIELD_SEP= '@'
 
       def self.included(klazz)
         klazz.instance_eval do

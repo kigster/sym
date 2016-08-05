@@ -88,14 +88,14 @@ You can do so programmatically, or using the command line.
 In ruby you would do the following:
 
 ```ruby
-require 'secrets-cipher-base64'
-@secret = Secrets::Cipher::Base64.generate
+require 'secrets/cipher/base64'
+@secret = Secrets::Cipher::Base64.create_secret
 ```
 
-Once the gem is installed you will be able to run an executable `secrets-cipher-base64`:
+Once the gem is installed you will be able to run an executable `secrets`:
 
 ```bash
-secrets-cipher-base64 --generate-secret | pbcopy
+secrets -g | pbcopy
 ```
 
 (if you installed the gem with bundler, make sure to prefix the above command with `bundle exec`).
@@ -142,17 +142,46 @@ Hopefully this is a very simple integration for most.
     secret ENV['secret_production']
     
     def secure_value=(value)
-      @secure_value = encr(value)
+      @secure_value = encr(value, this.class.secret)
     end
     
     def secure_value
-      decr(@secure_value)
-    end
-    
-    def save!
-      # saves the encrypted version @secure_value
+      decr(@secure_value, this.class.secret)
     end
   end
+```
+
+### Command Line Tool
+
+The library installs a command line tool that can be used to encrypt/decrypt data or to generate a new secret.
+
+Here is the full help message for the `secrets` tool:
+
+```bash
+Usage: secrets [ -g | [ -e | -d  -s secret -p phrase ]] [-v] [-V] [-h]
+
+Examples:
+    # generate a new secret:
+    export SECRET=$(secrets -g)
+
+    # encrypt a plain text string with the secret:
+    export ENCRYPTED=$(secrets -e -p "secret string" -s $SECRET)
+    
+    # decrypt a previously encrypted phrase:
+    secrets -d $ENCRYPTED -s $SECRET
+    # should print "secret string"
+
+Options:
+    -V, --version            print the version
+    -p, --phrase    [string] specify a string to encrypt/decrypt
+Modes:
+    -e, --encrypt            encrypt
+    -d, --decrypt            decrypt
+    -g, --generate           generate new secret
+    -h, --help               show help
+Flags:
+    -v, --verbose            show additional info
+    -s, --secret    [secret] specify a secret
 ```
 
 ## Development
