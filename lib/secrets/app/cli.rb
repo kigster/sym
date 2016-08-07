@@ -4,6 +4,7 @@ require 'secrets'
 require 'colored2'
 require 'hashie/mash'
 require 'yaml'
+require 'openssl'
 
 module Secrets
   module App
@@ -47,7 +48,7 @@ module Secrets
                    opts.to_s
                  end
         output.call(result)
-      rescue OpenSSL::Cipher::CipherError => e
+      rescue ::OpenSSL::Cipher::CipherError => e
         error type:    'Cipher Error',
               details: e.message,
               reason:  'Perhaps either the secret is invalid, or encrypted data is corrupt.',
