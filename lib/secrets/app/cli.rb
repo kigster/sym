@@ -80,7 +80,7 @@ module Secrets
           o.bool      '-h', '--help',       '           show help'
           o.bool      '-e', '--encrypt',    '           encrypt'
           o.bool      '-d', '--decrypt',    '           decrypt'
-          o.bool      '-g', '--generate',   '           generate new secret'
+          o.bool      '-g', '--generate',   '           generate new private key'
           o.separator 'Options:'.bold.yellow
           o.string    '-k', '--private-key','[key]   '.bold.blue + '   specify the encryption key'
           o.string    '-s', '--string',     '[string]'.bold.blue + '   specify a string to encrypt/decrypt'
