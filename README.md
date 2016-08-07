@@ -108,7 +108,7 @@ Modes:
     -t, --edit         [file]     open an encrypted yaml in an editor
     -e, --encrypt                 encrypt
     -d, --decrypt                 decrypt
-    -g, --generate                generate new secret
+    -g, --generate                generate new private key
 Options:
     -k, --private-key  [key]      specify the encryption key
     -s, --string       [string]   specify a string to encrypt/decrypt

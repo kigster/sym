@@ -46,7 +46,7 @@ module Secrets
                    elsif c.encrypt || c.decrypt
                      content = c.string || (c.file.eql?('-') ? STDIN.read : File.read(c.file))
                      self.send(action, content, c.private_key)
-                   elsif c.open
+                   elsif c.edit
                      'Not yet implemented'
                    end
                  elsif c.examples
