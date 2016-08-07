@@ -70,7 +70,7 @@ NOTE: If you installed the gem with bundler, make sure to prefix the above comma
 
 #### 2. Ruby
 
-Upon including the `Secrets` module, each ruby class will receive it's own method `#key` and `#create_private_key`. The latter will generate a new key each time it's called, the former will either assign a key, or generate and save it in the class instance variable. Therefore each class including `Secrets` will use it's own key (unless the key is assigned).
+Upon including the `Secrets` module, each ruby class will receive it's own method `#private_key` and `#create_private_key`. The latter will generate a new key each time it's called, the former will either assign a key, or generate and save it in the class instance variable. Therefore each class including `Secrets` will use it's own key (unless the key is assigned).
 
 ```ruby
 require 'secrets'
