@@ -1,8 +1,13 @@
 require 'spec_helper'
 
-describe Secrets::Cipher::Base64 do
+module Secrets
+  module Encrypted
+
+  end
+end
+describe 'Library' do
   it 'has a version number' do
-    expect(Secrets::Cipher::Base64::VERSION).not_to be nil
+    expect(Secrets::VERSION).not_to be nil
   end
 
   context '#secret' do

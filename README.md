@@ -89,7 +89,7 @@ In ruby you would do the following:
 
 ```ruby
 require 'secrets/cipher/base64'
-@secret = Secrets::Cipher::Base64.create_secret
+@secret = Secrets.create_secret
 ```
 
 Once the gem is installed you will be able to run an executable `secrets`:
@@ -130,30 +130,75 @@ function load_secrets() {
 
 With this out of the way, we just need to type `load_secrets` in Terminal to get our keys automatically exported.
 
-### Encrypting & Decrypting Scalar Data
+### Encrypting & Decrypting Data in Ruby
 
-So how would we use this library to encrypt and decrypt values?
+So how would we use this library from another ruby project to encrypt and decrypt values?
 
-Hopefully this is a very simple integration for most.
+There are several ways to incorporate this library in your code. You will choose the most appropriate method based on whether you need to encrypt data types other than a string.
+
+If the answer is "no" – ie. you only need to encrypt strings, then you will be well served by the simple instance methods `#encr` and `#decr` which encrypt and decrypt a string value using a provided secret. We show this in the method #1 below.
+
+If you need to encrypt other data types, such as `Integer`, `Symbol`, or a `Hash`, you should be using `Secrets::Encrypted::ScalarData` class – or the below mentioned Facåde in the method #2.
+
+#### 1. Encrypting/Decrypting Strings
+
+After including `Secrets` module, your class will now have the `#encr` and `#decr` instance methods, as well as `#secret` and `#create_secret` class methods.
+
+Therefore you could write something like this below, protecting a sensitive string using a class-level secret.
 
 ```ruby
-  class MyModel
-    include Secrets::Cipher::Base64
-    secret ENV['secret_production']
-    
-    def secure_value=(value)
-      @secure_value = encr(value, this.class.secret)
-    end
-    
-    def secure_value
-      decr(@secure_value, this.class.secret)
-    end
+require 'secrets'
+class TestClass
+  include Secrets
+  secret ENV['SECRET']
+  
+  def sensitive_value=(value)
+    @sensitive_value = encr(value, self.class.secret)
   end
+  def sensitive_value
+    decr(@sensitive_value, self.class.secret)
+  end
+end
 ```
 
-### Encrypting and Decrypting Hashes (and YAML)
+#### 2. Encrypting Scalar Data Types
 
-A ruby class `Secrets::Cipher::Base64::EncryptedHash` is offered so that you can encrypt values in a hash, and later decrypt them.
+To encrypt scalar data types, you could be using the following facåde API:
+
+```ruby
+encrypted = Secrets::Encrypt.scalar(3.1415926, Secrets.secret)
+decrypted = Secrets::Decrypt.scalar(encrypted, Secrets.secret)
+```
+
+Note that we are using randomly generated `secret`, which is saved on the `Secrets` module for the duration of the ruby session. If you are persisting the data make sure to save the auto-generated secret in a secure place.
+
+
+#### 3. Encrypting Complex Data Types, such as a `Hash`
+
+This is how you would encrypt __all values__ in a hash. Note that the below API does NOT encrypt keys.
+
+```ruby
+encrypted = Secrets::Encrypt.hash({'name' => :unknown}, Secrets.secret)
+decrypted = Secrets::Decrypt.hash(encrypted_hash, Secrets.secret)
+```
+
+__Adding Custom Data Types:__
+
+If your hash contains values that are of data type other than the basic supported scalar types, or a string, you can write your own simple decoder that is able to convert a `#to_s` representation of your object into a new object of the same type.
+
+You would the use the following API to do so:
+
+```ruby
+Secrets.add_scalar_type id: 'x', type: XtraCool, string_to_type_proc: ->(string) { XtraCool.new(string) }
+```
+
+The above code allows `Secrets` library to encrypt hash values of the type `XtraCool`, by first calling `#to_s` on t
+ 
+
+
+# Encrypting and Decrypting Hashes (and YAML)
+
+A ruby class `Secrets::EncryptedHash` is offered so that you can encrypt values in a hash, and later decrypt them.
 
 Here is a simple way to encrypt and decrypt a hash in ruby:
 
@@ -170,7 +215,7 @@ Here is a simple way to encrypt and decrypt a hash in ruby:
         'password' => "goddamnhrc"
       }
     }
-    hash_encrypted    = EncryptedHash.new(hash).encrypt(secret)
+    hash_encrypted    = Secrets::Encrypted::HashData.new(hash).encrypt(secret)
     hash_decrypted    = hash_encrypted.decrypt(secret)
 
     yaml_encrypted    = hash_encrypted.to_hash.to_yaml

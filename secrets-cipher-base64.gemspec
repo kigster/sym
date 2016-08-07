@@ -1,11 +1,11 @@
 # coding: utf-8
 lib = File.expand_path('../lib', __FILE__)
 $LOAD_PATH.unshift(lib) unless $LOAD_PATH.include?(lib)
-require 'secrets/cipher/base64/version'
+require 'secrets/version'
 
 Gem::Specification.new do |spec|
-  spec.name          = "secrets-cipher-base64"
-  spec.version       = Secrets::Cipher::Base64::VERSION
+  spec.name          = 'secrets-cipher-base64'
+  spec.version       = Secrets::VERSION
   spec.authors       = ['Konstantin Gredeskoul']
   spec.email         = %w(kigster@gmail.com)
 
@@ -28,4 +28,5 @@ Gem::Specification.new do |spec|
   spec.add_development_dependency 'bundler', '~> 1.12'
   spec.add_development_dependency 'rake', '~> 10.0'
   spec.add_development_dependency 'rspec', '~> 3.0'
+  spec.add_development_dependency 'irbtools'
 end

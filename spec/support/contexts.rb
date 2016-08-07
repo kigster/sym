@@ -1,8 +1,9 @@
 require 'spec_helper'
+require 'secrets'
 
 class TestClass
-  include Secrets::Cipher::Base64
-  secret '12312asdf0asdf090'
+  include Secrets
+  secret '12312asdf0asdf090'  # Use ENV['SECRET'] in prod
 
   def secure_value=(value)
     @secure_value = encr(value)

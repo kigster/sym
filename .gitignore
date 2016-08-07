@@ -10,3 +10,4 @@
 /tmp/
 *.yml
 *.yaml
+/spec/coverage/
