@@ -21,8 +21,7 @@ module Secrets
                     "#{type || exception.class.name}".yellow.bold.underlined,
                     'Details:  ' + (details || exception.message).red.italic,
                     reason ? "Reason:   #{reason.yellow.bold}" : nil].compact.join("\n"))
-      STDERR.puts exception.backtrace.join("\n").red if exception && config[:verbose]
-
+      STDERR.puts exception.backtrace.join("\n").red if exception && config && config[:verbose]
       self.exit_code = 1
     end
   end

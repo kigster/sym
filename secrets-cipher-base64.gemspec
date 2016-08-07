@@ -9,8 +9,8 @@ Gem::Specification.new do |spec|
   spec.authors       = ['Konstantin Gredeskoul']
   spec.email         = %w(kigster@gmail.com)
 
-  spec.summary       = %q{Store application secrets encrypted as strings, and read/write using symmetric aes-256-cbc encryption/decryption with a secret key and an IV vector}
-  spec.description   = %q{Store application secrets encrypted as strings, and read/write using symmetric aes-256-cbc encryption/decryption with a secret key and an IV vector}
+  spec.summary       = %q{Simple tool to encrypt/decrypt data using symmetric aes-256-cbc encryption with a private key and an IV vector}
+  spec.description   = %q{Store sensitive data safely as encrypted strings or entire files, using symmetric aes-256-cbc encryption/decryption with a secret key and an IV vector, and YAML-friendly base64-encoded encrypted result.}
   spec.homepage      = 'https://github.com/kigster/secrets-cipher-base64'
 
   spec.files         = `git ls-files -z`.split("\x0").reject { |f| f.match(%r{^(test|spec|features)/}) }
