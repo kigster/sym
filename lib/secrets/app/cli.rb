@@ -5,7 +5,8 @@ require 'colored2'
 require 'hashie/mash'
 require 'yaml'
 require 'openssl'
-
+require 'secrets/errors'
+require 'secrets'
 module Secrets
   module App
     class CLI
@@ -33,7 +34,8 @@ module Secrets
         return Secrets::App.exit_code if Secrets::App.exit_code != 0
         self.action = { c.encrypt => :encr, c.decrypt => :decr }[true]
         result = if c.help or c.keys.all? { |k| !c[k] }
-                   opts.to_s
+                   puts opts.to_s
+                   nil
                  elsif c.version
                    "secrets-cipher-base64 (version #{Secrets::VERSION})"
                  elsif c.generate
@@ -50,7 +52,9 @@ module Secrets
                  elsif c.examples
                    examples
                  else
-                   opts.to_s
+                   raise Secrets::Errors::NoPrivateKeyFound.new('Key is required') unless c.private_key
+                   puts opts.to_s
+                   nil
                  end
         output.call(result) if result
       rescue ::OpenSSL::Cipher::CipherError => e

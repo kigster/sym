@@ -4,7 +4,7 @@ module Secrets
     class Secrets::Errors::Error < StandardError; end
 
     # No secret has been provided for encryption or decryption
-    class SecretIsNotDefined < Secrets::Errors::Error; end
+    class NoPrivateKeyFound < Secrets::Errors::Error; end
 
     # Method was called on an abstract class. Override such methods in
     # subclasses, and use subclasses for instantiation of objects.
