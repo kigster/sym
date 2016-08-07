@@ -46,27 +46,27 @@ module Secrets
         end
       end
       context 'encryption' do
-        let(:phrase) { 'HelloWorld' }
+        let(:string) { 'HelloWorld' }
         let(:secret) { 'dp95EE/dIXodTvwiwxcFYiRpDe1WcF7mbIQqvzWlprM=' }
-        let(:argv) { "-e -p #{phrase} -k #{secret}".split(/\s/) }
+        let(:argv) { "-e -s #{string} -k #{secret}".split(/\s/) }
         let(:encrypted) { output.first }
         it 'should output the encrypted data' do
           expect(config.encrypt == true).to be_truthy
-          expect(config.phrase).to eql(phrase)
+          expect(config.string).to eql(string)
           expect(config.private_key).to eql(secret)
           expect(encrypted).to_not be_nil
-          expect(encrypted).to_not eql(phrase)
+          expect(encrypted).to_not eql(string)
         end
 
         context 'decryption' do
-          let(:decrypt_argv) { "-d -p #{encrypted} -k #{secret} -v".split(/\s/) }
+          let(:decrypt_argv) { "-d -s #{encrypted} -k #{secret} -v".split(/\s/) }
           let(:decrypt_cli) { CLI.new(decrypt_argv) }
 
           it 'should be able to decrypt encrypted data' do
             decrypt_cli.output = Secrets::App::OutputCollector::APPENDER
             decrypt_cli.run
             decrypted = output.last
-            expect(decrypted).to eql(phrase)
+            expect(decrypted).to eql(string)
           end
         end
       end

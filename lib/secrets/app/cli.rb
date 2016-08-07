@@ -11,18 +11,27 @@ module Secrets
     class CLI
       include Secrets
 
-      attr_accessor :opts, :c, :output
+      attr_accessor :opts, :c, :output, :action
 
       def initialize(argv)
-        self.opts   = parse(argv)
-        opts_hash   = opts.nil? ? {} : opts.to_hash
-        self.c      = Hashie::Mash.new(opts_hash)
-        self.output = ->(argument) { puts argument }
+        self.opts = parse(argv)
+        opts_hash = opts.nil? ? {} : opts.to_hash
+        self.c    = Hashie::Mash.new(opts_hash)
+
+        write_to_file_proc = ->(data) {
+          File.open(c.output, 'w') do |f|
+            f.write(data)
+          end
+          puts "File #{c.file} (#{File.size(c.file)/1024}Kb) has been #{action}ypted and saved to #{c.output} (#{File.size(c.output) / 1024}Kb)" if c.verbose
+        }
+
+        print_proc  = ->(argument) { puts argument }
+        self.output = c.output ? write_to_file_proc : print_proc
       end
 
       def run
         return Secrets::App.exit_code if Secrets::App.exit_code != 0
-        action = { c.encrypt => :encr, c.decrypt => :decr }[true]
+        self.action = { c.encrypt => :encr, c.decrypt => :decr }[true]
         result = if c.help or c.keys.all? { |k| !c[k] }
                    opts.to_s
                  elsif c.version
@@ -33,22 +42,8 @@ module Secrets
                    if c.encrypt && c.decrypt
                      error type: 'Command Line Options Error', details: 'Cannot both encrypt and decrypt, please choose one.'
                    elsif c.encrypt || c.decrypt
-                     if c.phrase
-                       self.send(action, c.phrase, c.private_key)
-                     elsif c.file
-                       contents = c.yaml.eql?('-') ? STDIN.read : File.read(c.file)
-                       data = self.send(action, contents, c.private_key)
-                       if c.output
-                         File.open(c.output, 'w') do |f|
-                           f.write(data)
-                         end
-                         c.verbose ?
-                           "File #{c.file} (#{File.size(c.file)/1024}Kb) has been #{action}ypted " +
-                           "and saved to #{c.output} (#{File.size(c.output) / 1024}Kb)" : nil
-                       else
-                         data
-                       end
-                     end
+                     content = c.string || (c.file.eql?('-') ? STDIN.read : File.read(c.file))
+                     self.send(action, content, c.private_key)
                    elsif c.open
                      'Not yet implemented'
                    end
@@ -84,13 +79,13 @@ module Secrets
           o.bool      '-g', '--generate',   '           generate new secret'
           o.separator 'Options:'.bold.yellow
           o.string    '-k', '--private-key','[key]   '.bold.blue + '   specify the encryption key'
-          o.string    '-p', '--phrase',     '[string]'.bold.blue + '   specify a string to encrypt/decrypt'
+          o.string    '-s', '--string',     '[string]'.bold.blue + '   specify a string to encrypt/decrypt'
           o.string    '-f', '--file',       '[file]  '.bold.blue + '   a file to encrypt/decrypt'
           o.string    '-o', '--output',     '[file]  '.bold.blue + '   a file to write to'
           o.separator 'Flags:'.bold.yellow
           o.bool      '-E', '--examples',   '           show usage examples'
           o.bool      '-V', '--version',    '           print the version'
-          o.bool      '-v', '--verbose',    '           show addit     ional info'
+          o.bool      '-v', '--verbose',    '           show additional info'
           o.string    '-t', '--edit',       '[file]  '.bold.blue + '   open an encrypted yaml in an editor'
           o.separator ''
         end
@@ -107,12 +102,12 @@ module Secrets
                 output:  '75ngenJpB6zL47/8Wo7Ne6JN1pnOsqNEcIqblItpfg4='
 
         example comment: 'encrypt a plain text string with the key:',
-                command: 'export ENCRYPTED=$(keys -e -p "secret string" -k $SECRET_KEY)',
+                command: 'export ENCRYPTED=$(keys -e -s "secret string" -k $SECRET_KEY)',
                 echo:    'echo $ENCRYPTED',
                 output:  'Y09MNDUyczU1S0UvelgrLzV0RTYxZz09CkBDMEw4Q0R0TmpnTm9md1QwNUNy%T013PT0K%'
 
-        example comment: 'decrypt a previously encrypted phrase:',
-                command: 'secrets -d -p $ENCRYPTED -k $SECRET_KEY',
+        example comment: 'decrypt a previously encrypted string:',
+                command: 'secrets -d -s $ENCRYPTED -k $SECRET_KEY',
                 output:  'secret string'
       end
 

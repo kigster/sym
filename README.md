@@ -101,23 +101,24 @@ As before, we'll first show how to encrypt raw data or files using the tool, and
 This may be a good time to show the full help message for the `secrets` tool:
 
 ```bash
-Usage: 
+❯ exe/secrets -h
+Usage:
     secrets [options]
-
-Options:
-    -V, --version            print the version
-    -p, --phrase    [string] specify a string to encrypt/decrypt
-    -y, --yaml      [file]   yaml file to encr/decr; use "-" for STDIN/OUT
-    
 Modes:
-    -e, --encrypt            encrypt
-    -d, --decrypt            decrypt
-    -g, --generate           generate new secret
-    -h, --help               show help
-    
+    -t, --edit         [file]     open an encrypted yaml in an editor
+    -e, --encrypt                 encrypt
+    -d, --decrypt                 decrypt
+    -g, --generate                generate new secret
+Options:
+    -k, --private-key  [key]      specify the encryption key
+    -s, --string       [string]   specify a string to encrypt/decrypt
+    -f, --file         [file]     a file to encrypt/decrypt
+    -o, --output       [file]     a file to write to
 Flags:
-    -v, --verbose            show additional info
-    -s, --secret    [key] specify a secret
+    -E, --examples                show usage examples
+    -V, --version                 print the version
+    -v, --verbose                 show additional info
+    -h, --help                    show help
 ```
 
 ##### CLI Examples
@@ -129,12 +130,12 @@ Flags:
   75ngenJpB6zL47/8Wo7Ne6JN1pnOsqNEcIqblItpfg4=
 
   # encrypt a plain text string with the secret:
-  > export ENCRYPTED=$(secrets -e -p "secret string" -k $SECRET_KEY)
+  > export ENCRYPTED=$(secrets -e -s "secret string" -k $SECRET_KEY)
   > echo $ENCRYPTED
   Y09MNDUyczU1S0UvelgrLzV0RTYxZz09CkBDMEw4Q0R0TmpnTm9md1QwNUNy%T013PT0K%
 
-  # decrypt a previously encrypted phrase:
-  > secrets -d -p $ENCRYPTED -k $SECRET_KEY
+  # decrypt a previously encrypted string:
+  > secrets -d -s $ENCRYPTED -k $SECRET_KEY
   secret string
   
   # encrypt a YAML file:
