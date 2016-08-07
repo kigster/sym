@@ -124,23 +124,27 @@ Flags:
 ##### CLI Examples
 
 ```bash
-  # generate a new secret:
-  > export SECRET_KEY=$(secrets -g)
-  > echo $SECRET_KEY
-  75ngenJpB6zL47/8Wo7Ne6JN1pnOsqNEcIqblItpfg4=
+  Examples:
 
-  # encrypt a plain text string with the secret:
-  > export ENCRYPTED=$(secrets -e -s "secret string" -k $SECRET_KEY)
-  > echo $ENCRYPTED
-  Y09MNDUyczU1S0UvelgrLzV0RTYxZz09CkBDMEw4Q0R0TmpnTm9md1QwNUNy%T013PT0K%
+# generate a new secret:
+export KEY=$(secrets -g)
+echo $KEY
+75ngenJpB6zL47/8Wo7Ne6JN1pnOsqNEcIqblItpfg4=
 
-  # decrypt a previously encrypted string:
-  > secrets -d -s $ENCRYPTED -k $SECRET_KEY
-  secret string
-  
-  # encrypt a YAML file:
-  secret -e -k $SECRET_KEY -f secrets.yaml -o secrets.yml.enc
-  secret -d -k $SECRET_KEY -f secrets.yml.enc -o secrets-decrypted.yml
+# encrypt a plain text string with the key:
+export ENCRYPTED=$(secrets -e -s "secret string" -k $KEY)
+echo $ENCRYPTED
+Y09MNDUyczU1S0UvelgrLzV0RTYxZz09CkBDMEw4Q0R0TmpnTm9md1QwNUNy%T013PT0K
+
+# decrypt a previously encrypted string:
+secrets -d -s $ENCRYPTED -k $KEY
+secret string
+
+# encrypt a file:
+secrets -e -f secrets.yml -o secrets.enc -k $KEY
+
+# decrypt an encrypted file and print to STDOUT:
+secrets -d -f secrets.enc -k $KEY
 ```
 
 #### 2. Ruby

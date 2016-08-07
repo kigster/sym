@@ -101,18 +101,25 @@ module Secrets
       def examples
         puts 'Examples:'.bold.yellow
         example comment: 'generate a new secret:',
-                command: 'export SECRET=$(keys -g)',
-                echo:    'echo $SECRET_KEY',
+                command: 'export KEY=$(secrets -g)',
+                echo:    'echo $KEY',
                 output:  '75ngenJpB6zL47/8Wo7Ne6JN1pnOsqNEcIqblItpfg4='
 
         example comment: 'encrypt a plain text string with the key:',
-                command: 'export ENCRYPTED=$(keys -e -s "secret string" -k $SECRET_KEY)',
+                command: 'export ENCRYPTED=$(secrets -e -s "secret string" -k $KEY)',
                 echo:    'echo $ENCRYPTED',
-                output:  'Y09MNDUyczU1S0UvelgrLzV0RTYxZz09CkBDMEw4Q0R0TmpnTm9md1QwNUNy%T013PT0K%'
+                output:  'Y09MNDUyczU1S0UvelgrLzV0RTYxZz09CkBDMEw4Q0R0TmpnTm9md1QwNUNy%T013PT0K'
 
         example comment: 'decrypt a previously encrypted string:',
-                command: 'secrets -d -s $ENCRYPTED -k $SECRET_KEY',
+                command: 'secrets -d -s $ENCRYPTED -k $KEY',
                 output:  'secret string'
+
+        example comment: 'encrypt a file:',
+                command: 'secrets -e -f secrets.yml -o secrets.enc -k $KEY'
+
+        example comment: 'decrypt an encrypted file and print to STDOUT:',
+                command: 'secrets -d -f secrets.enc -k $KEY'
+
       end
 
       def example(comment: nil, command: nil, echo: nil, output: nil)
