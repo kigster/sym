@@ -10,6 +10,10 @@ module Secrets
 
     self.exit_code = 0
 
+    def self.out
+      STDERR
+    end
+
     def self.error(
       config: {},
       exception: nil,
@@ -17,11 +21,11 @@ module Secrets
       details: nil,
       reason: nil)
 
-      STDERR.puts([\
+      self.out.puts([\
                     "#{type || exception.class.name}".yellow.bold.underlined,
                     'Details:  ' + (details || exception.message).red.italic,
                     reason ? "Reason:   #{reason.yellow.bold}" : nil].compact.join("\n"))
-      STDERR.puts exception.backtrace.join("\n").red if exception && config && config[:verbose]
+      self.out.puts exception.backtrace.join("\n").red if exception && config && config[:verbose]
       self.exit_code = 1
     end
   end

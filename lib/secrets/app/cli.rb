@@ -6,57 +6,41 @@ require 'hashie/mash'
 require 'yaml'
 require 'openssl'
 require 'secrets/errors'
-require 'secrets'
+require 'secrets/app/commands'
+
 module Secrets
   module App
     class CLI
       include Secrets
 
-      attr_accessor :opts, :c, :output, :action
+      attr_accessor :opts, :output_proc, :action, :print_proc, :write_to_file_proc
 
       def initialize(argv)
-        self.opts = parse(argv)
-        opts_hash = opts.nil? ? {} : opts.to_hash
-        self.c    = Hashie::Mash.new(opts_hash)
-
-        write_to_file_proc = ->(data) {
-          File.open(c.output, 'w') do |f|
+        self.opts = parse(argv.dup)
+        if opts[:no_color]
+          Colored2.disable!
+          self.opts = parse(argv.dup)
+        end
+        self.action = { opts[:encrypt] => :encr, opts[:decrypt] => :decr }[true]
+        self.write_to_file_proc = ->(data) {
+          File.open(opts[:output], 'w') do |f|
             f.write(data)
           end
-          puts "File #{c.file} (#{File.size(c.file)/1024}Kb) has been #{action}ypted and saved to #{c.output} (#{File.size(c.output) / 1024}Kb)" if c.verbose
+          puts "File #{opts[:file]} (#{File.size(opts[:file])/1024}Kb) has been #{opts[:action]}ypted and saved to #{opts[:output_proc]} (#{File.size(opts[:output]) / 1024}Kb)" if opts[:verbose]
         }
-
-        print_proc  = ->(argument) { puts argument }
-        self.output = c.output ? write_to_file_proc : print_proc
+        self.print_proc  = ->(argument) { puts argument }
+        select_output_proc
       end
 
       def run
         return Secrets::App.exit_code if Secrets::App.exit_code != 0
-        self.action = { c.encrypt => :encr, c.decrypt => :decr }[true]
-        result = if c.help or c.keys.all? { |k| !c[k] }
-                   puts opts.to_s
-                   nil
-                 elsif c.version
-                   "secrets-cipher-base64 (version #{Secrets::VERSION})"
-                 elsif c.generate
-                   self.class.create_private_key
-                 elsif c.private_key
-                   if c.encrypt && c.decrypt
-                     error type: 'Command Line Options Error', details: 'Cannot both encrypt and decrypt, please choose one.'
-                   elsif c.encrypt || c.decrypt
-                     content = c.string || (c.file.eql?('-') ? STDIN.read : File.read(c.file))
-                     self.send(action, content, c.private_key)
-                   elsif c.edit
-                     'Not yet implemented'
-                   end
-                 elsif c.examples
-                   examples
-                 else
-                   raise Secrets::Errors::NoPrivateKeyFound.new('Key is required') unless c.private_key
-                   puts opts.to_s
-                   nil
-                 end
-        output.call(result) if result
+        command = Secrets::App::Commands.find_command(opts)
+        if command
+          output_proc.call(command.new(self).run)
+        else
+          self.output_proc = self.print_proc
+          handle_command_not_found
+        end
       rescue ::OpenSSL::Cipher::CipherError => e
         error type:      'Cipher Error',
               details:   e.message,
@@ -67,10 +51,27 @@ module Secrets
       end
 
       def error(hash)
-        Secrets::App.error(hash.merge(config: c))
+        Secrets::App.error(hash.merge(config: opts.to_hash))
       end
 
       private
+
+      def handle_command_not_found
+        if opts[:private_key]
+          h             = opts.to_hash
+          supplied_opts = h.keys.select { |k| h[k] }.join(', ')
+          error type:    'Options Error',
+                details: 'Unable to determined what command to run',
+                reason:  "You provided the following options: #{supplied_opts.bold.yellow}"
+          output_proc.call(opts.to_s)
+        else
+          raise Secrets::Errors::NoPrivateKeyFound.new('Private key is required')
+        end
+      end
+
+      def select_output_proc
+        self.output_proc = opts[:output] ? self.write_to_file_proc : self.print_proc
+      end
 
       def parse(arguments)
         Slop.parse(arguments) do |o|
@@ -90,6 +91,7 @@ module Secrets
           o.bool      '-E', '--examples',   '           show usage examples'
           o.bool      '-V', '--version',    '           print the version'
           o.bool      '-v', '--verbose',    '           show additional info'
+          o.bool      '-n', '--no-color',   '           disable color output'
           o.string    '-t', '--edit',       '[file]  '.bold.blue + '   open an encrypted yaml in an editor'
           o.separator ''
         end
@@ -98,37 +100,6 @@ module Secrets
         nil
       end
 
-      def examples
-        puts 'Examples:'.bold.yellow
-        example comment: 'generate a new secret:',
-                command: 'export KEY=$(secrets -g)',
-                echo:    'echo $KEY',
-                output:  '75ngenJpB6zL47/8Wo7Ne6JN1pnOsqNEcIqblItpfg4='
-
-        example comment: 'encrypt a plain text string with the key:',
-                command: 'export ENCRYPTED=$(secrets -e -s "secret string" -k $KEY)',
-                echo:    'echo $ENCRYPTED',
-                output:  'Y09MNDUyczU1S0UvelgrLzV0RTYxZz09CkBDMEw4Q0R0TmpnTm9md1QwNUNy%T013PT0K'
-
-        example comment: 'decrypt a previously encrypted string:',
-                command: 'secrets -d -s $ENCRYPTED -k $KEY',
-                output:  'secret string'
-
-        example comment: 'encrypt a file:',
-                command: 'secrets -e -f secrets.yml -o secrets.enc -k $KEY'
-
-        example comment: 'decrypt an encrypted file and print to STDOUT:',
-                command: 'secrets -d -f secrets.enc -k $KEY'
-
-      end
-
-      def example(comment: nil, command: nil, echo: nil, output: nil)
-        puts
-        puts "# #{comment}".black.on.white.italic if comment
-        puts "#{command}".bold if command
-        puts "#{echo}".bold if echo
-        puts output.bold.cyan if output
-      end
     end
   end
 end

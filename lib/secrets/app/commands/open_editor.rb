@@ -1,8 +1,9 @@
 module Secrets
   module App
     module Commands
-      class OpenEditor < AbstractCommand
-        def initialize
+      class OpenEditor < Command
+        required_options :private_key, :edit
+        def run
         end
       end
     end

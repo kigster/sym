@@ -34,15 +34,15 @@ module Secrets
       include ::Secrets::Extensions::InstanceMethods
       extend ::Secrets::Extensions::ClassMethods
       class << self
-        def secret(value = nil)
+        def private_key(value = nil)
           if value
-            @secret = value
-          elsif @secret
-            @secret
+            @private_key= value
+          elsif @private_key
+            @private_key
           else
-            @secret = self.create_private_key
+            @private_key= self.create_private_key
           end
-          @secret
+          @private_key
         end
       end
     end
@@ -50,6 +50,6 @@ module Secrets
 end
 
 Secrets.dir 'secrets'
-Secrets.dir 'secrets/encrypted'
+Secrets.dir 'secrets/app/commands'
 
 
