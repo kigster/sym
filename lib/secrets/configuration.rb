@@ -1,4 +1,8 @@
 module Secrets
+  # Application configuration Singleton class.
+  # It's values are requested by the library upon encryption or
+  # decryption, or any other operation.
+
   class Configuration
     class << self
       attr_accessor :config

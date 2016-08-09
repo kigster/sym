@@ -13,20 +13,29 @@ Secrets::Configuration.configure do |config|
 end
 
 #
-# Include this class and use +#encr+ and +#decr+ instance methods to perform
-# encryption and decryption of object of any type (as long as it can be Marshalled to a string).
+# _Include_ +Secrets+ in your class to enable functionality of this library.
 #
-# Use class method +#secret+ class method to assign, or generate and store
-# a class-evel secret, or use class method +#create_private_key+ to just purely generate
-# a new encryption secret when needed.
+# Once included, you would normally use +#encr+ and +#decr+ instance methods to perform
+# encryption and decryption of object of any type using a symmetric key encryption.
+#
+# You could also use +#encr_password+ and +#decr_password+ if you prefer to encrypt
+# with a password instead. The encryption key is generated from the password in that
+# case.
+#
+# Create a new key with +#create_private_key+ class method, which returns a new key every
+# time it's called, or with +#private_key+ class method, which either assigns, or creates
+# and caches the private key at a class level.
 #
 # ```ruby
 # require 'secrets'
 # class TestClass
 #   include Secrets
+#   private_key ENV['PRIVATE_KEY']
+#
 #   def sensitive_value=(value)
 #     @sensitive_value = encr(value, self.class.private_key)
 #   end
+#
 #   def sensitive_value
 #     decr(@sensitive_value, self.class.private_key)
 #   end

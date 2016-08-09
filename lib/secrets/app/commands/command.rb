@@ -3,8 +3,8 @@ module Secrets
   module App
     module Commands
       class Command
-        def self.inherited(klass)
 
+        def self.inherited(klass)
           klass.instance_eval do
             @required_options = Set.new
             class << self
@@ -29,25 +29,26 @@ module Secrets
             # Register this command with the global list.
             Secrets::App::Commands.register klass
           end
-
-          attr_accessor :cli
-
-          def initialize(cli)
-            self.cli = cli
-          end
-
-          def opts
-            cli.opts
-          end
-
-          def key
-            @key ||= opts[:private_key]
-          end
-
-          def run
-            raise Secrets::Errors::AbstractMethodCalled.new(:run)
-          end
         end
+
+        attr_accessor :cli
+
+        def initialize(cli)
+          self.cli = cli
+        end
+
+        def opts
+          cli.opts
+        end
+
+        def key
+          @key ||= opts[:private_key]
+        end
+
+        def run
+          raise Secrets::Errors::AbstractMethodCalled.new(:run)
+        end
+
       end
     end
   end
