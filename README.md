@@ -77,26 +77,31 @@ You can generate using the command line, or in a programmatic way. First we'll d
 
 Once the gem is installed you will be able to run an executable `secrets`:
 
-```bash
-gem install secrets-cipher-base64
+    gem install secrets-cipher-base64
 
-# then let's generate and copy the new private key to the clipboard.
-# Clipboard is activated with the -c flag does.
-secrets -gc
+Now let's generate and copy the new private key to the clipboard. Clipboard copy is activated with the -c flag:
 
-# or save a new key into a bash variable
-SECRET=$(secrets -g)
+    secrets -gc
 
-# or create a password-protected key, and save it to a file:
-secrets -gcp -o ~/.secret
-# New Password:     ••••••••••
-# Confirm Password: •••••••••• 
-```
+Or save a new key into a bash variable
+
+    SECRET=$(secrets -g)
+
+Or save it to a file:
+
+    secrets -go ~/.key
+
+Or create a password-protected key, and save it to a file:
+
+    secrets -gcp -o ~/.secret
+    # New Password:     ••••••••••
+    # Confirm Password: •••••••••• 
+
 
 You can subsequently use the private key by either:
 
   1. passing the `-k [key value]` flag 
-  2. passing the `-K [filename]` flag
+  2. passing the `-K [key file]` flag
 
 NOTE: If you installed the gem with bundler, make sure to prefix the above commands with `bundle exec`).
 
@@ -137,44 +142,36 @@ Flags:
 
 __Generating the Key__:
 
-```bash
-# generate a new private key into an environment variable:
-export KEY=$(secrets -g)
-echo $KEY
-75ngenJpB6zL47/8Wo7Ne6JN1pnOsqNEcIqblItpfg4=
-# ————————————————————————————————————————————————————————————————————————————————
-# generate a new password-protected key, copy to the clipboard & save to a file
-secrets -gpc -o ~/.key
-New Password     : ••••••••••
-Confirm Password : ••••••••••
-# ————————————————————————————————————————————————————————————————————————————————
-# encrypt a plain text string with a key, and save the output to a file
-secrets -e -s "secret string" -k $KEY -o file.enc
-cat file.enc
-# => Y09MNDUyczU1S0UvelgrLzV0RTYxZz09CkBDMEw4Q0R0TmpnTm9md1QwNUNy%T013PT0K
-# ————————————————————————————————————————————————————————————————————————————————
-# decrypt a previously encrypted string:
-secrets -d -s $(cat file.enc) -k $KEY
-secret string
-# ————————————————————————————————————————————————————————————————————————————————
-# encrypt secrets.yml and save it to secrets.enc:
-secrets -e -f secrets.yml -o secrets.enc -k $KEY
-# ————————————————————————————————————————————————————————————————————————————————
-# decrypt an encrypted file and print it to STDOUT:
-secrets -df secrets.enc -k $KEY
-# ————————————————————————————————————————————————————————————————————————————————
-# edit an encrypted file in $EDITOR, ask for key, create a backup
-secrets -tibf ecrets.enc
-# => Private Key: ••••••••••••••••••••••••••••••••••••••••••••
-# => Saved encrypted content to secrets.enc.
+Generate a new private key into an environment variable:
 
-# => Diff:
-3c3
-# # (c) 2015 Konstantin Gredeskoul.  All rights reserved.
-# ---
-# # (c) 2016 Konstantin Gredeskoul.  All rights reserved.
-# ————————————————————————————————————————————————————————————————————————————————
-```
+    export KEY=$(secrets -g)
+    echo $KEY
+    # => 75ngenJpB6zL47/8Wo7Ne6JN1pnOsqNEcIqblItpfg4=
+
+Generate a new password-protected key, copy to the clipboard & save to a file:
+
+    secrets -gpc -o ~/.key
+    New Password     : ••••••••••
+    Confirm Password : ••••••••••
+
+Encrypt a plain text string with a key, and save the output to a file:
+
+    secrets -e -s "secret string" -k $KEY -o file.enc
+    cat file.enc
+    # => Y09MNDUyczU1S0UvelgrLzV0RTYxZz09CkBDMEw4Q0R0TmpnTm9md1QwNUNy%T013PT0K
+
+Decrypt a previously encrypted string:
+
+    secrets -d -s $(cat file.enc) -k $KEY
+    # => secret string
+
+Encrypt a file and save it to secrets.enc:
+
+    secrets -e -f app-secrets.yml -o app-secrets.enc -k $KEY
+    
+Decrypt an encrypted file and print it to STDOUT:
+
+    secrets -df app-secrets.enc -k $KEY
 
 ##### Inline Editing
 
@@ -189,7 +186,16 @@ Here is a full command that opens a file specified by `-f | --file`, using the k
 
 NOTE: while much effort has been made to ensure that the gem is bug free, the reality is that no software is bug free. Please make sure to backup your encrypted file before doing it for the first few times to get familiar with the command.
      
-    secrets -tbv -K ~/.key 
+To edit an encrypted file in $EDITOR, while asking for a key (`-i | --interactive`), creating a backup file (`-b | --backup`):
+
+    secrets -tibf data.enc -K ~/.key 
+    # => Private Key: ••••••••••••••••••••••••••••••••••••••••••••
+    #
+    # => Diff:
+    # 3c3
+    # # (c) 2015 Konstantin Gredeskoul.  All rights reserved.
+    # ---
+    # # (c) 2016 Konstantin Gredeskoul.  All rights reserved.
 
 ### Ruby API
 
