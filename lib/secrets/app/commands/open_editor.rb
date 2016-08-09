@@ -2,7 +2,8 @@ require 'digest'
 require 'fileutils'
 require 'tempfile'
 require 'secrets'
-require_relative '../../errors'
+require 'secrets/errors'
+require_relative 'command'
 module Secrets
   module App
     module Commands

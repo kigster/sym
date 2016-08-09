@@ -1,3 +1,4 @@
+require_relative 'command'
 module Secrets
   module App
     module Commands

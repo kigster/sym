@@ -126,16 +126,16 @@ module Secrets
 
       def decrypt_private_key
         handler = Secrets::App::PasswordHandler.new(opts)
-        if handler && handler.password
-          begin
-            retries  ||= 0
-            handler.ask
-            self.key = decr_password(key, handler.password)
-          rescue ::OpenSSL::Cipher::CipherError => e
-            STDERR.puts 'Invalid password. Please try again.'.bold
-            ((retries += 1) < 3) ? retry : raise(Secrets::Errors::InvalidPasswordPrivateKey.new(e))
-          end
+        decrypted_key = nil
+        begin
+          retries ||= 0
+          handler.ask
+          decrypted_key = decr_password(key, handler.password)
+        rescue ::OpenSSL::Cipher::CipherError => e
+          STDERR.puts 'Invalid password. Please try again.'
+          ((retries += 1) < 3) ? retry : raise(Secrets::Errors::InvalidPasswordPrivateKey.new(e))
         end
+        self.key = decrypted_key
       end
 
       def command_not_found_error!

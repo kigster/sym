@@ -18,7 +18,7 @@ module Secrets
       end
 
       def self.handle_user_input(message, color)
-        HighLine.new(STDIN, STDERR).ask(message) { |q| q.echo = '•'.bold.send(color) }
+        HighLine.new(STDIN, STDERR).ask(message.bold) { |q| q.echo = '•'.send(color) }
       end
 
       def create

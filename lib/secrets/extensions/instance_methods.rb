@@ -56,18 +56,6 @@ module Secrets
         return key, salt
       end
 
-
-      # Expects key to be a base64 encoded key data
-      def _decr(encoded_data, cipher_name, iv = nil, &block)
-        wrapper_struct = decode(encoded_data)
-        cipher_struct  = create_cipher(cipher_name: cipher_name,
-                                       iv:          wrapper_struct.iv,
-                                       direction:   :decrypt,
-                                       salt:        wrapper_struct.salt)
-        yield cipher_struct if block_given?
-        decode(update_cipher(cipher_struct.cipher, wrapper_struct.encrypted_data))
-      end
-
       # Expects key to be a base64 encoded key data
       def _encr(data, cipher_name, iv = nil, &block)
         data, compression_enabled = encode_incoming_data(data)
@@ -86,6 +74,18 @@ module Secrets
           compress:       !compression_enabled)
         encode(wrapper_struct, false)
       end
+
+      # Expects key to be a base64 encoded key data
+      def _decr(encoded_data, cipher_name, iv = nil, &block)
+        wrapper_struct = decode(encoded_data)
+        cipher_struct  = create_cipher(cipher_name: cipher_name,
+                                       iv:          wrapper_struct.iv,
+                                       direction:   :decrypt,
+                                       salt:        wrapper_struct.salt)
+        yield cipher_struct if block_given?
+        decode(update_cipher(cipher_struct.cipher, wrapper_struct.encrypted_data))
+      end
+
 
       def encode_incoming_data(data)
         compression_enabled = !data.respond_to?(:size) || (data.size > 100 && encryption_config.compression_enabled)
