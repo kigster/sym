@@ -1,11 +1,11 @@
 require 'base64'
-require 'secrets/encrypted'
+require 'secrets/cipher_handler'
 
 module Secrets
   module Extensions
     module ClassMethods
-      def create_private_key
-        ::Base64.encode64(Secrets::Encrypted::CIPHER.call.random_key)
+      def self.extended(klass)
+        klass.extend Secrets::CipherHandler::ClassMethods
       end
     end
   end

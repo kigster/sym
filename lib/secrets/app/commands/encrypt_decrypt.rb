@@ -1,3 +1,4 @@
+require_relative 'command'
 module Secrets
   module App
     module Commands
@@ -6,13 +7,14 @@ module Secrets
         required_options   :private_key,
                          [ :encrypt, :decrypt ],
                          [ :file, :string ]
-
-        def content
-          opts[:string] || (opts[:file].eql?('-') ? STDIN.read : File.read(opts[:file]))
-        end
-
         def run
           send(cli.action, content, opts[:private_key])
+        end
+
+        private
+
+        def content
+          @content ||= (opts[:string] || (opts[:file].eql?('-') ? STDIN.read : File.read(opts[:file])))
         end
       end
     end
