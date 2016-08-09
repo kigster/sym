@@ -29,9 +29,9 @@ You see, security is an incredibly wide topic. The tools around security tend to
 
 The point behind this gem is to allow you to store sensitive application secrets in your source code repo as `AES-256-CBC`-encrypted strings (this is the same encryption algorithm that US Government uses for internal encryption). The output of the encryption is always a (strict) `base64`-encoded string, without the linebreaks.
  
- The private key (encrypted or not) is also a base64-encoded string. 
+The private key (encrypted or not) is also a base64-encoded string. 
  
- Using a single-line string that `strict_base64` generates, makes this gem well fit for encrypting specific fields in the YAML file.  Similarly, using the same encoding for the private key means it can be easily exported as an environment variable.  
+Using a single-line string that `strict_base64` generates, makes this gem well fit for encrypting specific fields in the YAML file.  Similarly, using the same encoding for the private key means it can be easily exported as an environment variable.  
  
 > NOTE: The library leverages the code shown in the following discussion: http://stuff-things.net/2015/02/12/symmetric-encryption-with-ruby-and-rails/ Thanks to the author of the above thread for demonstrating it.
 
@@ -67,6 +67,7 @@ Secrets::Configuration.configure do |config|
   config.data_cipher = 'AES-256-CBC'
   config.private_key_cipher = config.data_cipher
   config.compression_enabled = true
+  config.compression_level = Zlib::BEST_COMPRESSION
 end
 ```
 
@@ -92,11 +93,22 @@ Once the gem is installed you will be able to run an executable `secrets`:
 
 ```bash
 gem install secrets-cipher-base64
-# then let's generate and copy the secret to Mac clipboard
-secrets -g | pbcopy
+# then let's generate and copy the secret to clipboard
+secrets -gc
+
 # or save a new key into a bash variable
 SECRET=$(secrets -g)
+
+# or create a password-protected key, and save it to a file:
+secrets -gcp -o ~/.secret
+New Password:     *********
+Confirm Password: ********* 
 ```
+
+You can subsequently use the private key by either:
+
+ 1. passing the -k 'key value' to the command line
+ 2. passing the -K <filename> to the command line
 
 NOTE: If you installed the gem with bundler, make sure to prefix the above commands with `bundle exec`).
 
