@@ -24,16 +24,16 @@ module Secrets
             expect(fake.required_options.to_a).to include(:fake)
           end
           it 'should select the command based on required options with OR' do
-            expect(Secrets::App::Commands.find_command({ fake: true, one: true })).to eql(FakeCommand)
+            expect(Secrets::App::Commands.find_command_class({ fake: true, one: true })).to eql(FakeCommand)
           end
           it 'should select the command based on required options with OR' do
-            expect(Secrets::App::Commands.find_command({ fake: true, other: true })).to eql(FakeCommand)
+            expect(Secrets::App::Commands.find_command_class({ fake: true, other: true })).to eql(FakeCommand)
           end
           it 'should not select the command without all options satisfied' do
-            expect(Secrets::App::Commands.find_command({ fake: true })).to be_nil
+            expect(Secrets::App::Commands.find_command_class({ fake: true })).to be_nil
           end
           it 'should select a command based on a proc' do
-            expect(Secrets::App::Commands.find_command({ booboo: :doodoo })).to eql(FakeCommand)
+            expect(Secrets::App::Commands.find_command_class({ booboo: :doodoo })).to eql(FakeCommand)
           end
         end
 
@@ -47,7 +47,7 @@ module Secrets
           }
           it 'should find the command' do
             options_variations.each do |opts|
-              expect(Secrets::App::Commands.find_command(opts)).to eql(subject)
+              expect(Secrets::App::Commands.find_command_class(opts)).to eql(subject)
             end
           end
         end

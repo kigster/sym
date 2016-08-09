@@ -1,4 +1,5 @@
 require 'active_support/inflector'
+
 module Secrets
   module App
     module Commands
@@ -9,7 +10,7 @@ module Secrets
       self.commands = Set.new
 
       class << self
-        def find_command(opts)
+        def find_command_class(opts)
           self.commands.each do |command_class|
             return command_class if command_class.options_satisfied_by?(opts.to_hash)
           end
@@ -24,4 +25,3 @@ module Secrets
   end
 end
 
-Secrets.dir 'secrets/app/commands'

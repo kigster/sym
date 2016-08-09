@@ -4,6 +4,7 @@ module Secrets
     module Commands
       class Command
         def self.inherited(klass)
+
           klass.instance_eval do
             @required_options = Set.new
             class << self
@@ -17,10 +18,10 @@ module Secrets
               end
 
               def options_satisfied_by?(opts_hash)
-                proc = required_options.find{ |option| option.is_a?(Proc) }
+                proc = required_options.find { |option| option.is_a?(Proc) }
                 return true if proc && proc.call(opts_hash)
 
-                required_options.to_a.delete_if{|o| o.is_a?(Proc)}.all? { |o|
+                required_options.to_a.delete_if { |o| o.is_a?(Proc) }.all? { |o|
                   o.is_a?(Array) ? o.any? { |opt| opts_hash[opt] } : opts_hash[o]
                 }
               end
@@ -37,6 +38,10 @@ module Secrets
 
           def opts
             cli.opts
+          end
+
+          def key
+            @key ||= opts[:private_key]
           end
 
           def run

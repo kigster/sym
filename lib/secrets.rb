@@ -1,12 +1,17 @@
 require 'require_dir'
 require 'colored2'
+require 'zlib'
 
-module Secrets
-  extend RequireDir
-  init(__FILE__)
+require_relative 'secrets/configuration'
+
+Secrets::Configuration.configure do |config|
+  config.password_cipher = 'AES-128-CBC'
+  config.data_cipher = 'AES-256-CBC'
+  config.private_key_cipher = config.data_cipher
+  config.compression_enabled = true
+  config.compression_level = Zlib::BEST_COMPRESSION
 end
 
-Secrets.dir 'secrets/extensions'
 #
 # Include this class and use +#encr+ and +#decr+ instance methods to perform
 # encryption and decryption of object of any type (as long as it can be Marshalled to a string).
@@ -28,7 +33,13 @@ Secrets.dir 'secrets/extensions'
 # end
 # ```
 module Secrets
+  extend RequireDir
+  init(__FILE__)
+end
 
+Secrets.dir 'secrets/extensions'
+
+module Secrets
   def self.included(klass)
     klass.instance_eval do
       include ::Secrets::Extensions::InstanceMethods
@@ -51,5 +62,3 @@ end
 
 Secrets.dir 'secrets'
 Secrets.dir 'secrets/app/commands'
-
-
