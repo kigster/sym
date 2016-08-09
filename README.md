@@ -69,17 +69,19 @@ You can use one key for all encrypted fields, or many keys – perhaps one per d
 
 __NOTE: it is considered a bad practice to check in the private key into the version control.__  If you keep your secret out of your repo, you can check-in encrypted secrets file directly into the repo. As long as the private key itself is safe, the data in your encrypted  will be next to impossible to extract. 
 
-### Generating Private Keys
+### Command Line (CLI)
  
-You can generate using the command line, or in a programmatic way. 
+You can generate using the command line, or in a programmatic way. First we'll discuss the command line usage, and in a later section we'll discuss Ruby API provided by the gem. 
 
-#### 1. Command Line
+#### Generating and Using Private Keys
 
 Once the gem is installed you will be able to run an executable `secrets`:
 
 ```bash
 gem install secrets-cipher-base64
-# then let's generate and copy the secret to clipboard
+
+# then let's generate and copy the new private key to the clipboard.
+# Clipboard is activated with the -c flag does.
 secrets -gc
 
 # or save a new key into a bash variable
@@ -87,48 +89,20 @@ SECRET=$(secrets -g)
 
 # or create a password-protected key, and save it to a file:
 secrets -gcp -o ~/.secret
-New Password:     *********
-Confirm Password: ********* 
+# New Password:     ••••••••••
+# Confirm Password: •••••••••• 
 ```
 
 You can subsequently use the private key by either:
 
- 1. passing the -k 'key value' to the command line
- 2. passing the -K <filename> to the command line
+  1. passing the `-k [key value]` flag 
+  2. passing the `-K [filename]` flag
 
 NOTE: If you installed the gem with bundler, make sure to prefix the above commands with `bundle exec`).
 
-#### 2. Ruby
+####  Encryption and Decryption
 
-Upon including the `Secrets` module, each ruby class will receive it's own method `#private_key` and `#create_private_key`. The latter will generate a new key each time it's called, the former will either assign a key, or generate and save it in the class instance variable. Therefore each class including `Secrets` will use it's own key (unless the key is assigned).
-
-```ruby
-require 'secrets'
-@secret = Secrets.create_private_key # generates a new key every time it's called
-# OR
-@secret = Secrets.private_key        # generates a new key and saves it
-@secret.eql?(Secrets.private_key)    # => true
-
-class TestClass
-  include Secrets
-end
-
-@secret.eql?(TestClass.private_key)  # => false (a new key is saved in the class)
-
-class SomeClass
-  include Secrets
-  secret Secrets.private_key
-end
-
-@secret.eql?(SomeClass.private_key)  # => true (it was assigned)
-```
-### Encrypting and Decrypting Data
-
-As before, we'll first show how to encrypt raw data or files using the tool, and then show how to do the same in Ruby.
-
-#### 1. CLI
-
-This may be a good time to show the full help message for the `secrets` tool:
+This may be a good time to take a look at the full help message for the `secrets` tool:
 
 ```bash
 ❯ exe/secrets -h
@@ -157,33 +131,95 @@ Flags:
     -N, --no-color                disable color output
     -h, --help                    show help```
 
-__CLI Examples:__
+```
+
+#### Examples of CLI Usage
+
+__Generating the Key__:
 
 ```bash
-  Examples:
-
-# generate a new secret:
+# generate a new private key into an environment variable:
 export KEY=$(secrets -g)
 echo $KEY
 75ngenJpB6zL47/8Wo7Ne6JN1pnOsqNEcIqblItpfg4=
-
-# encrypt a plain text string with the key:
-export ENCRYPTED=$(secrets -e -s "secret string" -k $KEY)
-echo $ENCRYPTED
-Y09MNDUyczU1S0UvelgrLzV0RTYxZz09CkBDMEw4Q0R0TmpnTm9md1QwNUNy%T013PT0K
-
+# ————————————————————————————————————————————————————————————————————————————————
+# generate a new password-protected key, copy to the clipboard & save to a file
+secrets -gpc -o ~/.key
+New Password     : ••••••••••
+Confirm Password : ••••••••••
+# ————————————————————————————————————————————————————————————————————————————————
+# encrypt a plain text string with a key, and save the output to a file
+secrets -e -s "secret string" -k $KEY -o file.enc
+cat file.enc
+# => Y09MNDUyczU1S0UvelgrLzV0RTYxZz09CkBDMEw4Q0R0TmpnTm9md1QwNUNy%T013PT0K
+# ————————————————————————————————————————————————————————————————————————————————
 # decrypt a previously encrypted string:
-secrets -d -s $ENCRYPTED -k $KEY
+secrets -d -s $(cat file.enc) -k $KEY
 secret string
-
-# encrypt a file:
+# ————————————————————————————————————————————————————————————————————————————————
+# encrypt secrets.yml and save it to secrets.enc:
 secrets -e -f secrets.yml -o secrets.enc -k $KEY
+# ————————————————————————————————————————————————————————————————————————————————
+# decrypt an encrypted file and print it to STDOUT:
+secrets -df secrets.enc -k $KEY
+# ————————————————————————————————————————————————————————————————————————————————
+# edit an encrypted file in $EDITOR, ask for key, create a backup
+secrets -tibf ecrets.enc
+# => Private Key: ••••••••••••••••••••••••••••••••••••••••••••
+# => Saved encrypted content to secrets.enc.
 
-# decrypt an encrypted file and print to STDOUT:
-secrets -d -f secrets.enc -k $KEY
+# => Diff:
+3c3
+# # (c) 2015 Konstantin Gredeskoul.  All rights reserved.
+# ---
+# # (c) 2016 Konstantin Gredeskoul.  All rights reserved.
+# ————————————————————————————————————————————————————————————————————————————————
 ```
 
-#### 2. Ruby
+##### Inline Editing
+
+The `secrets` CLI tool supports one interesting mode where you can open an encrypted file in an `$EDITOR`, and edit it's unencrypted version (stored temporarily in a temp file), and upon saving and exiting the gem will automatically diff the new and old content, and if different – will save encrypt it and overwrite the original file.
+
+In this mode several flags are of importance:
+
+    -b (--backup)   – will create a backup of the original file
+    -v (--verbose) - will show additional info about file sizes
+      
+Here is a full command that opens a file specified by `-f | --file`, using the key specified in `-K | --key-file`, in the editor defined by the `$EDITOR` environment variable (or if not set – defaults to `/bin/vi`)". 
+
+NOTE: while much effort has been made to ensure that the gem is bug free, the reality is that no software is bug free. Please make sure to backup your encrypted file before doing it for the first few times to get familiar with the command.
+     
+    secrets -tbv -K ~/.key 
+
+### Ruby API
+
+To use this library you must include the main `Secrets` module into your library.
+
+Any class including `Secrets` will be decorated with new class methods `#private_key` and `#create_private_key`, as well as instance methods `#encr`, and `#decr`. 
+
+`#create_private_key` will generate a new key each time it's called, while `#private_key` will either assign an existing key (if a value is passed), or generate and save a new key in the class instance variable. Therefore each class including `Secrets` will use it's own key (unless the key is assigned). 
+
+The following example illustrates this point:
+
+```ruby
+require 'secrets'
+
+class TestClass
+  include Secrets
+end
+@key = TestClass.create_private_key
+@key.eql?(TestClass.private_key)  # => false
+# A new key was created and saved in #private_key accessor.
+
+class SomeClass
+  include Secrets
+  private_key TestClass.private_key
+end
+
+@key.eql?(SomeClass.private_key)  # => true (it was assigned)
+```
+
+#### Encryption and Decryption
 
 So how would we use this library from another ruby project to encrypt and decrypt values?
 
