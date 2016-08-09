@@ -2,7 +2,6 @@
 require 'slop'
 require 'secrets'
 require 'colored2'
-require 'hashie/mash'
 require 'yaml'
 require 'openssl'
 require 'secrets/errors'
@@ -28,7 +27,7 @@ module Secrets
       def initialize(argv)
         begin
           self.opts = parse(argv.dup)
-        rescue Exception => e
+        rescue StandardError => e
           error exception: e
           return
         end
@@ -74,7 +73,7 @@ module Secrets
               details:   e.message,
               exception: e
 
-      rescue Exception => e
+      rescue StandardError => e
         error exception: e
       end
 
@@ -179,7 +178,7 @@ module Secrets
           o.bool '-g', '--generate', '           generate a new private key'
           o.separator ''
         end
-      rescue Exception => e
+      rescue StandardError => e
         error exception: e
         raise(e)
       end

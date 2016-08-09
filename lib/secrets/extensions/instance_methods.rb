@@ -4,6 +4,17 @@ require 'secrets/cipher_handler'
 require 'openssl'
 module Secrets
   module Extensions
+    # This is the module that is really included in your class
+    # when you include +Secrets+.
+    #
+    # The module provides easy access to the encryption configuration
+    # via the +#encryption_config+ method, as well as two key
+    # methods: +#encr+ and +#decr+.
+    #
+    # Methods +#encr_password+ and +#decr_password+ provide a good
+    # example of how this module can be extended to provide more uses
+    # of various ciphers, by calling into the private +_encr+ and +_decr+
+    # methods.f
     module InstanceMethods
       include Secrets::Data
       include Secrets::CipherHandler

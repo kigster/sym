@@ -1,8 +1,12 @@
 require 'secrets/data'
 require 'active_support/inflector'
 module Secrets
-  # This module is responsible for handing user input and executing commands
-  # around the encryption
+  # The +App+ Module is responsible for handing user input and executing commands.
+  # Central class in this module is the +CLI+ class.
+
+  # This module is responsible for printing pretty errors and maintaining the
+  # future exit code class-global variable.
+
   module App
     class << self
       attr_accessor :exit_code

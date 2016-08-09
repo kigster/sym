@@ -2,6 +2,10 @@ require 'base64'
 require_relative 'configuration'
 
 module Secrets
+  #
+  # +CipherHandler+ contains cipher-related utilities necessary to create
+  # ciphers, and seed them with the salt or iV vector,
+  #
   module CipherHandler
 
     CREATE_CIPHER = ->(name) { ::OpenSSL::Cipher.new(name) }

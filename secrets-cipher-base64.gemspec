@@ -21,7 +21,6 @@ Gem::Specification.new do |spec|
   spec.add_dependency 'require_dir', '~> 0.1'
   spec.add_dependency 'colored2', '~> 2.0'
   spec.add_dependency 'slop', '~> 4.3'
-  spec.add_dependency 'hashie', '~> 3.4'
   spec.add_dependency 'activesupport'
   spec.add_dependency 'highline', '~> 1.7'
   spec.add_dependency 'clipboard', '~> 1.1'
@@ -30,9 +29,5 @@ Gem::Specification.new do |spec|
   spec.add_development_dependency 'bundler', '~> 1.12'
   spec.add_development_dependency 'rake', '~> 10.0'
   spec.add_development_dependency 'rspec', '~> 3.0'
-  #spec.add_development_dependency 'irbtools'
-  #spec.add_development_dependency 'guard'
-  #spec.add_development_dependency 'guard-rspec'
-  #spec.add_development_dependency 'terminal-notifier-guard'
   spec.add_development_dependency 'yard', '~> 0.9'
 end

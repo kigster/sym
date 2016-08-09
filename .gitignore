@@ -3,12 +3,10 @@
 /.yardoc
 /Gemfile.lock
 /_yardoc/
-/coverage/
 /doc/
 /pkg/
-/spec/reports/
+/coverage/
+/spec/coverage/
 /tmp/
-/*.yml
-/*.yaml
-/*.enc
+/data
 /spec/coverage/
