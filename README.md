@@ -188,7 +188,7 @@ NOTE: while much effort has been made to ensure that the gem is bug free, the re
      
 To edit an encrypted file in $EDITOR, while asking for a key (`-i | --interactive`), creating a backup file (`-b | --backup`):
 
-    secrets -tibf data.enc -K ~/.key 
+    secrets -tibf data.enc
     # => Private Key: ••••••••••••••••••••••••••••••••••••••••••••
     #
     # => Diff:
