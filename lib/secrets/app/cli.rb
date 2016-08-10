@@ -161,12 +161,12 @@ module Secrets
           o.bool      '-h', '--help',         '           show help'
           o.bool      '-d', '--decrypt',      '           decrypt mode'
           o.bool      '-t', '--edit',         '           decrypt, open an encr. file in ' + editor
-          o.separator 'Create` a Private Key:'.bold.yellow
+          o.separator 'Create a private key:'.bold.yellow
           o.bool      '-g', '--generate',     '           generate a new private key'
           o.bool      '-p', '--password',     '           encrypt the key with a password'
           o.bool      '-c', '--copy',         '           copy the new key to the clipboard'
-          o.separator 'Using a Private Key:'.bold.yellow
-          o.bool      '-i', '--interactive',  '           ask for a key interactively'
+          o.separator 'Provide a private key:'.bold.yellow
+          o.bool      '-i', '--interactive',  '           Paste or type the key interactively'
           o.string    '-k', '--private-key',  '[key]   '.bold.blue + '   private key as a string'
           o.string    '-K', '--key-file',     '[key-file]'.bold.blue + ' private key from a file'
           if Secrets::App.is_osx?
