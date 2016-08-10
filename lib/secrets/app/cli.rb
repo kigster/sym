@@ -158,33 +158,33 @@ module Secrets
           o.banner = 'Usage:'.bold.yellow
           o.separator '    secrets [options]'.bold.green
           o.separator 'Modes:'.bold.yellow
-          o.bool '-h', '--help', '           show help'
-          o.bool '-e', '--encrypt', '           encrypt mode'
-          o.bool '-d', '--decrypt', '           decrypt mode'
-          o.separator 'Private Key:'.bold.yellow
-          o.bool '-g', '--generate', '           generate a new private key'
-          o.bool '-p', '--password', '           encrypt the key with a password'
-          o.bool '-c', '--copy', '           copy the new key to a clipboard'
-          o.string '-k', '--private-key', '[key]   '.bold.blue + '   private key as a string'
-          o.string '-K', '--key-file', '[key-file]'.bold.blue + ' file containing the key'
+          o.bool      '-h', '--help',         '           show help'
+          o.bool      '-d', '--decrypt',      '           decrypt mode'
+          o.bool      '-t', '--edit',         '           decrypt, open an encr. file in ' + editor
+          o.separator 'Create` a Private Key:'.bold.yellow
+          o.bool      '-g', '--generate',     '           generate a new private key'
+          o.bool      '-p', '--password',     '           encrypt the key with a password'
+          o.bool      '-c', '--copy',         '           copy the new key to the clipboard'
+          o.separator 'Using a Private Key:'.bold.yellow
+          o.bool      '-i', '--interactive',  '           ask for a key interactively'
+          o.string    '-k', '--private-key',  '[key]   '.bold.blue + '   private key as a string'
+          o.string    '-K', '--key-file',     '[key-file]'.bold.blue + ' private key from a file'
           if Secrets::App.is_osx?
-            o.string '-x', '--keychain', '[key-name] '.bold.blue + 'name of the generic password entry'
-            o.string '-X', '--delete-key', '[key-name] '.bold.blue + 'delete keychain entry with that name'
+          o.string    '-x', '--keychain',     '[key-name] '.bold.blue + 'private key to/from a password entry'
+          o.string    '-X', '--keychain-del', '[key-name] '.bold.blue + 'delete keychain entry with that name'
           end
           o.separator 'Data:'.bold.yellow
-          o.string '-s', '--string', '[string]'.bold.blue + '   specify a string to encrypt/decrypt'
-          o.string '-f', '--file', '[file]  '.bold.blue + '   filename to read from'
-          o.string '-o', '--output', '[file]  '.bold.blue + '   filename to write to'
-          o.separator 'Data:'.bold.yellow
-          o.bool '-i', '--interactive', '           ask for a key interactively'
-          o.bool '-b', '--backup', '           create a backup file in the edit mode'
+          o.string    '-s', '--string',       '[string]'.bold.blue + '   specify a string to encrypt/decrypt'
+          o.string    '-f', '--file',         '[file]  '.bold.blue + '   filename to read from'
+          o.string    '-o', '--output',       '[file]  '.bold.blue + '   filename to write to'
+          o.bool      '-b', '--backup',       '           create a backup file in the edit mode'
           o.separator 'Flags:'.bold.yellow
-          o.bool '-v', '--verbose', '           show additional information'
-          o.bool '-T', '--trace', '           print a backtrace of any errors'
-          o.bool '-E', '--examples', '           show several examples'
-          o.bool '-V', '--version', '           print library version'
-          o.bool '-N', '--no-color', '           disable color output'
-          o.bool '-t', '--edit', '           decrypt, open an encr. file in ' + editor
+          o.bool      '-v', '--verbose',      '           show additional information'
+          o.bool      '-T', '--trace',        '           print a backtrace of any errors'
+          o.bool      '-E', '--examples',     '           show several examples'
+          o.bool      '-V', '--version',      '           print library version'
+          o.bool      '-N', '--no-color',     '           disable color output'
+          o.bool      '-e', '--encrypt',      '           encrypt mode'
           o.separator ''
         end
       rescue StandardError => e

@@ -5,9 +5,9 @@ module Secrets
     module Commands
       class DeleteKeychainKey < Command
         include Secrets
-        required_options   :delete_key
+        required_options   :keychain_del
         def run
-          Secrets::App::KeyChain.new(opts[:delete_key]).delete
+          Secrets::App::KeyChain.new(opts[:keychain_del]).delete
         end
       end
     end
