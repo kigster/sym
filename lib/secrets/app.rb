@@ -27,10 +27,14 @@ module Secrets
 
       self.out.puts([\
                     "#{(type || exception.class.name).titleize}:".red.bold.underlined +
-                    (sprintf '  %-70.70s', details || exception.message).red.italic,
+                    (sprintf '  %s', details || exception.message).red.italic,
                     reason ? "\n#{reason.blue.bold.italic}" : nil].compact.join("\n"))
       self.out.puts "\n" + exception.backtrace.join("\n").bold.red if exception && config && config[:trace]
       self.exit_code = 1
+    end
+
+    def self.is_osx?
+      Gem::Platform.local.os.eql?('darwin')
     end
   end
 end

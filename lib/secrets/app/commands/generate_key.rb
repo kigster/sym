@@ -1,4 +1,5 @@
 require_relative 'command'
+require 'secrets/app/keychain'
 module Secrets
   module App
     module Commands
@@ -17,6 +18,11 @@ module Secrets
           end
 
           clipboard_copy(new_private_key) if opts[:copy]
+
+          if opts[:keychain] && Secrets::App.is_osx?
+            Secrets::App::KeyChain.new(opts[:keychain]).add(new_private_key)
+          end
+
           new_private_key
         rescue Secrets::Errors::PasswordsDontMatch, Secrets::Errors::PasswordTooShort => e
           STDERR.puts e.message.bold

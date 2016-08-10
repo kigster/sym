@@ -12,6 +12,7 @@ module Secrets
     class InvalidEncodingPrivateKey < Secrets::Errors::Error; end
     class InvalidPasswordPrivateKey < Secrets::Errors::Error; end
     class FileNotFound < Secrets::Errors::Error; end
+    class ExternalCommandError < Secrets::Errors::Error; end
 
     # Method was called on an abstract class. Override such methods in
     # subclasses, and use subclasses for instantiation of objects.

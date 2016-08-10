@@ -1,0 +1,38 @@
+#!/usr/bin/env ruby
+
+lib_path = File.expand_path(File.dirname(__FILE__) + '/../lib')
+$LOAD_PATH << lib_path if File.exist?(lib_path) && !$LOAD_PATH.include?(lib_path)
+
+require 'secrets'
+require 'secrets/app'
+require 'secrets/app/keychain'
+require 'colored2'
+
+def usage
+  puts 'Usage: ' + 'keychain'.bold.blue + ' item [ add <contents> | find | delete ]'.bold.green
+  exit 0
+end
+
+usage if ARGV.empty?
+
+key_name, action, data = ARGV
+
+unless %i(add find delete).include?(action.to_sym)
+  puts "Error: operation #{action.bold.red} is not recognized"
+  usage
+end
+
+if action.eql?('add') && data.nil?
+  puts "Error: please provide data to store with the #{'add'.bold.green} operation."
+  usage
+end
+
+begin
+puts data ? \
+  Secrets::App::KeyChain.new(key_name).send(action.to_sym, data) :
+  Secrets::App::KeyChain.new(key_name).send(action.to_sym)
+rescue StandardError => e
+  STDERR.puts "#{e.message.red}"
+end
+
+

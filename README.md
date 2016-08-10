@@ -75,9 +75,11 @@ You can generate using the command line, or in a programmatic way. First we'll d
 
 #### Generating and Using Private Keys
 
-Once the gem is installed you will be able to run an executable `secrets`:
+Once the gem is installed you will be able to run an executable `secrets`. 
 
     gem install secrets-cipher-base64
+    secrets -h   # display help
+    secrets -E   # show examples
 
 Now let's generate and copy the new private key to the clipboard. Clipboard copy is activated with the -c flag:
 
@@ -97,13 +99,40 @@ Or create a password-protected key, and save it to a file:
     # New Password:     ••••••••••
     # Confirm Password: •••••••••• 
 
-
 You can subsequently use the private key by either:
 
   1. passing the `-k [key value]` flag 
   2. passing the `-K [key file]` flag
 
-NOTE: If you installed the gem with bundler, make sure to prefix the above commands with `bundle exec`).
+#### Using KeyChain Access on Mac OS-X
+
+On Mac OS-X there is a third option – using the Keychain Access Manager behind the scenes. Apple released a `security` command line tool, which this library uses to securely store a key/value pair of the key name and the actual private key in your OS-X KeyChain. The advantages of this method are numerous: 
+
+ * The private key won't be lying around your file system unencrypted, so if your Mac is ever stolen, you don't need to worry about the keys running wild.
+ * If you sync your keychain with iCloud you will have access to it on other machines
+
+To activate the KeyChain mode on the Mac, use `-x <keyname>` field instead of `-k` or `-K`, and add it to `-g` when generating a key. The `keyname` is what you name this particular key base on where it's going to be used. For example, you may call it `staging`, etc. 
+
+The following command generates the private key and immediately stores it in the KeyChain access under the name provided:
+
+    secrets -g -x staging
+
+Now, whenever you need to encrypt something, in addition to the `-k` and `-K` you can also choose `-x staging`. This will retrieve the key from the KeyChain access, and use it for encryption/decryption.
+    
+Finally, you can delete a key from KeyChain access by running:
+    
+    secrets -X staging
+    
+#### KeyChain Key Management
+    
+Another tiny executable supplied with this library is called `keychain`
+
+```bash
+Usage: keychain item [ add <contents> | find | delete ]
+```
+You can use this to add an existing key that can be used with the `secrets` later. Of course you can also use the tool to find or delete it.b
+
+3. passing the `-x [keychain access entry name]` flag
 
 ####  Encryption and Decryption
 
@@ -114,31 +143,34 @@ This may be a good time to take a look at the full help message for the `secrets
 Usage:
     secrets [options]
 Modes:
+    -t, --edit                    decrypt, open encr. file in vim
+    -e, --encrypt                 encrypt mode
+    -d, --decrypt                 decrypt mode
+Private Key:
     -g, --generate                generate a new private key
-    -e, --encrypt                 encrypt
-    -d, --decrypt                 decrypt
-    -t, --edit                    decrypt and edit a file in vim
-Options:
-    -p, --password                encrypt key with a password
-    -k, --private-key  [key]      file containing private key
-    -K, --key-file     [file]     specify the encryption key
+    -p, --password                encrypt the key with a password
+    -c, --copy                    copy the new key to a clipboard
+    -k, --private-key  [key]      private key as a string
+    -K, --key-file     [key-file] file containing the key
+    -x, --keychain     [key-name] name of the generic password entry
+    -X, --delete-key   [key-name] delete keychain entry with that name
+Data:
     -s, --string       [string]   specify a string to encrypt/decrypt
     -f, --file         [file]     filename to read from
     -o, --output       [file]     filename to write to
+Data:
     -i, --interactive             ask for a key interactively
     -b, --backup                  create a backup file in the edit mode
-    -c, --copy                    when used with -g copies the key to clipboard
 Flags:
     -v, --verbose                 show additional information
     -T, --trace                   print a backtrace of any errors
     -E, --examples                show several examples
     -V, --version                 print library version
     -N, --no-color                disable color output
-    -h, --help                    show help```
-
+    -h, --help                    show help
 ```
 
-#### Examples of CLI Usage
+### CLI Usage Examples
 
 __Generating the Key__:
 
@@ -237,7 +269,7 @@ Therefore you could write something like this below, protecting a sensitive stri
 require 'secrets'
 class TestClass
   include Secrets
-  key ENV['SECRET']
+  private_key ENV['SECRET']
   
   def sensitive_value=(value)
     @sensitive_value = encr(value, self.class.private_key)

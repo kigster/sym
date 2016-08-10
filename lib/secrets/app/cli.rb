@@ -1,11 +1,13 @@
-#!/usr/bin/env ruby
+ #!/usr/bin/env ruby
 require 'slop'
 require 'secrets'
 require 'colored2'
 require 'yaml'
 require 'openssl'
+require 'secrets/app'
 require 'secrets/errors'
 require 'secrets/app/commands'
+require 'secrets/app/keychain'
 require 'highline'
 
 require_relative 'outputs/to_file'
@@ -105,6 +107,7 @@ module Secrets
         end
 
         opts[:private_key] ||= PasswordHandler.handle_user_input('Private Key: ', :magenta) if opts[:interactive]
+        opts[:private_key] ||= KeyChain.new(opts[:keychain]).find if opts[:keychain]
         self.key           = opts[:private_key]
       end
 
@@ -156,26 +159,32 @@ module Secrets
           o.separator '    secrets [options]'.bold.green
           o.separator 'Modes:'.bold.yellow
           o.bool '-h', '--help', '           show help'
-          o.bool '-e', '--encrypt', '           encrypt'
-          o.bool '-d', '--decrypt', '           decrypt'
-          o.bool '-t', '--edit', '           decrypt and edit a file in ' + editor
-          o.separator 'Options:'.bold.yellow
-          o.bool '-p', '--password', '           encrypt/decrypt private key with a password'
-          o.string '-k', '--private-key', '[key]   '.bold.blue + '   file containing private key'
-          o.string '-K', '--key-file', '[file]   '.bold.blue + '  specify the encryption key'
+          o.bool '-e', '--encrypt', '           encrypt mode'
+          o.bool '-d', '--decrypt', '           decrypt mode'
+          o.separator 'Private Key:'.bold.yellow
+          o.bool '-g', '--generate', '           generate a new private key'
+          o.bool '-p', '--password', '           encrypt the key with a password'
+          o.bool '-c', '--copy', '           copy the new key to a clipboard'
+          o.string '-k', '--private-key', '[key]   '.bold.blue + '   private key as a string'
+          o.string '-K', '--key-file', '[key-file]'.bold.blue + ' file containing the key'
+          if Secrets::App.is_osx?
+            o.string '-x', '--keychain', '[key-name] '.bold.blue + 'name of the generic password entry'
+            o.string '-X', '--delete-key', '[key-name] '.bold.blue + 'delete keychain entry with that name'
+          end
+          o.separator 'Data:'.bold.yellow
           o.string '-s', '--string', '[string]'.bold.blue + '   specify a string to encrypt/decrypt'
           o.string '-f', '--file', '[file]  '.bold.blue + '   filename to read from'
           o.string '-o', '--output', '[file]  '.bold.blue + '   filename to write to'
+          o.separator 'Data:'.bold.yellow
           o.bool '-i', '--interactive', '           ask for a key interactively'
           o.bool '-b', '--backup', '           create a backup file in the edit mode'
-          o.bool '-c', '--copy', '           when used with -g copies the key to clipboard'
           o.separator 'Flags:'.bold.yellow
           o.bool '-v', '--verbose', '           show additional information'
           o.bool '-T', '--trace', '           print a backtrace of any errors'
           o.bool '-E', '--examples', '           show several examples'
           o.bool '-V', '--version', '           print library version'
           o.bool '-N', '--no-color', '           disable color output'
-          o.bool '-g', '--generate', '           generate a new private key'
+          o.bool '-t', '--edit', '           decrypt, open an encr. file in ' + editor
           o.separator ''
         end
       rescue StandardError => e
