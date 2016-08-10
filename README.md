@@ -75,13 +75,7 @@ You can generate using the command line, or in a programmatic way. First we'll d
 
 #### Generating and Using Private Keys
 
-Once the gem is installed you will be able to run an executable `secrets`. 
-
-    gem install secrets-cipher-base64
-    secrets -h   # display help
-    secrets -E   # show examples
-
-Now let's generate and copy the new private key to the clipboard. Clipboard copy is activated with the -c flag:
+Once the gem is installed you will be able to run an executable `secrets`. Now let's generate and copy the new private key to the clipboard. Clipboard copy is activated with the -c flag:
 
     secrets -gc
 
