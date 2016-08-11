@@ -1,4 +1,4 @@
- #!/usr/bin/env ruby
+#!/usr/bin/env ruby
 require 'slop'
 require 'secrets'
 require 'colored2'
@@ -8,23 +8,18 @@ require 'secrets/app'
 require 'secrets/errors'
 require 'secrets/app/commands'
 require 'secrets/app/keychain'
+require 'secrets/app/private_key/handler'
 require 'highline'
 
-require_relative 'outputs/to_file'
-require_relative 'outputs/to_stdout'
+require_relative 'output/file'
+require_relative 'output/stdout'
 
 module Secrets
   module App
     class CLI
-      include Secrets
 
-      attr_accessor :opts,
-                    :output_proc,
-                    :action,
-                    :print_proc,
-                    :write_proc,
-                    :password,
-                    :key
+      attr_accessor :opts, :output_proc, :print_proc, :write_proc,
+                    :action, :password, :key
 
       def initialize(argv)
         begin
@@ -34,29 +29,21 @@ module Secrets
           return
         end
         configure_color(argv)
-        define_output
+        select_output_stream
         self.action = { opts[:encrypt] => :encr, opts[:decrypt] => :decr }[true]
-      end
-
-      def command
-        @command_class ||= Secrets::App::Commands.find_command_class(opts)
-        @command       ||= @command_class.new(self) if @command_class
+        unless opts[:generate]
+          self.key = PrivateKey::Handler.new(opts).key
+        end
       end
 
       def run
         return Secrets::App.exit_code if Secrets::App.exit_code != 0
 
-        define_private_key
-        decrypt_private_key if should_decrypt_private_key?
-        verify_private_key_encoding if key
+        return self.output_proc.call(command.run) if command
 
-        if command
-          return self.output_proc.call(command.run)
-        else
-          # command was not found. Reset output to printing, and return an error.
-          self.output_proc = print_proc
-          command_not_found_error!
-        end
+        # command was not found. Reset output to printing, and return an error.
+        self.output_proc = print_proc
+        command_not_found_error!
 
       rescue ::OpenSSL::Cipher::CipherError => e
         error type:      'Cipher Error',
@@ -87,57 +74,25 @@ module Secrets
         ENV['EDITOR'] || '/bin/vi'
       end
 
-      private
-
-      def should_decrypt_private_key?
-        key && (key.length > 45 || opts[:password])
+      def command
+        @command_class ||= Secrets::App::Commands.find_command_class(opts)
+        @command       ||= @command_class.new(self) if @command_class
       end
 
-      def define_output
-        self.print_proc  = Secrets::App::Outputs::ToStdout.new(self).output_proc
-        self.write_proc  = Secrets::App::Outputs::ToFile.new(self).output_proc
+      private
+
+      def select_output_stream
+        self.print_proc  = Secrets::App::Output::Stdout.new(self).output_proc
+        self.write_proc  = Secrets::App::Output::File.new(self).output_proc
         self.output_proc = opts[:output] ? self.write_proc : self.print_proc
       end
 
-      def define_private_key
-        begin
-          opts[:private_key] = File.read(opts[:key_file]) if opts[:key_file]
-        rescue Errno::ENOENT
-          raise Secrets::Errors::FileNotFound.new("Encryption key file #{opts[:key_file]} was not found.")
-        end
-
-        opts[:private_key] ||= PasswordHandler.handle_user_input('Private Key: ', :magenta) if opts[:interactive]
-        opts[:private_key] ||= KeyChain.new(opts[:keychain]).find if opts[:keychain]
-        self.key           = opts[:private_key]
-      end
 
       def configure_color(argv)
         if opts[:no_color]
           Colored2.disable! # reparse options without the colors to create new help msg
           self.opts = parse(argv.dup)
         end
-      end
-
-      def verify_private_key_encoding
-        begin
-          Base64.urlsafe_decode64(key)
-        rescue ArgumentError => e
-          raise Secrets::Errors::InvalidEncodingPrivateKey.new(e)
-        end
-      end
-
-      def decrypt_private_key
-        handler = Secrets::App::PasswordHandler.new(opts)
-        decrypted_key = nil
-        begin
-          retries ||= 0
-          handler.ask
-          decrypted_key = decr_password(key, handler.password)
-        rescue ::OpenSSL::Cipher::CipherError => e
-          STDERR.puts 'Invalid password. Please try again.'
-          ((retries += 1) < 3) ? retry : raise(Secrets::Errors::InvalidPasswordPrivateKey.new(e))
-        end
-        self.key = decrypted_key
       end
 
       def command_not_found_error!
@@ -158,40 +113,39 @@ module Secrets
           o.banner = 'Usage:'.bold.yellow
           o.separator '    secrets [options]'.bold.green
           o.separator 'Modes:'.bold.yellow
-          o.bool      '-h', '--help',         '           show help'
-          o.bool      '-d', '--decrypt',      '           decrypt mode'
-          o.bool      '-t', '--edit',         '           decrypt, open an encr. file in ' + editor
+          o.bool '-h', '--help', '           show help'
+          o.bool '-d', '--decrypt', '           decrypt mode'
+          o.bool '-t', '--edit', '           decrypt, open an encr. file in ' + editor
           o.separator 'Create a private key:'.bold.yellow
-          o.bool      '-g', '--generate',     '           generate a new private key'
-          o.bool      '-p', '--password',     '           encrypt the key with a password'
-          o.bool      '-c', '--copy',         '           copy the new key to the clipboard'
+          o.bool '-g', '--generate', '           generate a new private key'
+          o.bool '-p', '--password', '           encrypt the key with a password'
+          o.bool '-c', '--copy', '           copy the new key to the clipboard'
           o.separator 'Provide a private key:'.bold.yellow
-          o.bool      '-i', '--interactive',  '           Paste or type the key interactively'
-          o.string    '-k', '--private-key',  '[key]   '.bold.blue + '   private key as a string'
-          o.string    '-K', '--key-file',     '[key-file]'.bold.blue + ' private key from a file'
+          o.bool '-i', '--interactive', '           Paste or type the key interactively'
+          o.string '-k', '--private-key', '[key]   '.bold.blue + '   private key as a string'
+          o.string '-K', '--keyfile', '[key-file]'.bold.blue + ' private key from a file'
           if Secrets::App.is_osx?
-          o.string    '-x', '--keychain',     '[key-name] '.bold.blue + 'private key to/from a password entry'
-          o.string    '-X', '--keychain-del', '[key-name] '.bold.blue + 'delete keychain entry with that name'
+            o.string '-x', '--keychain', '[key-name] '.bold.blue + 'private key to/from a password entry'
+            o.string '--keychain-del', '[key-name] '.bold.blue + 'delete keychain entry with that name'
           end
           o.separator 'Data:'.bold.yellow
-          o.string    '-s', '--string',       '[string]'.bold.blue + '   specify a string to encrypt/decrypt'
-          o.string    '-f', '--file',         '[file]  '.bold.blue + '   filename to read from'
-          o.string    '-o', '--output',       '[file]  '.bold.blue + '   filename to write to'
-          o.bool      '-b', '--backup',       '           create a backup file in the edit mode'
+          o.string '-s', '--string', '[string]'.bold.blue + '   specify a string to encrypt/decrypt'
+          o.string '-f', '--file', '[file]  '.bold.blue + '   filename to read from'
+          o.string '-o', '--output', '[file]  '.bold.blue + '   filename to write to'
+          o.bool '-b', '--backup', '           create a backup file in the edit mode'
           o.separator 'Flags:'.bold.yellow
-          o.bool      '-v', '--verbose',      '           show additional information'
-          o.bool      '-T', '--trace',        '           print a backtrace of any errors'
-          o.bool      '-E', '--examples',     '           show several examples'
-          o.bool      '-V', '--version',      '           print library version'
-          o.bool      '-N', '--no-color',     '           disable color output'
-          o.bool      '-e', '--encrypt',      '           encrypt mode'
+          o.bool '-v', '--verbose', '           show additional information'
+          o.bool '-T', '--trace', '           print a backtrace of any errors'
+          o.bool '-E', '--examples', '           show several examples'
+          o.bool '-V', '--version', '           print library version'
+          o.bool '-N', '--no-color', '           disable color output'
+          o.bool '-e', '--encrypt', '           encrypt mode'
           o.separator ''
         end
       rescue StandardError => e
         error exception: e
         raise(e)
       end
-
     end
   end
 end

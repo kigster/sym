@@ -10,7 +10,6 @@ module Secrets
     # They provide access to storing generic passwords in the KeyChain Access.
     #
     class KeyChain
-
       class << self
         attr_accessor :user, :kind, :sub_section
 
@@ -25,9 +24,9 @@ module Secrets
       end
 
       configure do
-        @kind        = 'secrets-cipher-base64'
-        @user        = ENV['USER']
-        @sub_section = 'generic-password'
+        self.kind        = 'secrets-cipher-base64'
+        self.user        = ENV['USER']
+        self.sub_section = 'generic-password'
       end
 
       attr_accessor :key_name, :opts, :stderr_disabled
@@ -76,7 +75,7 @@ module Secrets
         out << extras if extras
         out = out.join
         # Do not actually ever run these commands on non MacOSX
-        out = "echo #{out}" unless Secrets::App.is_osx?
+        out = "echo Run this –\"#{out}\", on #{Secrets::App.this_os}?\nAre you sure?" unless Secrets::App.is_osx?
         out
       end
 

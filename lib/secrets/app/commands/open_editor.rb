@@ -9,7 +9,11 @@ module Secrets
     module Commands
       class OpenEditor < Command
         include Secrets
-        required_options :private_key, :edit, :file
+
+        required_options [ :private_key, :keyfile, :keychain, :interactive ],
+                           :edit,
+                           :file
+
         attr_accessor :tempfile
 
         def run

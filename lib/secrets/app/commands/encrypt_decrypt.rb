@@ -4,9 +4,11 @@ module Secrets
     module Commands
       class EncryptDecrypt < Command
         include Secrets
-        required_options   :private_key,
+
+        required_options [ :private_key, :keyfile, :keychain, :interactive ],
                          [ :encrypt, :decrypt ],
                          [ :file, :string ]
+
         def run
           send(cli.action, content, opts[:private_key])
         end

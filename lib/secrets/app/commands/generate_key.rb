@@ -5,7 +5,6 @@ module Secrets
     module Commands
       class GenerateKey < Command
         include Secrets
-
         required_options :generate
 
         def run
@@ -13,8 +12,8 @@ module Secrets
           new_private_key = self.class.create_private_key
 
           if opts[:password]
-            handler = Secrets::App::PasswordHandler.new(opts).create
-            new_private_key = encr_password(new_private_key, handler.password)
+            new_private_key = encr_password(new_private_key,
+                                            Secrets::App::Input::Handler.new_password)
           end
 
           clipboard_copy(new_private_key) if opts[:copy]

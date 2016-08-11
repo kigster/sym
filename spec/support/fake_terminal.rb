@@ -1,13 +1,13 @@
 require 'singleton'
-
 module Secrets
   module App
     class FakeTerminal
       APPENDER = ->(argument) { Secrets::App::FakeTerminal.instance.append(argument) }
       include Singleton
-      attr_accessor :lines
+      attr_accessor :lines, :mutex
 
-      def self.create
+
+      def self.new_password
         self.instance.clear!
         self.instance
       end
@@ -17,15 +17,26 @@ module Secrets
       end
 
       def append(arg)
-        self.lines ||= []
-        self.lines << arg.split("\n")
-        self.lines.flatten!.compact!
+        self.mutex ||= Mutex.new
+        terminal = self
+        mutex.synchronize do
+          terminal.lines ||= []
+          terminal.lines << arg.split("\n")
+          terminal.lines.flatten!.compact!
+        end
       end
 
       alias_method :<<, :append
 
       def clear!
         self.lines = []
+      end
+
+      private
+
+      def new
+        self.mutex = Mutex.new
+        super
       end
     end
   end

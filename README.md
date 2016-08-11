@@ -95,8 +95,10 @@ Or create a password-protected key, and save it to a file:
 
 You can subsequently use the private key by either:
 
-  1. passing the `-k [key value]` flag 
-  2. passing the `-K [key file]` flag
+1. passing the `-k [key value]` flag 
+2. passing the `-K [key file]` flag3.  
+3. pasting or typing the key with the `-i` (interactive) flag
+4. passing the `-x [keychain access entry name]` flag to read from Mac OS-X KeyChain Access's generic password field.
 
 #### Using KeyChain Access on Mac OS-X
 
@@ -124,9 +126,7 @@ Another tiny executable supplied with this library is called `keychain`
 ```bash
 Usage: keychain item [ add <contents> | find | delete ]
 ```
-You can use this to add an existing key that can be used with the `secrets` later. Of course you can also use the tool to find or delete it.b
-
-3. passing the `-x [keychain access entry name]` flag
+You can use this to add an existing key that can be used with the `secrets` later. Of course you can also use the tool to find or delete it.
 
 ####  Encryption and Decryption
 

@@ -3,11 +3,13 @@ require 'secrets/app/keychain'
 module Secrets
   module App
     module Commands
-      class DeleteKeychainKey < Command
+      class KeychainKeyPrint < Command
         include Secrets
-        required_options   :keychain_del
+        required_options :keychain
+        incompatible_options :generate
+
         def run
-          Secrets::App::KeyChain.new(opts[:keychain_del]).delete
+          cli.key
         end
       end
     end

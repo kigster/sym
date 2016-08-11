@@ -1,11 +1,10 @@
-require 'spec_helper'
 require 'secrets'
-
 require_relative 'fake_terminal'
 
+TEST_KEY = 'LxRV7pqW5XY5DDcuh128byukvsr3JLGX54v6eKNl8a0='
 class TestClass
   include Secrets
-  private_key '12312asdf0asdf090'  # Use ENV['SECRET'] in prod
+  private_key TEST_KEY # Use ENV['SECRET'] in prod
 
   def secure_value=(value)
     @secure_value = encr(value)
@@ -16,11 +15,28 @@ class TestClass
   end
 end
 
-RSpec.shared_context :test_instance do
-  let(:fake_terminal) { Secrets::App::FakeTerminal.instance }
-  let(:fake_stdout) { fake_terminal.lines }
+RSpec.shared_context :commands do
+  include_context :fake_terminal
 
+  let(:private_key) { TEST_KEY }
+  let(:cli) { Secrets::App::CLI.new(argv) }
+  let(:opts) { cli.opts }
+
+  before do
+    fake_terminal.clear!
+    expect(Secrets::App::Commands).to receive(:find_command_class).and_return(command_class)
+    if self.respond_to?(:before_cli_run)
+      self.before_cli_run
+    end
+    cli.print_proc = cli.output_proc = fake_terminal.output_proc
+    cli.run
+  end
+
+end
+
+RSpec.shared_context :test_instance do
   let(:instance) { TestClass.new }
+  let(:private_key) { TestClass.create_private_key }
 end
 
 RSpec.shared_context :fake_terminal do
@@ -53,28 +69,6 @@ RSpec.shared_context :abc_classes do
       include Secrets
       private_key 'BOT+8SVzRKQSl5qecjB4tUW1ENakJQw8wojugYQnEHc='
     end
-  end
-end
-
-RSpec.shared_context :commands do
-  include_context :fake_terminal
-
-  let(:private_key) { 'zDMFsylyIsu2k3biBm7EXsM2den9rYoXRC7GfBtgUNI=' }
-  let(:cli) { Secrets::App::CLI.new(argv) }
-  let(:opts) { cli.opts }
-
-  def before_cli_run
 
   end
-
-  before do
-    fake_terminal.clear!
-    expect(Secrets::App::Commands).to receive(:find_command_class).and_return(command_class)
-    if self.respond_to?(:before_cli_run)
-      self.before_cli_run
-    end
-    cli.print_proc = cli.output_proc = fake_terminal.output_proc
-    cli.run
-  end
-
 end

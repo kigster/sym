@@ -56,6 +56,8 @@ module Secrets
 
       def decode_key(encoded_key)
         Base64.urlsafe_decode64(encoded_key)
+      rescue
+        encoded_key
       end
 
       def _key_from_password(cipher, password, salt = nil)

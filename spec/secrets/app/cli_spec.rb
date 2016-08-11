@@ -24,6 +24,7 @@ module Secrets
           expect(fake_stdout.size).to eql(1)
         end
       end
+
       context 'show version' do
         let(:argv) { %w(-V) }
         it 'should output the version number' do
@@ -48,6 +49,7 @@ module Secrets
           expect(cli).to receive(:error).once
           cli.run
           expect(opts[:private_key]).to eql(private_key)
+          expect(opts[:verbose]).to be_truthy
           expect(fake_stdout).to_not be_nil
           expect(fake_stdout.first).to match(/Usage/)
         end

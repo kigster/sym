@@ -36,6 +36,9 @@ module Secrets
     def self.is_osx?
       Gem::Platform.local.os.eql?('darwin')
     end
+    def self.this_os
+      Gem::Platform.local.os
+    end
   end
 end
 

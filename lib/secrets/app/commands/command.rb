@@ -7,10 +7,15 @@ module Secrets
         def self.inherited(klass)
           klass.instance_eval do
             @required_options = Set.new
+            @incompatible_options = Set.new
             class << self
               def required_options(*args)
                 @required_options.merge(args) if args
                 @required_options
+              end
+              def incompatible_options(*args)
+                @incompatible_options.merge(args) if args
+                @incompatible_options
               end
 
               def short_name
@@ -20,7 +25,7 @@ module Secrets
               def options_satisfied_by?(opts_hash)
                 proc = required_options.find { |option| option.is_a?(Proc) }
                 return true if proc && proc.call(opts_hash)
-
+                return false if incompatible_options.any?{ |option| opts_hash[option] }
                 required_options.to_a.delete_if { |o| o.is_a?(Proc) }.all? { |o|
                   o.is_a?(Array) ? o.any? { |opt| opts_hash[opt] } : opts_hash[o]
                 }
@@ -42,7 +47,7 @@ module Secrets
         end
 
         def key
-          @key ||= opts[:private_key]
+          @key ||= cli.key
         end
 
         def run
