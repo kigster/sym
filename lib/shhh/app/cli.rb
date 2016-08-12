@@ -177,21 +177,22 @@ module Shhh
           o.string '-k', '--private-key', '[key]   '.bold.blue + '   private key as a string'
           o.string '-K', '--keyfile', '[key-file]'.bold.blue + ' private key from a file'
           if Shhh::App.is_osx?
-            o.string '-x', '--keychain', '[key-name] '.bold.blue + 'private key to/from a password entry'
+            o.separator 'Use your KeyChain password entry to store a private key:'.bold.yellow
+            o.string '-x', '--keychain', '[key-name] '.bold.blue + 'add to, or read the key from Keychain'
             o.string '--keychain-del', '[key-name] '.bold.blue + 'delete keychain entry with that name'
           end
           o.separator 'Data:'.bold.yellow
           o.string '-s', '--string', '[string]'.bold.blue + '   specify a string to encrypt/decrypt'
           o.string '-f', '--file', '[file]  '.bold.blue + '   filename to read from'
           o.string '-o', '--output', '[file]  '.bold.blue + '   filename to write to'
-          o.bool '-b', '--backup', '           create a backup file in the edit mode'
+          o.bool '-b',  '--backup',      '           create a backup file in the edit mode'
           o.separator 'Flags:'.bold.yellow
-          o.bool '-v', '--verbose', '           show additional information'
-          o.bool '-T', '--trace', '           print a backtrace of any errors'
-          o.bool '-E', '--examples', '           show several examples'
-          o.bool '-V', '--version', '           print library version'
-          o.bool '-N', '--no-color', '           disable color output'
-          o.bool '-e', '--encrypt', '           encrypt mode'
+          o.bool '-v',  '--verbose',     '           show additional information'
+          o.bool '-T',  '--trace',       '           print a backtrace of any errors'
+          o.bool '-E',  '--examples',    '           show several examples'
+          o.bool '-V',  '--version',     '           print library version'
+          o.bool '-N',  '--no-color',    '           disable color output'
+          o.bool '-e',  '--encrypt',     '           encrypt mode'
           o.separator ''
         end
       rescue StandardError => e

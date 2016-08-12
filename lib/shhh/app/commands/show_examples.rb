@@ -47,6 +47,18 @@ Diff:
 ---' + '
 # (c) 2016 Konstantin Gredeskoul.  All rights reserved.'.green.bold)
 
+
+          if Shhh::App.is_osx?
+          output << example(comment: 'generate a new password-encrypted key, save it to your Keychain:',
+                            command: 'shhh -gpx mykey -o ~/.key')
+
+          output << example(comment: 'use the new key to encrypt a file:',
+                            command: 'shhh -x mykey -e -f password.txt -o passwords.enc')
+
+          output << example(comment: 'use the new key to inline-edit the encrypted file:',
+                            command: 'shhh -x mykey -t -f shhh.yml')
+          end
+
           output.flatten.compact.join("\n")
         end
 

@@ -129,30 +129,32 @@ You can use this to add an existing key that can be used with the `shhh` later. 
 
 ####  Encryption and Decryption
 
-This may be a good time to take a look at the full help message for the `shhh` tool:
+This may be a good time to take a look at the full help message for the `shhh` tool, shown naturally with a `-h` or `--help` option.
 
 ```bash
-❯ exe/shhh -h
+❯ shhh -h
+
 Usage:
     shhh [options]
 Modes:
-    -t, --edit                    decrypt, open encr. file in vim
     -e, --encrypt                 encrypt mode
     -d, --decrypt                 decrypt mode
-Private Key:
+    -t, --edit                    decrypt, open an encr. file in vim
+Create a private key:
     -g, --generate                generate a new private key
     -p, --password                encrypt the key with a password
-    -c, --copy                    copy the new key to a clipboard
+    -c, --copy                    copy the new key to the clipboard
+Provide a private key:
+    -i, --interactive             Paste or type the key interactively
     -k, --private-key  [key]      private key as a string
-    -K, --key-file     [key-file] file containing the key
-    -x, --keychain     [key-name] name of the generic password entry
-    -X, --delete-key   [key-name] delete keychain entry with that name
+    -K, --keyfile      [key-file] private key from a file
+Use your KeyChain password entry to store a private key:
+    -x, --keychain     [key-name] add to, or read the key from Keychain
+    --keychain-del     [key-name] delete keychain entry with that name
 Data:
     -s, --string       [string]   specify a string to encrypt/decrypt
     -f, --file         [file]     filename to read from
     -o, --output       [file]     filename to write to
-Data:
-    -i, --interactive             ask for a key interactively
     -b, --backup                  create a backup file in the edit mode
 Flags:
     -v, --verbose                 show additional information
