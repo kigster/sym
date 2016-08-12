@@ -5,10 +5,10 @@
 
 <br />
 
-[![Build Status](https://travis-ci.org/kigster/shhh.svg?branch=master)](https://travis-ci.org/kigster/shhh)
-[![Code Climate](https://codeclimate.com/github/kigster/shhh/badges/gpa.svg)](https://codeclimate.com/github/kigster/shhh)
-[![Test Coverage](https://codeclimate.com/github/kigster/shhh/badges/coverage.svg)](https://codeclimate.com/github/kigster/shhh/coverage)
-[![Issue Count](https://codeclimate.com/github/kigster/shhh/badges/issue_count.svg)](https://codeclimate.com/github/kigster/shhh)
+[![Build Status](https://travis-ci.org/kigster/secrets-cipher-base64.svg?branch=master)](https://travis-ci.org/kigster/secrets-cipher-base64)
+[![Code Climate](https://codeclimate.com/github/kigster/secrets-cipher-base64/badges/gpa.svg)](https://codeclimate.com/github/kigster/secrets-cipher-base64)
+[![Test Coverage](https://codeclimate.com/github/kigster/secrets-cipher-base64/badges/coverage.svg)](https://codeclimate.com/github/kigster/secrets-cipher-base64/coverage)
+[![Issue Count](https://codeclimate.com/github/kigster/secrets-cipher-base64/badges/issue_count.svg)](https://codeclimate.com/github/kigster/secrets-cipher-base64)
 
 ## Summary
 
