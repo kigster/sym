@@ -14,7 +14,7 @@ module Shhh
 
           if opts[:password]
             new_private_key = encr_password(new_private_key,
-                                            Shhh::App::Input::Handler.new_password)
+                                            cli.input_handler.new_password)
           end
 
           clipboard_copy(new_private_key) if opts[:copy]
