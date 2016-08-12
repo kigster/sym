@@ -27,7 +27,7 @@ You see, security is an incredibly wide topic. The tools around security tend to
 > * Automatic detection of password-protected keys, 
 > * and more...
 
-The main point behind this gem is to allow you to store sensitive application shhh in your source code repo as `AES-256-CBC`-encrypted files or strings (this is the same encryption algorithm that US Government uses internally). The output of the encryption is always a (urlsafe) `base64`-encoded string, without the linebreaks.
+The main point behind this gem is to allow you to store sensitive application secrets in your source code repo as `AES-256-CBC`-encrypted files or strings (this is the same encryption algorithm that US Government uses internally). The output of the encryption is always a (urlsafe) `base64`-encoded string, without the linebreaks.
  
 The private key (encrypted or not) is also a base64-encoded string, typically 45 characters long (unless it's password encrypted, in which case it is considerably longer). 
  
@@ -64,9 +64,9 @@ This library relies on the existance of the 32-byte private key (aka, *a secret*
 
 > In fact, we put together a separate file that discusses strategies for protecting your encryption keys, for example you can read about [how to use Mac OS-X Keychain Access application](https://github.com/kigster/shhh/blob/master/MANAGING-KEYS.md) and other methods. Additions and discussion are welcome. Please contribute!
 
-You can use one key for all encrypted fields, or many keys – perhaps one per deployment environment, etc. While you can have per-field shhh, it seems like an overkill.
+You can use one key for all encrypted fields, or many keys – perhaps one per deployment environment, etc. While you can have per-field private key, it seems like an overkill.
 
-__NOTE: it is considered a bad practice to check in the private key into the version control.__  If you keep your secret out of your repo, you can check-in encrypted shhh file directly into the repo. As long as the private key itself is safe, the data in your encrypted  will be next to impossible to extract. 
+__NOTE: it is considered a bad practice to check in the private key into the version control.__  If you keep your secret out of your repo, you can check-in encrypted key file directly into the repo. As long as the private key itself is safe, the data in your encrypted  will be next to impossible to extract. 
 
 ### Command Line (CLI)
  
