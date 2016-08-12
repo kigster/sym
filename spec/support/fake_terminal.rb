@@ -1,8 +1,8 @@
 require 'singleton'
-module Secrets
+module Shhh
   module App
     class FakeTerminal
-      APPENDER = ->(argument) { Secrets::App::FakeTerminal.instance.append(argument) }
+      APPENDER = ->(argument) { Shhh::App::FakeTerminal.instance.append(argument) }
       include Singleton
       attr_accessor :lines, :mutex
 
@@ -17,6 +17,7 @@ module Secrets
       end
 
       def append(arg)
+        return unless arg
         self.mutex ||= Mutex.new
         terminal = self
         mutex.synchronize do

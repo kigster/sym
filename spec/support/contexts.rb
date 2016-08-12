@@ -1,9 +1,9 @@
-require 'secrets'
+require 'shhh'
 require_relative 'fake_terminal'
 
 TEST_KEY = 'LxRV7pqW5XY5DDcuh128byukvsr3JLGX54v6eKNl8a0='
 class TestClass
-  include Secrets
+  include Shhh
   private_key TEST_KEY # Use ENV['SECRET'] in prod
 
   def secure_value=(value)
@@ -15,58 +15,100 @@ class TestClass
   end
 end
 
-RSpec.shared_context :commands do
-  include_context :fake_terminal
+class Shhh::App::CLI
+  attr_accessor :already_ran
+  alias_method :old_run, :run
 
-  let(:private_key) { TEST_KEY }
-  let(:cli) { Secrets::App::CLI.new(argv) }
-  let(:opts) { cli.opts }
-
-  before do
-    fake_terminal.clear!
-    expect(Secrets::App::Commands).to receive(:find_command_class).and_return(command_class)
-    if self.respond_to?(:before_cli_run)
-      self.before_cli_run
-    end
-    cli.print_proc = cli.output_proc = fake_terminal.output_proc
-    cli.run
+  def run
+    raise ArgumentError.new('CLI already ran this example') if already_ran
+    self.already_ran = true
+    self.old_run
   end
-
 end
+
 
 RSpec.shared_context :test_instance do
   let(:instance) { TestClass.new }
+  let(:test_class) { TestClass }
+  let(:test_instance) { instance }
   let(:private_key) { TestClass.create_private_key }
 end
 
-RSpec.shared_context :fake_terminal do
-  let(:fake_terminal) { Secrets::App::FakeTerminal.instance }
-  let(:fake_stdout) { fake_terminal.lines }
-  let(:program_output) { fake_stdout.join("\n") }
 
-  def expect_some_output
-    expect(fake_stdout).not_to be_nil
-    expect(fake_stdout).to be_kind_of(Array)
-    expect(fake_stdout.size).to be > 0
+RSpec.shared_context :console do
+  let(:console) { Shhh::App::FakeTerminal.instance }
+  let(:program_output_lines) { console.lines }
+  let(:program_output) { program_output_lines.join("\n") }
+
+  before do
+    console.clear!
+  end
+
+  def expect_some_output(args = [])
+    expect(program_output_lines).not_to be_nil
+    expect(program_output_lines).to be_kind_of(Array)
+    expect(program_output_lines.size).to be > 0
+    if args
+      args.each_with_index do |argument, index|
+        expect(program_output_lines[index]).to (argument.is_a?(Regexp) ? match(argument) : include(argument))
+      end
+    end
   end
 end
 
 RSpec.shared_context :encryption do
   include_context :test_instance
-  include_context :fake_terminal
+  include_context :console
+end
+
+RSpec.shared_context :run_command do
+  include_context :encryption
+
+  let(:private_key) { TEST_KEY }
+  let(:cli) { Shhh::App::CLI.new(argv) }
+  let(:opts) { cli.opts }
+
+  before do
+    self.before_cli_run if self.respond_to?(:before_cli_run)
+    # overwrite output proc on CLI so that we can collect and test the output
+    cli.print_proc = cli.output_proc = console.output_proc
+    cli.run
+  end
+
+  def expect_command_to_have(klass:, output: [], option: nil, value: nil, lines: nil)
+    expect(opts[option]).to eql(value) if value && option
+    expect(cli.already_ran).to be_truthy
+
+    if klass
+      klass.is_a?(Symbol) ?
+        expect(cli.command.send(klass)).to(be_truthy) :
+        expect(cli.command.class).to(eql(klass))
+    end
+    expect_some_output output.is_a?(Array) ? output : [output]
+    expect(program_output_lines.size).to eql(lines) if lines
+  end
+end
+
+
+RSpec.shared_context :commands do
+  include_context :run_command
+
+  def before_cli_runs
+    expect(Shhh::App::Commands).to receive(:find_command_class).and_return(command_class)
+  end
 end
 
 RSpec.shared_context :abc_classes do
   let(:c_private_key) { 'BOT+8SVzRKQSl5qecjB4tUW1ENakJQw8wojugYQnEHc=' }
   before do
     class AClass
-      include Secrets
+      include Shhh
     end
     class BClass
-      include Secrets
+      include Shhh
     end
     class CClass
-      include Secrets
+      include Shhh
       private_key 'BOT+8SVzRKQSl5qecjB4tUW1ENakJQw8wojugYQnEHc='
     end
 
