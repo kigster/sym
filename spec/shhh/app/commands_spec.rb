@@ -50,12 +50,14 @@ module Shhh
           let(:options_variations) {
             [
               { decrypt: true, string: 'hello', private_key: FakeCommand.private_key },
-              { encrypt: true, file: 'file.txt', private_key: FakeCommand.private_key }
+              { encrypt: true, file: 'file.txt', private_key: FakeCommand.private_key },
+              { decrypt: true, string: 'hello', keyfile: 'file.txt', verbose: true, trace: true}
             ]
           }
           it 'should find the command' do
+            expect(Shhh::App::Commands.commands.size).to eql(9)
             options_variations.each do |opts|
-              expect(Shhh::App::Commands.find_command_class(opts)).to eql(subject)
+              expect(Shhh::App::Commands.find_command_class(opts)).to eql(subject), opts.inspect
             end
           end
         end

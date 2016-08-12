@@ -2,10 +2,11 @@ require 'base64'
 require_relative 'configuration'
 
 module Shhh
-  #
-  # +CipherHandler+ contains cipher-related utilities necessary to create
-  # ciphers, and seed them with the salt or iV vector,
-  #
+
+  # {Shhh::CipherHandler} contains cipher-related utilities necessary to create
+  # ciphers, and seed them with the salt or iV vector. It also defines the
+  # internal structure {Shhh::CipherHandler::CipherStruct} which is a key
+  # struct used in constructing cipher and saving it with the data packet.
   module CipherHandler
 
     CREATE_CIPHER = ->(name) { ::OpenSSL::Cipher.new(name) }

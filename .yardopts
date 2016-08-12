@@ -1,0 +1,5 @@
+
+--protected
+--no-private
+--embed-mixin ClassMethods
+--embed-mixin Shhh::Extensions::InstanceMethods

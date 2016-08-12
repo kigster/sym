@@ -4,7 +4,7 @@ module Shhh
   module App
     module Input
       class Handler
-        def self.ask
+        def ask
           retries ||= 0
           prompt('Password: ', :green)
         rescue ::OpenSSL::Cipher::CipherError
@@ -13,11 +13,15 @@ module Shhh
           nil
         end
 
-        def self.prompt(message, color)
+        def puts(*args)
+          STDERR.puts args
+        end
+
+        def prompt(message, color)
           HighLine.new(STDIN, STDERR).ask(message.bold) { |q| q.echo = '•'.send(color) }
         end
 
-        def self.new_password
+        def new_password
           password         = prompt('New Password     : ', :blue)
           password_confirm = prompt('Confirm Password : ', :blue)
 

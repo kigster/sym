@@ -1,13 +1,14 @@
 require 'bundler/gem_tasks'
 require 'rspec/core/rake_task'
-#require 'guard/notifiers/terminal_notifier'
-RSpec::Core::RakeTask.new(:spec)
-
 require 'yard'
-YARD::Rake::YardocTask.new do |t|
+
+
+YARD::Rake::YardocTask.new(:doc) do |t|
   t.files = %w(lib/**/*.rb exe/*.rb - README.md MANAGING-KEYS.md LICENSE)
   t.options.unshift('--title', '"Shhh – Symmetric Key Encryption for Your Data"')
-  system('open doc/index.html')
+  t.after = ->() { exec('open doc/index.html') }
 end
+
+RSpec::Core::RakeTask.new(:spec)
 
 task :default => :spec

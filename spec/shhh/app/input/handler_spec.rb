@@ -3,7 +3,7 @@ require 'singleton'
 
 def setup_handler(calls = [])
   calls.each do |hash|
-    expect(Shhh::App::Input::Handler).to receive(:prompt).with(hash[:message], hash[:color]).and_return(hash[:password])
+    expect(handler).to receive(:prompt).with(hash[:message], hash[:color]).and_return(hash[:password])
   end
 end
 
@@ -13,7 +13,7 @@ module Shhh
     RSpec.describe Shhh::App::Input::Handler do
       let(:password) { 'boobooboo' }
       let(:opts) { { password: true } }
-      let(:handler) { Input::Handler }
+      let(:handler) { Input::Handler.new  }
 
       context 'entering password' do
         it 'should save what the stupid user entered' do

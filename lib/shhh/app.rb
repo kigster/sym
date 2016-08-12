@@ -1,12 +1,16 @@
 require 'shhh/data'
 require 'active_support/inflector'
 module Shhh
-  # The +App+ Module is responsible for handing user input and executing commands.
-  # Central class in this module is the +CLI+ class.
 
-  # This module is responsible for printing pretty errors and maintaining the
-  # future exit code class-global variable.
-
+  # The {Shhh::App} Module is responsible for handing user input and executing commands.
+  # Central class in this module is the {Shhh::App::CLI} class.
+  #
+  # Methods in this module are responsible for reporting errors and
+  # maintaining the future exit code class-global variable.
+  #
+  # It also contains several helpers that enable some additional functionality
+  # on Mac OS-X (such as using KeyChain for storing encryption keys).
+  #
   module App
     class << self
       attr_accessor :exit_code

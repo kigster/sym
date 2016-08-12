@@ -1,4 +1,5 @@
 module Shhh
+  # All public exceptions of this library are here.
   module Errors
     # Exceptions superclass for this library.
     class Shhh::Errors::Error < StandardError; end

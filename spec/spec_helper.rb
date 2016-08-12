@@ -7,3 +7,10 @@ require 'base64'
 require 'openssl'
 
 require_relative 'support/contexts'
+
+RSpec.configure do |spec|
+
+  spec.before do
+    Shhh::App.exit_code = 0
+  end
+end

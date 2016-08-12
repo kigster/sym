@@ -7,7 +7,7 @@ module Shhh
 
         attr_accessor :encrypted_key, :input_handler
 
-        def initialize(encrypted_key, input_handler = Shhh::App::Input::Handler)
+        def initialize(encrypted_key, input_handler)
           self.encrypted_key = encrypted_key
           self.input_handler = input_handler
         end
@@ -20,8 +20,8 @@ module Shhh
               retries ||= 0
               decrypted_key = decrypt(password)
             rescue ::OpenSSL::Cipher::CipherError => e
-              STDERR.puts 'Invalid password. Please try again.'
-              ((retries += 1) < 3) ? retry : raise(Shhh::Errors::InvalidPasswordPrivateKey.new(e))
+              input_handler.puts 'Invalid password. Please try again.'
+              ((retries += 1) < 3) ? retry : raise(Shhh::Errors::InvalidPasswordPrivateKey.new('Invalid password.'))
             end
           else
             decrypted_key = encrypted_key

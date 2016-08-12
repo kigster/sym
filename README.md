@@ -3,7 +3,6 @@
 [![Gem Version](https://badge.fury.io/rb/shhh.svg)](https://badge.fury.io/rb/shhh)
 [![Downloads](http://ruby-gem-downloads-badge.herokuapp.com/shhh?type=total)](https://rubygems.org/gems/shhh)
 
-<br />
 
 [![Build Status](https://travis-ci.org/kigster/secrets-cipher-base64.svg?branch=master)](https://travis-ci.org/kigster/secrets-cipher-base64)
 [![Code Climate](https://codeclimate.com/github/kigster/secrets-cipher-base64/badges/gpa.svg)](https://codeclimate.com/github/kigster/secrets-cipher-base64)
@@ -279,6 +278,7 @@ end
 The library offers a typical `Shhh::Configuration` class which can be used to tweak some of the internals of the gem. This is really meant for a very advanced user who knows what she is doing. The following snippet is actually part of the Configuration class itself, but can be overridden by your code that uses and initializes this library. `Configuration` is a singleton, so changes to it will propagate to any subsequent calls to the gem.
 
 ```ruby
+require 'zlib'
 Shhh::Configuration.configure do |config|
   config.password_cipher = 'AES-128-CBC'  # 
   config.data_cipher = 'AES-256-CBC'
@@ -308,15 +308,12 @@ Bug reports and pull requests are welcome on GitHub at https://github.com/kigste
  
 ### Natural Language Based API
 
-This is the spec for an alternative CLI that is at feature parity with the standard flag-based CLI.
+This is the proposed mini-idea/specification for an alternative CLI that is at a feature parity with the standard flag-based CLI.
 
     shhh encrypt with $key string 'hello' and save to output.enc 
-    shhh edit file 'hamlet.enc' encrypted with $key
-    shhh decrypt file'hamlet.enc' encrypted with $key \ 
-      and save to hamlet.txt
+    shhh edit file 'passwords.enc' encrypted with $key
+    shhh decrypt file /etc/secrets encrypted with $key save to ./secrets
     shhh encrypt with keychain $item file $input   
-
-
 
 ## License
 

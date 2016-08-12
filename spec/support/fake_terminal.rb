@@ -2,10 +2,11 @@ require 'singleton'
 module Shhh
   module App
     class FakeTerminal
-      APPENDER = ->(argument) { Shhh::App::FakeTerminal.instance.append(argument) }
-      include Singleton
-      attr_accessor :lines, :mutex
+      def self.appender(console)
+        ->(argument) { console.append(argument) }
+      end
 
+      attr_accessor :lines, :mutex
 
       def self.new_password
         self.instance.clear!
@@ -13,7 +14,7 @@ module Shhh
       end
 
       def output_proc
-        APPENDER
+        self.class.appender(self)
       end
 
       def append(arg)

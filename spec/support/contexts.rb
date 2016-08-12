@@ -15,17 +15,19 @@ class TestClass
   end
 end
 
-class Shhh::App::CLI
-  attr_accessor :already_ran
-  alias_method :old_run, :run
 
-  def run
-    raise ArgumentError.new('CLI already ran this example') if already_ran
-    self.already_ran = true
-    self.old_run
+unless Shhh::App::CLI.instance_methods.include?(:old_run)
+  class Shhh::App::CLI
+    attr_accessor :already_ran
+    alias_method :old_run, :run
+
+    def run
+      raise ArgumentError.new('CLI already ran this example') if already_ran
+      self.already_ran = true
+      self.old_run
+    end
   end
 end
-
 
 RSpec.shared_context :test_instance do
   let(:instance) { TestClass.new }
@@ -36,7 +38,7 @@ end
 
 
 RSpec.shared_context :console do
-  let(:console) { Shhh::App::FakeTerminal.instance }
+  let(:console) { Shhh::App::FakeTerminal.new }
   let(:program_output_lines) { console.lines }
   let(:program_output) { program_output_lines.join("\n") }
 
@@ -67,12 +69,18 @@ RSpec.shared_context :run_command do
   let(:private_key) { TEST_KEY }
   let(:cli) { Shhh::App::CLI.new(argv) }
   let(:opts) { cli.opts }
+  let(:run_cli) { true }
+
+  after do
+    console.clear!
+  end
 
   before do
+    console.clear!
     self.before_cli_run if self.respond_to?(:before_cli_run)
     # overwrite output proc on CLI so that we can collect and test the output
     cli.print_proc = cli.output_proc = console.output_proc
-    cli.run
+    cli.run if run_cli
   end
 
   def expect_command_to_have(klass:, output: [], option: nil, value: nil, lines: nil)

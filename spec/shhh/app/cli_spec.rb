@@ -1,8 +1,10 @@
 require 'spec_helper'
 require 'shhh/app'
+
 module Shhh
   module App
     RSpec.describe 'Shhh::App::CLI' do
+
 
       context 'generate private key' do
         let(:argv) { %w(-g -v) }
@@ -72,38 +74,90 @@ module Shhh
       end
 
 
-      context 'as well as decryption' do
-        let(:string) { 'HelloWorld' }
-        let(:encrypted_string) { test_instance.encr(string, private_key) }
-        let(:decrypted_string) { program_output }
-        let(:argv) { "-d -s #{encrypted_string} -k #{private_key} -v".split(' ') }
+      #–––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––
 
-        include_context :run_command
-
-        it 'should decrypt' do
-          expect(decrypted_string).to eql(string)
-        end
-      end
+      context 'perform decryption' do
 
 
-      context 'when loading key from file' do
-        let(:string) { 'HelloWorld' }
-        let(:encrypted_string) { test_instance.encr(string, private_key) }
-        let(:decrypted_string) { program_output }
-        let(:tempfile) { Tempfile.new('shhh') }
-        let(:argv) { "-d -s #{encrypted_string} -K #{tempfile.path} -v -T".split(' ') }
+        SAVE_TO_TEMPFILE = ->(content) {
+          tempfile = Tempfile.new('shhh');
+          tempfile.instance_eval { write(content); flush }
+          tempfile
+        }
 
-        before do
-          tempfile.write(private_key)
-          tempfile.flush
+        RSpec.shared_context :decrypting do
+          let(:string) { 'I am being encrypted' }
+          let(:encrypted_string) { test_instance.encr(string, private_key) }
+          let(:decrypted_string) { program_output }
+
+          include_context :run_command
         end
 
-        include_context :run_command
+        context 'when key is unencrypted' do
 
-        it 'should decrypt' do
-          expect(decrypted_string).to eql(string)
+          context 'and is supplied via -k string' do
+            let(:argv) { "-d -s #{encrypted_string} -k #{private_key} -v".split(' ') }
+            include_context :decrypting
+
+            it 'should decrypt' do
+              expect(decrypted_string).to eql(string)
+            end
+          end
+
+          context 'and is supplied via -K file' do
+            let(:argv) { "-d -s #{encrypted_string} -K #{tempfile.path} -v -T".split(' ') }
+            let!(:tempfile) { SAVE_TO_TEMPFILE.call(private_key) }
+
+            include_context :decrypting
+            it 'should decrypt' do
+              expect(decrypted_string).to eql(string)
+            end
+          end
         end
 
+        context 'when the key is password-protected' do
+          let(:password) { 'pIA44z!w04DS' }
+          let(:encrypted_key) { test_instance.encr_password(private_key, password) }
+          let(:argv) { "-d -s #{encrypted_string} -K #{tempfile.path} -v -T".split(' ') }
+          let(:tempfile) { SAVE_TO_TEMPFILE.call(encrypted_key) }
+          let(:input_handler) { Shhh::App::Input::Handler.new }
+          before do
+            cli.input_handler = input_handler
+            cli.send(:initialize_key_handler)
+            expect(input_handler).to receive(:ask).exactly(attempts).times.and_return(decryption_password)
+          end
+
+          include_context :decrypting
+
+          context 'and the password is correct' do
+            let(:decryption_password) { password }
+            let(:attempts) { 1 }
+            it 'should decrypt' do
+              expect(decrypted_string).to eql(string)
+              expect(File.read(tempfile.path)).to eql(encrypted_key)
+              expect(File.read(tempfile.path)).not_to eql(private_key)
+              expect(decrypted_string).to eql(string)
+            end
+          end
+
+          context 'and has a wrong password' do
+            let(:decryption_password) { 'boooadfdsf' }
+            let(:attempts) { 3 }
+            let(:run_cli) { false }
+
+            it 'should decrypt' do
+              expect(File.read(tempfile.path)).to eql(encrypted_key)
+              expect(File.read(tempfile.path)).not_to eql(private_key)
+              expect(input_handler).to receive(:puts).and_return(nil).exactly(attempts).times
+              expect(cli).to receive(:error).
+                with(type:    'Error',
+                     details: 'Invalid password, private key can not decrypted.'
+                )
+
+              cli.run
+            end
+          end
+        end
       end
     end
   end

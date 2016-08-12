@@ -1,14 +1,14 @@
 require 'spec_helper'
 require 'singleton'
-
 module Shhh
   module App
     RSpec.describe Shhh::App::PrivateKey::Handler do
       include_context :test_instance
 
       let(:private_key) { test_class.create_private_key }
+      let(:input_handler) { Shhh::App::Input::Handler.new }
 
-      subject { Shhh::App::PrivateKey::Handler.new(opts).key }
+      subject { Shhh::App::PrivateKey::Handler.new(opts, input_handler).key }
 
       context 'in both cases, where the key is ' do
         context 'unencrypted' do
@@ -25,7 +25,7 @@ module Shhh
           let(:opts) { { private_key: encrypted_key } }
 
           before do
-            expect(Shhh::App::Input::Handler).to receive(:ask).once.and_return(password)
+            expect(input_handler).to receive(:ask).once.and_return(password)
           end
           context 'shows the decrypted private keys' do
             it { is_expected.to eql(private_key) }
