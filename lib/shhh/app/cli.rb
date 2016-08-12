@@ -195,7 +195,6 @@ module Shhh
           o.separator ''
         end
       rescue StandardError => e
-        error exception: e
         raise(e)
       end
     end
