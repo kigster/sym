@@ -5,4 +5,8 @@ $LOAD_PATH << lib_path if File.exist?(lib_path) && !$LOAD_PATH.include?(lib_path
 
 require 'shhh'
 
-Shhh::App::CLI.new(ARGV.dup).run
+#ARGV.any?{ |a| a =~ /^-/ } ?
+ARGV.first =~ /^-/  ?
+  Shhh::App::CLI.new(ARGV.dup).run :
+  Shhh::App::NLP.new(ARGV.dup).run
+

@@ -338,9 +338,10 @@ Bug reports and pull requests are welcome on GitHub at https://github.com/kigste
 
 This is the proposed mini-idea/specification for an alternative CLI that is at a feature parity with the standard flag-based CLI.
 
-    shhh encrypt with $key string 'hello' and save to output.enc 
-    shhh edit file 'passwords.enc' encrypted with $key
-    shhh decrypt file /etc/secrets encrypted with $key save to ./secrets
+    shhh generate key to the clipboard and keychain 
+    shhh encrypt file 'hello' using $key [to output.enc] 
+    shhh edit 'passwords.enc' using $key
+    shhh decrypt /etc/secrets encrypted with $key save to ./secrets
     shhh encrypt with keychain $item file $input   
 
 ## License

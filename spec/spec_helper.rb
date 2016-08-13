@@ -7,6 +7,7 @@ require 'base64'
 require 'openssl'
 
 require_relative 'support/contexts'
+require_relative 'support/matchers'
 
 RSpec.configure do |spec|
 
