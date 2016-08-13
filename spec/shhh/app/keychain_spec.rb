@@ -29,7 +29,7 @@ module Shhh
 
       context '#execute' do
         it 'should run a command successfully' do
-          expect(keychain.execute('pwd')).to eql(Dir.pwd)
+          expect(keychain.execute('echo hello')).to eql('hello')
         end
       end
 
