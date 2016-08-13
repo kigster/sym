@@ -139,7 +139,7 @@ Now, whenever you need to encrypt something, in addition to the `-k` and `-K` yo
     
 Finally, you can delete a key from KeyChain access by running:
     
-    shhh -X staging
+    shhh --keychain-del staging
     
 #### KeyChain Key Management
     
@@ -159,26 +159,32 @@ This may be a good time to take a look at the full help message for the `shhh` t
 
 Usage:
     shhh [options]
+
 Modes:
     -e, --encrypt                 encrypt mode
     -d, --decrypt                 decrypt mode
     -t, --edit                    decrypt, open an encr. file in vim
+
 Create a private key:
     -g, --generate                generate a new private key
     -p, --password                encrypt the key with a password
     -c, --copy                    copy the new key to the clipboard
+
 Provide a private key:
     -i, --interactive             Paste or type the key interactively
     -k, --private-key  [key]      private key as a string
     -K, --keyfile      [key-file] private key from a file
+
 Use your KeyChain password entry to store a private key:
     -x, --keychain     [key-name] add to, or read the key from Keychain
     --keychain-del     [key-name] delete keychain entry with that name
+
 Data:
     -s, --string       [string]   specify a string to encrypt/decrypt
     -f, --file         [file]     filename to read from
     -o, --output       [file]     filename to write to
     -b, --backup                  create a backup file in the edit mode
+
 Flags:
     -v, --verbose                 show additional information
     -T, --trace                   print a backtrace of any errors
