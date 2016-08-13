@@ -3,21 +3,18 @@
 [![Gem Version](https://badge.fury.io/rb/shhh.svg)](https://badge.fury.io/rb/shhh)
 [![Downloads](http://ruby-gem-downloads-badge.herokuapp.com/shhh?type=total)](https://rubygems.org/gems/shhh)
 
-
 [![Build Status](https://travis-ci.org/kigster/shhh.svg?branch=master)](https://travis-ci.org/kigster/shhh)
 [![Code Climate](https://codeclimate.com/github/kigster/secrets-cipher-base64/badges/gpa.svg)](https://codeclimate.com/github/kigster/secrets-cipher-base64)
 [![Test Coverage](https://codeclimate.com/github/kigster/secrets-cipher-base64/badges/coverage.svg)](https://codeclimate.com/github/kigster/secrets-cipher-base64/coverage)
 [![Issue Count](https://codeclimate.com/github/kigster/secrets-cipher-base64/badges/issue_count.svg)](https://codeclimate.com/github/kigster/secrets-cipher-base64)
 
---
-
 ## Description
 
-### Elevator Pitch
+### Summary
 
 > __shhh__ is little program that makes it _trivial to encrypt and decrypt sensitive data_.  But, unlike many other existing tools, __shhh__'s goal is to dramatically simplify the command line interface (CLI), and make symmetric encryption as routine as listing directories in Terminal.
 
-With this tool I wanted to make it super easy to remember the basic operational options, so that there is little to no barriers to the full power of encryption.
+With this tool I wanted to make it easy to memorize the most common options, so that there is little no longer a barrier to the full power of encryption offered by [`OpenSSL`](https://www.openssl.org/) library.
 
 And no tool works in isolation: this is just a stepping stone that could be part of your deployment or infrastructure code: don't rely on external services: minimize the risk of a "man-in-the-middle" attack, by dealing with the encryption and decryption locally. Ideal application of this gem, is the ability to store sensitive application _secrets_ protected on a file system, or in a repo, and use `shhh` to automaticaly decrypt the data when any changes are to be made, or when the data needs to be read by an application service.
 
