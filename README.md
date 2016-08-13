@@ -1,4 +1,4 @@
-# Shhh 
+# Shhh — Your Encryption Best Friend
 
 [![Gem Version](https://badge.fury.io/rb/shhh.svg)](https://badge.fury.io/rb/shhh)
 [![Downloads](http://ruby-gem-downloads-badge.herokuapp.com/shhh?type=total)](https://rubygems.org/gems/shhh)
@@ -9,33 +9,48 @@
 [![Test Coverage](https://codeclimate.com/github/kigster/secrets-cipher-base64/badges/coverage.svg)](https://codeclimate.com/github/kigster/secrets-cipher-base64/coverage)
 [![Issue Count](https://codeclimate.com/github/kigster/secrets-cipher-base64/badges/issue_count.svg)](https://codeclimate.com/github/kigster/secrets-cipher-base64)
 
-## Summary
+--
 
-What? *Another security gem?* —— Well, funny you should ask! 
+## Description
 
-You see, security is an incredibly wide topic. The tools around security tend to fall into two classes: swiss army knife wrappers around `OpenSSL`, and more specialized tools. This gem falls in the second category. It wraps a very small part of `OpenSSL` library. 
+### Elevator Pitch
 
-> __Namely, `shhh` provides:__
->
-> * Symmetric data encryption with: 
->   * the cipher `AES-256-CBC` 
->   * 256-bit private key
->   * which can be optionally password-encrypted.
-> * Rich command line interface with some innovative features, such as inline encrypted file editing using your current `$EDITOR`
-> * Automatic compression of the data
-> * Rich Ruby API and highly extensible approach to encryption/decryption
-> * Automatic detection of password-protected keys, 
-> * and more...
+> __shhh__ is little program that makes it _trivial to encrypt and decrypt sensitive data_.  But, unlike many other tools, __shhh__ goal is simplify the command line interface (CLI) as much as possible, and make symmetric encryption as routine as listing directories in Terminal.
 
-The main point behind this gem is to allow you to store sensitive application secrets in your source code repo as `AES-256-CBC`-encrypted files or strings (this is the same encryption algorithm that US Government uses internally). The output of the encryption is always a (urlsafe) `base64`-encoded string, without the linebreaks.
- 
-The private key (encrypted or not) is also a base64-encoded string, typically 45 characters long (unless it's password encrypted, in which case it is considerably longer). 
- 
-Using a single-line string that `urlsafe_encode64()` generates, makes this gem well suited for encrypting specific fields in the YAML file, or simply the entire file.  This also means that the private key can be easily exported as an environment variable (as it's value is a single-line string).  
- 
-> NOTE: The library leverages the code shown in the following discussion: http://stuff-things.net/2015/02/12/symmetric-encryption-with-ruby-and-rails/ I'd like to acknowledge the the author of the above thread for providing clear examples of a simple symmetric encryption with `OpenSSL`.
+I wanted to make it super easy to remember the basic operational options, so that there is little to none barriers to the full power of encryption.
 
-## Symmetric Encryption
+And ultimately, the goal is to be able to store sensitive application _secrets_ protected on a file system, or in a repo, and use `shhh` to automaticaly decrypt the data when any changes are to be made, or when the data needs to be read by an application service.
+
+And finally, in addition to the rich CLI interface of the `shhh` executable, there is a rich and extensibe symmetric encryption API that can be easily used from any ruby project.
+
+### How It Works
+
+  1.  You start with a piece of sensitive data, say it's called _X_. 
+  2.  _X_ is  currently a file on your file system, unencrypted. 
+  2. You use __shhh__ (with `-g` — for "generate")  to make a new encryption key. The key is 256 bits, or 32 bytes, or 45 bytes when base64-encoded.
+  3. You must save this key somewhere safe. We'll talk about this further.
+  4. You use __shhh__ (with `-e`) to encrypt _X_ with the key, and save into _Y_.
+  5. You now delete _X_ from your file system. You now only have _Y_ and the _key_.
+  7. To read the data back, you use __shhh__ with the `-d` (for "decrypt") to decrypt _Y_ back. You can print the contents or save it again.
+  8. But, instead of just decrypting it, you can use the `-t` mode (for "ediT"), which would decrypt _Y_ into _X_, save _X_ into a temporary location, and allow you to edit the unencrypted file using `$EDITOR`. Once you save and exit the editor, a new version is automatically encrypted and replaces the old version, showing you the diff and, optionally, creating a backup.
+
+### Features
+
+The `shhh` executable as well as the Ruby API provide:
+
+ * Symmetric data encryption with: 
+   * the cipher `AES-256-CBC` used by the US Government
+   * 256-bit private key
+   * which can be optionally password-encrypted using 128-bit key.
+   * which is automatically detected when the key is read
+ * Rich command line interface with some innovative features, such as inline  editing of an encrypted file, using your favorite `$EDITOR`.
+ * Data management:
+   * Automatic compression of the data upon encryption
+   * Automatic base64 encryption to make all output fully string-compliant, and suitable for YAML or JSON configuration files.
+ * Rich Ruby API and highly extensible approach to encryption/decryption
+ * Ability to create, add and delete generic password entries from the Mac OS-X KeyChain, and to leverage the KeyChain to store sensitive private keys.
+
+### Symmetric Encryption
 
 Symmetric encryption simply means that we are using the same private key to encrypt and decrypt. The secret can be generated by the tool and is a *base64-encoded* string which is 45 characters long. The *decoded* secret is always 32 characters long (or 256 bytes long).
 
@@ -60,13 +75,22 @@ Or install it into the global namespace with `gem install` command:
 
 ### Private Keys
 
-This library relies on the existance of the 32-byte private key (aka, *a secret*), that must be stored somewhere safely if your encrypted data is to be persisted, for example it can be saved into the keychain on Mac OSX. 
+This library relies on the existance of the 32-byte private key (aka, *a secret*) to perform the encryption and decription.
 
-> In fact, we put together a separate file that discusses strategies for protecting your encryption keys, for example you can read about [how to use Mac OS-X Keychain Access application](https://github.com/kigster/shhh/blob/master/MANAGING-KEYS.md) and other methods. Additions and discussion are welcome. Please contribute!
+The key can be easily:
+ 
+ * generated by this gem
+ * automatically saved by the gem to the Mac OS-X Keychain (on Mac OS-X only)
+ * can be used by Keychain name-reference in subsequent encryption/decryption steps
+ * one way or another must be kept very well protected and secure.
+ * to additionally protect your key, you can generate it and password protect it at the same time.
+   * NOTE: right now there is no way to add a password to an existing key.
 
-You can use one key for all encrypted fields, or many keys – perhaps one per deployment environment, etc. While you can have per-field private key, it seems like an overkill.
+Unencrypted private key will be in the form of a base64-encoded string, 45 characters long.
 
-__NOTE: it is considered a bad practice to check in the private key into the version control.__  If you keep your secret out of your repo, you can check-in encrypted key file directly into the repo. As long as the private key itself is safe, the data in your encrypted  will be next to impossible to extract. 
+Encrypted private key will be considerably longer, perhaps 200-300 characters long.
+
+When the private key is encrypted, `shhh` will request the password every time it is used. We are looking at adding a caching layer with a configuerable timeout, so that the password is only re-entered once per given period.
 
 ### Command Line (CLI)
  
