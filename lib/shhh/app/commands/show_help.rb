@@ -8,7 +8,7 @@ module Shhh
         try_after :generate_key, :open_editor, :encrypt_decrypt
 
         def run
-          opts.to_s
+          opts.to_s(prefix: ' ' * 2)
         end
       end
     end

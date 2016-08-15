@@ -1,5 +1,5 @@
 require 'spec_helper'
-require 'shhh/app'
+require 'shhh/app/output/base'
 
 module Shhh
   module App
@@ -47,12 +47,11 @@ module Shhh
       context 'insufficient arguments' do
         let(:argv) { ['-k', private_key, '-v'] }
         before do
-          expect(cli).to receive(:error).once
+          expect(Shhh::App).to receive(:error)
         end
         include_context :run_command
         it 'should show usage' do
-          expect_command_to_have klass:  :nil?,
-                                 output: [/Usage/]
+          expect(cli.command).to be_nil
         end
       end
 

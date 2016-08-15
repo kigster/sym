@@ -12,6 +12,7 @@ require 'shhh/app/private_key/handler'
 require 'highline'
 
 require_relative 'output/file'
+require_relative 'output/file'
 require_relative 'output/stdout'
 
 module Shhh
@@ -50,7 +51,7 @@ module Shhh
     # in a cross-platform way inside the {Shhh::App::Keychain} module.
 
     class CLI
-      attr_accessor :opts, :output_proc, :print_proc, :write_proc,
+      attr_accessor :opts, :args, :outputs, :output_proc,
                     :action, :password, :key, :input_handler, :key_handler
 
       def initialize(argv)
@@ -60,11 +61,15 @@ module Shhh
           error exception: e
           return
         end
+
+
+        self.args = ::Shhh::App::Args.new(opts, argv)
+
         configure_color(argv)
         select_output_stream
-
         initialize_input_handler
         initialize_key_handler
+
         self.action        = { opts[:encrypt] => :encr, opts[:decrypt] => :decr }[true]
       end
 
@@ -80,7 +85,7 @@ module Shhh
           output_proc.call(result)
         else
           # command was not found. Reset output to printing, and return an error.
-          self.output_proc = print_proc
+          self.output_proc = Args.new(Hash.new, []).output_class
           command_not_found_error!
         end
 
@@ -125,9 +130,11 @@ module Shhh
       private
 
       def select_output_stream
-        self.print_proc  = Shhh::App::Output::Stdout.new(self).output_proc
-        self.write_proc  = Shhh::App::Output::File.new(self).output_proc
-        self.output_proc = opts[:output] ? self.write_proc : self.print_proc
+        out_klass = self.args.output_class
+        raise "Can not determine output class from arguments #{opts.to_hash}" unless
+          out_klass && out_klass.is_a?(Class)
+
+        self.output_proc = out_klass.new(self).output_proc
       end
 
       def configure_color(argv)
@@ -136,7 +143,6 @@ module Shhh
           self.opts = parse(argv.dup)
         end
       end
-
 
       def initialize_input_handler(handler = Input::Handler.new)
         self.input_handler = handler
@@ -153,8 +159,8 @@ module Shhh
           supplied_opts = h.keys.select { |k| h[k] }.join(', ')
           error type:    'Options Error',
                 details: 'Unable to determined what command to run',
-                reason:  "You provided the following options: #{supplied_opts.bold.yellow}"
-          output_proc.call(opts.to_s)
+                reason:  "You provided the following options: #{supplied_opts.bold.yellow}",
+                comments: opts.to_s
         else
           raise Shhh::Errors::NoPrivateKeyFound.new('Private key is required')
         end
@@ -163,33 +169,41 @@ module Shhh
       def parse(arguments)
         Slop.parse(arguments) do |o|
           o.banner = 'Usage:'.bold.yellow
-          o.separator '    shhh [options]'.bold.green
-          o.separator 'Modes:'.bold.yellow
+          o.separator '    shhh [options]'.green
+          o.separator ' '
+          o.separator 'Modes:'.yellow
           o.bool '-h', '--help', '           show help'
           o.bool '-d', '--decrypt', '           decrypt mode'
           o.bool '-t', '--edit', '           decrypt, open an encr. file in ' + editor
-          o.separator 'Create a private key:'.bold.yellow
+          o.separator ' '
+          o.separator 'Create a private key:'.yellow
           o.bool '-g', '--generate', '           generate a new private key'
           o.bool '-p', '--password', '           encrypt the key with a password'
           o.bool '-c', '--copy', '           copy the new key to the clipboard'
-          o.separator 'Provide a private key:'.bold.yellow
+          o.separator ' '
+          o.separator 'Provide a private key:'.yellow
           o.bool '-i', '--interactive', '           Paste or type the key interactively'
-          o.string '-k', '--private-key', '[key]   '.bold.blue + '   private key as a string'
-          o.string '-K', '--keyfile', '[key-file]'.bold.blue + ' private key from a file'
+          o.string '-k', '--private-key', '[key]   '.blue + '   private key as a string'
+          o.string '-K', '--keyfile', '[key-file]'.blue + ' private key from a file'
           if Shhh::App.is_osx?
-            o.separator 'Use your KeyChain password entry to store a private key:'.bold.yellow
-            o.string '-x', '--keychain', '[key-name] '.bold.blue + 'add to, or read the key from Keychain'
-            o.string '--keychain-del', '[key-name] '.bold.blue + 'delete keychain entry with that name'
+            o.separator ' '
+            o.separator 'Use your KeyChain password entry to store a private key:'.yellow
+            o.string '-x', '--keychain', '[key-name] '.blue + 'add to, or read the key from Keychain'
+            o.string '--keychain-del', '[key-name] '.blue + 'delete keychain entry with that name'
           end
-          o.separator 'Data:'.bold.yellow
-          o.string '-s', '--string', '[string]'.bold.blue + '   specify a string to encrypt/decrypt'
-          o.string '-f', '--file', '[file]  '.bold.blue + '   filename to read from'
-          o.string '-o', '--output', '[file]  '.bold.blue + '   filename to write to'
+          o.separator ' '
+          o.separator 'Data:'.yellow
+          o.string '-s', '--string', '[string]'.blue + '   specify a string to encrypt/decrypt'
+          o.string '-f', '--file', '[file]  '.blue + '   filename to read from'
+          o.string '-o', '--output', '[file]  '.blue + '   filename to write to'
           o.bool '-b',  '--backup',      '           create a backup file in the edit mode'
+          o.separator ' '
           o.separator 'Flags:'.bold.yellow
           o.bool '-v',  '--verbose',     '           show additional information'
+          o.bool '-q',  '--quiet',       '           silence all output'
           o.bool '-T',  '--trace',       '           print a backtrace of any errors'
           o.bool '-E',  '--examples',    '           show several examples'
+          o.bool '-L',  '--language',    '           natural language examples'
           o.bool '-V',  '--version',     '           print library version'
           o.bool '-N',  '--no-color',    '           disable color output'
           o.bool '-e',  '--encrypt',     '           encrypt mode'

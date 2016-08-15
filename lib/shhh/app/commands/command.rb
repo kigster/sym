@@ -9,6 +9,8 @@ module Shhh
             class << self
               attr_accessor :required, :incompatible
 
+              include Shhh::App::ShortName
+
               def try_after(*dependencies)
                 Shhh::App::Commands.order(self, dependencies)
               end
@@ -23,10 +25,6 @@ module Shhh
                 self.incompatible ||= Set.new
                 incompatible.merge(args) if args
                 incompatible
-              end
-
-              def short_name
-                name.split(/::/)[-1].underscore.to_sym
               end
 
               def options_satisfied_by?(opts_hash)

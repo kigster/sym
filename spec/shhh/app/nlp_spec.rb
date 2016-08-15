@@ -11,7 +11,7 @@ module Shhh
       # let(:result) { nlp.process }
 
       describe %Q(encrypt file 'hello' using 1234 save to output.enc) do
-        it { is_expected.to map_to(%w(--encrypt --file 'hello' --private_key 1234 --output output.enc)) }
+        it { is_expected.to map_to(%w(--encrypt --file 'hello' --private-key 1234 --output output.enc)) }
       end
 
       describe %Q(edit file 'passwords.enc' ask the key) do

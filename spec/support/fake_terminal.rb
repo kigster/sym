@@ -28,6 +28,10 @@ module Shhh
         end
       end
 
+      def puts(*args)
+        append(args.join)
+      end
+
       alias_method :<<, :append
 
       def clear!

@@ -1,16 +1,11 @@
+require 'shhh/app/output/base'
 module Shhh
   module App
     module Output
-      class File
-        attr_accessor :cli
+      class File < ::Shhh::App::Output::Base
 
-        def initialize(cli)
-          self.cli = cli
-        end
+        required_option :output
 
-        def opts
-          cli.opts
-        end
 
         def output_proc
           ->(data) {

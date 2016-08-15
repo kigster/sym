@@ -27,12 +27,14 @@ module Shhh
       exception: nil,
       type: nil,
       details: nil,
-      reason: nil)
+      reason: nil,
+      comments: nil)
 
       self.out.puts([\
                     "#{(type || exception.class.name).titleize}:".red.bold.underlined +
                     (sprintf '  %s', details || exception.message).red.italic,
-                    reason ? "\n#{reason.blue.bold.italic}" : nil].compact.join("\n"))
+                    (reason ? "\n#{reason.blue.bold.italic}" : nil),
+                    (comments ? "\n\n#{comments}" : nil)].compact.join("\n"))
       self.out.puts "\n" + exception.backtrace.join("\n").bold.red if exception && config && config[:trace]
       self.exit_code = 1
     end

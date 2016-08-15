@@ -55,7 +55,7 @@ module Shhh
             ]
           }
           it 'should find the command' do
-            expect(Shhh::App::Commands.commands.size).to eql(9)
+            expect(Shhh::App::Commands.commands.size).to be >= 9
             options_variations.each do |opts|
               expect(Shhh::App::Commands.find_command_class(opts)).to eql(subject), opts.inspect
             end

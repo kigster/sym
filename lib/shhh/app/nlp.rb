@@ -8,7 +8,7 @@ module Shhh
     #     shhh encrypt file $input with keychain $item
 
     class NLP
-      IGNORED = %i(and the to key with item about for of from)
+      IGNORED = %i(and the to key with it item about for of from make create)
 
       MAPPING = { using:     :private_key,
                   from:      :keyfile,
@@ -17,6 +17,10 @@ module Shhh
                   save:      :output,
                   clipboard: :copy,
                   ask:       :interactive,
+                  enter:     :interactive,
+                  read:      :file,
+                  write:     :output,
+                  silently:  :quiet
       }
 
       attr_accessor :argv, :result, :cli, :opts
@@ -30,14 +34,16 @@ module Shhh
 
       def process
         argv.each do |value|
+
           arg = MAPPING.key?(value.to_sym) ? MAPPING[value.to_sym] : value.to_sym
-          if opts.key? arg
-            result << "--#{arg}"
+          if opts.to_hash.key?(arg)
+            result << '--' + "#{arg.to_s.gsub(/_/, '-')}"
           else
             result << arg.to_s unless IGNORED.include?(arg)
           end
         end
         result
+
       end
 
       def run
