@@ -8,5 +8,5 @@ require 'shhh'
 #ARGV.any?{ |a| a =~ /^-/ } ?
 ARGV.first =~ /^-/  ?
   Shhh::App::CLI.new(ARGV.dup).run :
-  Shhh::App::NLP.new(ARGV.dup).run
+  Shhh::App::NLP::Translator.new(ARGV.dup).translate
 

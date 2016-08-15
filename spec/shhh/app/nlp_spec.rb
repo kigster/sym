@@ -1,6 +1,7 @@
 require 'spec_helper'
 require 'singleton'
 
+require 'shhh/app/nlp'
 
 module Shhh
   module App

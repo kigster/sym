@@ -1,5 +1,6 @@
 require 'colored2'
 require_relative 'command'
+require_relative '../nlp'
 module Shhh
   module App
     module Commands
@@ -10,12 +11,14 @@ module Shhh
         def run
           output = []
 
+          output << Shhh::App::NLP::Base.usage
+
           output << example(comment: 'generate a new private key and copy to the clipboard',
-                            command: 'shhh generate key and copy to clipboard'
+                            command: 'shhh make new key and copy it to the clipboard'
           )
 
           output << example(comment: 'generate and save to a file a password-protected key, silently',
-                            command: 'shhh generate key with password and save to file',
+                            command: 'shhh create a secure key and save it to "my.key"',
           )
 
           output << example(comment: 'encrypt a plain text string with a key, and save the output to a file',
@@ -48,12 +51,25 @@ module Shhh
         end
 
         def example(comment: nil, command: nil, echo: nil, result: nil)
-          out = []
+          @dict   ||= ::Shhh::App::NLP::Constants::DICTIONARY.to_a.flatten!
+          _command = command.split(' ').map do |w|
+            _w = w.to_sym
+            if w == 'shhh'
+              w.italic.yellow
+            elsif ::Shhh::App::NLP::Constants::STRIPPED.include?(_w)
+              w.italic.red
+            elsif @dict.include?(_w)
+              w.blue
+            else
+              w
+            end
+          end.join(' ') if command
+          out     = []
           out << "# #{comment}".white.dark.italic if comment
-          out << "#{command}" if command
+          out << "#{_command}" if command
           out << "#{echo}" if echo
           out << "#{result}" if result
-          out << '—'*80
+          out << (' '*80).dark
         end
       end
     end
