@@ -60,6 +60,10 @@ module Shhh
           raise Shhh::Errors::AbstractMethodCalled.new(:run)
         end
 
+        def to_s
+          "#{self.class.short_name.to_s.bold.yellow}, with options: #{cli.args.argv.join(' ').gsub(/--/, '').bold.green}"
+        end
+
       end
     end
   end
