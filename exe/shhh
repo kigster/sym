@@ -6,7 +6,14 @@ $LOAD_PATH << lib_path if File.exist?(lib_path) && !$LOAD_PATH.include?(lib_path
 require 'shhh'
 
 #ARGV.any?{ |a| a =~ /^-/ } ?
+begin
 ARGV.first =~ /^-/  ?
-  Shhh::App::CLI.new(ARGV.dup).run :
-  Shhh::App::NLP::Translator.new(ARGV.dup).translate
+  ::Shhh::App::CLI.new(ARGV.dup).run :
+  ::Shhh::App::NLP::Translator.new(ARGV.dup).translate.and.run
+rescue Interrupt => e
+  STDERR.flush
+  STDERR.puts "Interrupt, #{e.message}, exiting."
+  STDERR.flush
+end
+
 
