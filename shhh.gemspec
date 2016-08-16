@@ -2,7 +2,7 @@
 lib = File.expand_path('../lib', __FILE__)
 $LOAD_PATH.unshift(lib) unless $LOAD_PATH.include?(lib)
 require 'shhh/version'
-
+BASH_COMPLETION = File.read("#{lib}/../bin/shhh.bash-completion")
 Gem::Specification.new do |spec|
   spec.name          = 'shhh'
   spec.version       = Shhh::VERSION
@@ -17,6 +17,17 @@ Gem::Specification.new do |spec|
   spec.bindir        = 'exe'
   spec.executables   = spec.files.grep(%r{^exe/}) { |f| File.basename(f) }
   spec.require_paths = ['lib']
+  spec.required_ruby_version = '>= 2.2'
+  spec.post_install_message = "
+
+Please copy and paste the following BASH function into your ~/.bashrc or
+equivalent, in order to enable command completion:
+
+#{BASH_COMPLETION}
+
+Thank you for installing Shhh!
+   -- KG (github.com/kigster)
+"
 
   spec.add_dependency 'require_dir', '~> 0.1'
   spec.add_dependency 'colored2', '~> 2.0'

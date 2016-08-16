@@ -1,3 +1,4 @@
+
 #!/usr/bin/env ruby
 require 'slop'
 require 'shhh'
@@ -9,6 +10,7 @@ require 'shhh/errors'
 require 'shhh/app/commands'
 require 'shhh/app/keychain'
 require 'shhh/app/private_key/handler'
+require 'shhh/app/nlp/constants'
 require 'highline'
 
 require_relative 'output/file'
@@ -81,6 +83,7 @@ module Shhh
         end
 
         if command
+          STDERR.puts '   Running command: '.dark + "#{command.to_s}" if opts[:verbose]
           result = command.run
           output_proc.call(result)
         else
@@ -208,6 +211,10 @@ module Shhh
           o.bool '-N',  '--no-color',    '           disable color output'
           o.bool '-e',  '--encrypt',     '           encrypt mode'
           o.separator ''
+          o.on '--dictionary' do
+            puts o.to_a.map{ |w| "#{w.flags.reject{|f| f.to_s !~ /--/ }.first.to_s}" }.join(' ')
+            exit 0
+          end
         end
       rescue StandardError => e
         raise(e)
