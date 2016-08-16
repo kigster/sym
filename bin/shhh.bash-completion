@@ -9,14 +9,14 @@
 _shhh() {
     local SHHH_OPTS SHHH_POINTS cur prev
 
-    cur=\"${COMP_WORDS[COMP_CWORD]}\"
-    prev=\"${COMP_WORDS[COMP_CWORD-1]}\"
+    cur="${COMP_WORDS[COMP_CWORD]}"
+    prev="${COMP_WORDS[COMP_CWORD-1]}"
 
     COMPREPLY=()
 
     SHHH_COMP_OPTIONS=$(shhh --dictionary)
-    [[ $COMP_CWORD == 1 ]] && SHHH_COMP_OPTIONS=\"${SHHH_COMP_OPTIONS} ${SHHH_COMMANDS}\"
-    COMPREPLY=( $(compgen -W \"${SHHH_COMP_OPTIONS}\" -- ${cur}) )
+    [[ $COMP_CWORD == 1 ]] && SHHH_COMP_OPTIONS="${SHHH_COMP_OPTIONS} ${SHHH_COMMANDS}"
+    COMPREPLY=( $(compgen -W "${SHHH_COMP_OPTIONS}" -- ${cur}) )
     return 0
 }
 
