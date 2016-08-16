@@ -14,24 +14,30 @@ module Shhh
           out << %Q`
 #{header('Natural Language Processing')}
 
-#{'When shhh is called, but none of the arguments contain a dash, then the
-the NLP (natural language processing) Translator is invoked. The Translator is
-based on a very simple algorithm:
+#{'When '.dark.normal}#{'shhh'.bold.blue} #{'is invoked, and the first argument does not begin with a dash,
+then the the NLP (natural language processing) Translator is invoked.
+The Translator is based on a very simple algorithm:
 
- * ignore all of the ambiguous words, or words with duplicate meaning
- * unambiguously map arguments to the regular options (the double-dash version)
- * words that already match double-dash options are double-dashed
- * the mapping of words into --options is performed
- * the result is parsed
+ * ignore any of the words tagged STRIPPED. These are the ambiguous words,
+   or words with duplicate meaning.
 
-When verbose is provided as an argument, you will additionally see the command line
-arguments that NLP system had produced following the mapping of the actual arguments.
-This may be helpful in diagnosis of why a particular sentence is not recognized.'.dark.normal}
+ * map the remaining arguments to regular double-dashed options using the DICTIONARY
+
+ * words that are a direct match for a --option are automatically double-dashed
+
+ * remaining words are left as is (these would be file names, key names, etc).
+
+ * finally, the resulting "new" command line is parsed with regular options.
+
+ * When arguments include "verbose", NLP system will print "before" and "after"
+   of the arguments, so that any issues can be debugged and corrected.
+
+'.dark.normal}
 
 #{header('Currently ignored words:')}
     #{Constants::STRIPPED.join(', ').red.italic}
 
-#{header('Currently Dictionary')}
+#{header('Regular Word Mapping')}
 #{Constants::DICTIONARY.pretty_inspect.split(/\n/).map do |line|
             line.gsub(
               /[\:\}\,\[\]]/, ''
@@ -48,8 +54,8 @@ This may be helpful in diagnosis of why a particular sentence is not recognized.
         def convert_dictionary(left = '', right = '')
           [
             sprintf('%35.35s', left.gsub(/ /, ' ')).italic.yellow,
-            ' >————————➤ '.dark,
-            sprintf('%-20.20s', right).blue,
+            '   ───────➤   '.dark,
+            sprintf('--%-20.20s', right).blue,
 
             "\n"
           ].join

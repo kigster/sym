@@ -2,7 +2,7 @@ module Shhh
   module App
     module NLP
       module Constants
-        STRIPPED = %i(and a the it item to key with about for of new make)
+        STRIPPED = %i(and a the it item to key with about for of new make store in print)
 
         DICTIONARY = {
           # option (Slop)

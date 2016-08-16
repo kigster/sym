@@ -4,11 +4,11 @@ require 'rspec/expectations'
 
 RSpec::Matchers.define :map_to do |expected|
   match do |actual|
-    result = Shhh::App::NLP::Translator.new(actual.split(' ')).translate
-    result == expected
+    @translator =  Shhh::App::NLP::Translator.new(actual.split(' ')).translate
+    @translator.translated_argv == expected
   end
   failure_message do |actual|
-    "Expected transation result to be: ——> #{expected.to_s} but the result was: ——> #{Shhh::App::NLP::Translator.new(actual.split(' ')).translate}"
+    "Expected transation result to be: ——> #{expected.to_s} but the result was: ——> #{@translator.translated_argv}"
   end
 
 end

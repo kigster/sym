@@ -67,7 +67,7 @@ RSpec.shared_context :run_command do
   include_context :encryption
 
   let(:private_key) { TEST_KEY }
-  let(:cli) { Shhh::App::CLI.new(argv) }
+  let(:cli) { Shhh::App::CLI.new(argv.reject{ |a| a.to_s =~ /verbose|-v/ }) }
   let(:opts) { cli.opts }
   let(:run_cli) { true }
 
