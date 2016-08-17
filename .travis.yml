@@ -4,7 +4,7 @@ env:
 rvm:
   - 2.2.5
   - 2.3.1
-script: "bundle exec rspec"
+script: "rake"
 notifications:
   email:
     recipients:
