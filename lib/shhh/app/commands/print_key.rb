@@ -8,7 +8,6 @@ module Shhh
         required_options [ :keychain, :keyfile ]
 
         try_after :show_examples
-
         def run
           cli.key
         end

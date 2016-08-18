@@ -22,14 +22,15 @@ module Shhh
         end
 
         def new_password
-          password         = prompt('New Password     : ', :blue)
-          password_confirm = prompt('Confirm Password : ', :blue)
-
-          raise Shhh::Errors::PasswordsDontMatch.new(
-            'The passwords you entered do not match.') if password != password_confirm
+          password         = prompt('New Password     :  ', :blue)
 
           raise Shhh::Errors::PasswordTooShort.new(
             'Minimum length is 7 characters.') if password.length < 7
+
+          password_confirm = prompt('Confirm Password :  ', :blue)
+
+          raise Shhh::Errors::PasswordsDontMatch.new(
+          'The passwords you entered do not match.') if password != password_confirm
 
           password
         end

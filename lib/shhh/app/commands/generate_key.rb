@@ -20,7 +20,7 @@ module Shhh
           clipboard_copy(new_private_key) if opts[:copy]
 
           if opts[:keychain] && Shhh::App.is_osx?
-            Shhh::App::KeyChain.new(opts[:keychain]).add(new_private_key)
+            Shhh::App::KeyChain.new(opts[:keychain], opts).add(new_private_key)
           end
 
           new_private_key
