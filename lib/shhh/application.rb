@@ -29,7 +29,7 @@ module Shhh
                     end
     end
 
-    def execute
+    def execute!
       if args.do_options_require_key? || args.do_options_specify_key?
         self.key = Shhh::App::PrivateKey::Handler.new(opts, input_handler).key
         raise Shhh::Errors::NoPrivateKeyFound.new('Private key is required') unless self.key
@@ -39,9 +39,11 @@ module Shhh
         raise Shhh::Errors::InsufficientOptionsError.new(
           'Can not determine what to do from the options ' + opts_hash.keys.reject { |k| !opts[k] }.to_s)
       end
-
       self.result = command.execute
-      return result
+    end
+
+    def execute
+      execute!
 
     rescue ::OpenSSL::Cipher::CipherError => e
       error type:      'Cipher Error',

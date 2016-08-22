@@ -108,8 +108,8 @@ module Shhh
         context 'when key is unencrypted' do
 
           context 'and is supplied via -k string' do
-            let(:argv) { "-d -s #{encrypted_string} -k #{private_key} -v".split(' ') }
             include_context :decrypting
+            let(:argv) { "-d -s #{encrypted_string} -k #{private_key} -v".split(' ') }
 
             it 'should decrypt' do
               expect(decrypted_string).to eql(string)
