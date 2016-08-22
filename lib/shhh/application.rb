@@ -14,7 +14,7 @@ module Shhh
 
     def initialize(opts)
       self.opts      = opts
-      self.opts_hash = opts.to_hash
+      self.opts_hash = opts.respond_to?(:to_hash) ? opts.to_hash : opts
       self.args      = ::Shhh::App::Args.new(opts_hash)
       initialize_input_handler
       initialize_key_handler
@@ -37,7 +37,7 @@ module Shhh
 
       unless command
         raise Shhh::Errors::InsufficientOptionsError.new(
-          'Can not determine what to do from the options ' + opts.keys.reject { |k| !opts[k] }.to_s)
+          'Can not determine what to do from the options ' + opts_hash.keys.reject { |k| !opts[k] }.to_s)
       end
 
       self.result = command.execute
@@ -62,16 +62,13 @@ module Shhh
       @command       ||= @command_class.new(self) if @command_class
     end
 
-    private
-
-    def error(hash)
-      hash
-    end
-
     def editor
       ENV['EDITOR'] || '/bin/vi'
     end
 
+    def error(hash)
+      hash
+    end
 
     def initialize_input_handler(handler = ::Shhh::App::Input::Handler.new)
       self.input_handler = handler
