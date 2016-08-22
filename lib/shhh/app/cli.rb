@@ -61,15 +61,27 @@ module Shhh
 
       def initialize(argv)
         begin
-          self.opts = parse(argv.dup)
+          argv_copy = argv.dup
+          dict      = false
+          if argv_copy.include?('--dictionary')
+            dict = true
+            argv_copy.delete('--dictionary')
+          end
+          self.opts = parse(argv_copy)
+          if dict
+            options = opts.parser.unused_options + opts.parser.used_options
+            puts options.map{|o| o.to_s.gsub(/.*(--[\w-]+).*/, '\1') }.sort.join(' ')
+            exit 0
+          end
         rescue StandardError => e
           error exception: e
           return
         end
 
+        configure_color(argv)
+
         self.application = ::Shhh::Application.new(opts)
 
-        configure_color(argv)
         select_output_stream
 
       end
@@ -111,11 +123,24 @@ module Shhh
 
       def parse(arguments)
         Slop.parse(arguments) do |o|
-          o.banner = 'Usage:'.bold.yellow
-          o.separator '    shhh [options]'.green
+          o.banner = "Shhh (#{Shhh::VERSION}) – encrypt/decrypt data with a private key\n".bold.white
+          o.separator 'Usage:'.yellow
+          o.separator '   # Generate a new key:'.dark
+          o.separator '   shhh -g '.green.bold +
+                      '[ -c ] [ -p ] [ -x keychain ] [ -o keyfile | -q | ]  '.green
+          o.separator ''
+          o.separator '   # Encrypt/Decrypt '.dark
+          o.separator '   shhh [ -d | -e ] '.green.bold +
+          '[ -f <file> | -s <string> ] '.green
+          o.separator '        [ -k key | -K keyfile | -x keychain | -i ] '.green
+          o.separator '        [ -o <output file> ] '.green
+          o.separator ' '
+          o.separator '   # Edit an encrypted file in $EDITOR '.dark
+          o.separator '   shhh -t -f <file> [ -b ]'.green.bold +
+          '[ -k key | -K keyfile | -x keychain | -i ] '.green
           o.separator ' '
           o.separator 'Modes:'.yellow
-          o.bool '-h', '--help', '           show help'
+          o.bool '-e', '--encrypt', '           encrypt mode'
           o.bool '-d', '--decrypt', '           decrypt mode'
           o.bool '-t', '--edit', '           decrypt, open an encr. file in an $EDITOR'
           o.separator ' '
@@ -123,41 +148,37 @@ module Shhh
           o.bool '-g', '--generate', '           generate a new private key'
           o.bool '-p', '--password', '           encrypt the key with a password'
           o.bool '-c', '--copy', '           copy the new key to the clipboard'
+          if Shhh::App.is_osx?
+            o.string '-x', '--keychain', '[key-name] '.blue + 'add to (or read from) the OS-X Keychain'
+          end
           o.separator ' '
           o.separator 'Provide a private key:'.yellow
           o.bool '-i', '--interactive', '           Paste or type the key interactively'
           o.string '-k', '--private-key', '[key]   '.blue + '   private key as a string'
           o.string '-K', '--keyfile', '[key-file]'.blue + ' private key from a file'
-          if Shhh::App.is_osx?
-            o.separator ' '
-            o.separator 'Use your KeyChain password entry to store a private key:'.yellow
-            o.string '-x', '--keychain', '[key-name] '.blue + 'add to, or read the key from Keychain'
-            o.string '--keychain-del', '[key-name] '.blue + 'delete keychain entry with that name'
-          end
           o.separator ' '
           o.separator 'Data:'.yellow
           o.string '-s', '--string', '[string]'.blue + '   specify a string to encrypt/decrypt'
           o.string '-f', '--file', '[file]  '.blue + '   filename to read from'
           o.string '-o', '--output', '[file]  '.blue + '   filename to write to'
-          o.bool '-b', '--backup', '           create a backup file in the edit mode'
           o.separator ' '
-          o.separator 'Flags:'.bold.yellow
+          o.separator 'Flags:'.yellow
+          if Shhh::App.is_osx?
+            o.string '--keychain-del', '[key-name] '.blue + 'delete keychain entry with that name'
+          end
+          o.bool '-b', '--backup', '           create a backup file in the edit mode'
           o.bool '-v', '--verbose', '           show additional information'
-          o.bool '-q', '--quiet', '           silence all output'
           o.bool '-T', '--trace', '           print a backtrace of any errors'
-          o.bool '-E', '--examples', '           show several examples'
-          o.bool '-L', '--language', '           natural language examples'
+          o.bool '-q', '--quiet', '           silence all output'
           o.bool '-V', '--version', '           print library version'
           o.bool '-N', '--no-color', '           disable color output'
-          o.bool '-e', '--encrypt', '           encrypt mode'
-          o.separator ''
-          o.on '--dictionary' do
-            puts o.to_a.map { |w| "#{w.flags.reject { |f| f.to_s !~ /--/ }.first.to_s}" }.join(' ')
-            exit 0
-          end
+          o.separator ' '
+          o.separator 'Help & Examples:'.yellow
+          o.bool '-E', '--examples', '           show several examples'
+          o.bool '-L', '--language', '           natural language examples'
+          o.bool '-h', '--help', '           show help'
+
         end
-      rescue StandardError => e
-        raise(e)
       end
     end
   end
