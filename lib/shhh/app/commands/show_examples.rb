@@ -7,7 +7,7 @@ module Shhh
         required_options :examples
         try_after :show_help
 
-        def run
+        def execute
           output = []
 
           output << example(comment: 'generate a new private key into an environment variable:',

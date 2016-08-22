@@ -44,7 +44,7 @@ module Shhh
 
         def find_command_class(opts)
           self.sorted_commands.each do |command_class|
-            return command_class if command_class.options_satisfied_by?(opts.to_hash)
+            return command_class if command_class.options_satisfied_by?(opts)
           end
           nil
         end

@@ -42,26 +42,29 @@ module Shhh
           end
         end
 
-        attr_accessor :cli
+        attr_accessor :application
 
-        def initialize(cli)
-          self.cli = cli
+        def initialize(application)
+          self.application = application
         end
 
         def opts
-          cli.opts
+          application.opts
+        end
+        def opts_hash
+          application.opts_hash
         end
 
         def key
-          @key ||= cli.key
+          @key ||= application.key
         end
 
-        def run
+        def execute
           raise Shhh::Errors::AbstractMethodCalled.new(:run)
         end
 
         def to_s
-          "#{self.class.short_name.to_s.bold.yellow}, with options: #{cli.args.argv.join(' ').gsub(/--/, '').bold.green}"
+          "#{self.class.short_name.to_s.bold.yellow}, with options: #{application.args.argv.join(' ').gsub(/--/, '').bold.green}"
         end
 
       end

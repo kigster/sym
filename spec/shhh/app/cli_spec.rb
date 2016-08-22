@@ -5,10 +5,23 @@ module Shhh
   module App
     RSpec.describe 'Shhh::App::CLI' do
 
+      context 'basic initialization' do
+        let(:argv) { %w(-gc) }
+        let(:cli) { Shhh::App::CLI.new(argv) }
+
+        it 'should properly initialize' do
+          expect(cli).to_not be_nil
+          expect(cli.opts).to_not be_nil
+          expect(cli.opts[:generate]).to be_truthy
+          expect(cli.command).to be_a_kind_of(Shhh::App::Commands::GenerateKey)
+        end
+      end
 
       context 'generate private key' do
         let(:argv) { %w(-g -v) }
         before do
+          expect(cli).not_to be_nil
+          expect(cli.command).not_to be_nil
           expect(cli.command.class).to receive(:create_private_key).and_return(TEST_KEY)
         end
         include_context :run_command
@@ -121,9 +134,9 @@ module Shhh
           let(:tempfile) { SAVE_TO_TEMPFILE.call(encrypted_key) }
           let(:input_handler) { Shhh::App::Input::Handler.new }
           before do
-            cli.input_handler = input_handler
-            cli.send(:initialize_key_handler)
             expect(input_handler).to receive(:ask).exactly(attempts).times.and_return(decryption_password)
+            application.input_handler = input_handler
+            application.send(:initialize_key_handler)
           end
 
           include_context :decrypting
@@ -149,11 +162,11 @@ module Shhh
               expect(File.read(tempfile.path)).not_to eql(private_key)
               expect(input_handler).to receive(:puts).and_return(nil).exactly(attempts).times
               expect(cli).to receive(:error).
-                with(type:    'Error',
-                     details: 'Invalid password, private key can not decrypted.'
+                with(type:    'InvalidPasswordPrivateKey',
+                     details: 'Invalid password.'
                 )
 
-              cli.run
+              cli.execute
             end
           end
         end

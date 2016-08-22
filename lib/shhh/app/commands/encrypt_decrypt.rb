@@ -11,8 +11,8 @@ module Shhh
 
         try_after :generate_key
 
-        def run
-          send(cli.action, content, cli.key)
+        def execute
+          send(application.action, content, application.key)
         end
 
         private

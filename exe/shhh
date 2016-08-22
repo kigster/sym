@@ -8,8 +8,8 @@ require 'shhh'
 #ARGV.any?{ |a| a =~ /^-/ } ?
 begin
 ARGV.first =~ /^-/  ?
-  ::Shhh::App::CLI.new(ARGV.dup).run :
-  ::Shhh::App::NLP::Translator.new(ARGV.dup).translate.and.run
+  ::Shhh::App::CLI.new(ARGV.dup).execute :
+  ::Shhh::App::NLP::Translator.new(ARGV.dup).translate.and.execute
 rescue Interrupt => e
   STDERR.flush
   STDERR.puts "Interrupt, #{e.message}, exiting."

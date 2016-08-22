@@ -5,7 +5,7 @@ module Shhh
       class ShowVersion < Command
         required_options :version
         try_after :show_help
-        def run
+        def execute
           "shhh (version #{Shhh::VERSION})"
         end
       end

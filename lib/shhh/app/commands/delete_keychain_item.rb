@@ -8,7 +8,7 @@ module Shhh
         required_options :keychain_del
         try_after :generate_key, :open_editor, :encrypt_decrypt
 
-        def run
+        def execute
           Shhh::App::KeyChain.new(opts[:keychain_del]).delete
         end
       end

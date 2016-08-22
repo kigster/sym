@@ -54,10 +54,10 @@ module Shhh
         puts "> #{command.yellow.green}" if opts[:verbose]
         output = `#{command}`
         result = $?
-        raise Shhh::Errors::ExternalCommandError.new("Command error: #{result}, command: #{command}") unless result.success?
+        raise Shhh::Errors::KeyChainCommandError.new("Command error: #{result}, command: #{command}") unless result.success?
         output.chomp
       rescue Errno::ENOENT => e
-        raise Shhh::Errors::ExternalCommandError.new("Command error: #{e.message}, command: #{command}")
+        raise Shhh::Errors::KeyChainCommandError.new("Command error: #{e.message}, command: #{command}")
       end
 
       def stderr_off

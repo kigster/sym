@@ -1,11 +1,10 @@
-
-#!/usr/bin/env ruby
 require 'slop'
 require 'shhh'
 require 'colored2'
 require 'yaml'
+require 'forwardable'
 require 'openssl'
-require 'shhh/app'
+require 'shhh/application'
 require 'shhh/errors'
 require 'shhh/app/commands'
 require 'shhh/app/keychain'
@@ -53,8 +52,12 @@ module Shhh
     # in a cross-platform way inside the {Shhh::App::Keychain} module.
 
     class CLI
-      attr_accessor :opts, :args, :outputs, :output_proc,
-                    :action, :password, :key, :input_handler, :key_handler
+
+      extend Forwardable
+
+      def_delegators :@application, :command
+
+      attr_accessor :opts, :application, :outputs, :output_proc
 
       def initialize(argv)
         begin
@@ -64,108 +67,45 @@ module Shhh
           return
         end
 
-
-        self.args = ::Shhh::App::Args.new(opts, argv)
+        self.application = ::Shhh::Application.new(opts)
 
         configure_color(argv)
         select_output_stream
-        initialize_input_handler
-        initialize_key_handler
 
-        self.action        = { opts[:encrypt] => :encr, opts[:decrypt] => :decr }[true]
       end
 
-      def run
+      def execute
         return Shhh::App.exit_code if Shhh::App.exit_code != 0
-        unless opts[:generate]
-          self.key = PrivateKey::Handler.new(opts,
-                                             input_handler).key
-        end
 
-        if command
-          STDERR.puts '   Running command: '.dark + "#{command.to_s}" if opts[:verbose]
-          result = command.run
-          output_proc.call(result)
+        result = application.execute
+        if result.is_a?(Hash)
+          self.output_proc = ::Shhh::App::Args.new({}).output_class
+          error(result)
         else
-          # command was not found. Reset output to printing, and return an error.
-          self.output_proc = Args.new(Hash.new, []).output_class
-          command_not_found_error!
+          self.output_proc.call(result)
         end
-
-      rescue ::OpenSSL::Cipher::CipherError => e
-        error type:      'Cipher Error',
-              details:   e.message,
-              reason:    'Perhaps either the secret is invalid, or encrypted data is corrupt.',
-              exception: e
-
-      rescue Shhh::Errors::InvalidEncodingPrivateKey => e
-        error type:      'Private Key Error',
-              details:   'Private key does not appear to be properly encoded. ',
-              reason:    (opts[:password] ? nil : 'Perhaps the key is password-protected?'),
-              exception: e
-
-      rescue Shhh::Errors::InvalidPasswordPrivateKey => e
-        error type:      'Error',
-              details:   'Invalid password, private key can not decrypted.'
-
-      rescue Shhh::Errors::Error => e
-        error type:      'Error',
-              details:   e.message,
-              exception: e
-
-      rescue StandardError => e
-        error exception: e
       end
+
+      private
 
       def error(hash)
         Shhh::App.error(hash.merge(config: (opts ? opts.to_hash : {})))
       end
 
-      def editor
-        ENV['EDITOR'] || '/bin/vi'
-      end
-
-      def command
-        @command_class ||= Shhh::App::Commands.find_command_class(opts)
-        @command       ||= @command_class.new(self) if @command_class
-      end
-
-      private
-
       def select_output_stream
-        out_klass = self.args.output_class
-        raise "Can not determine output class from arguments #{opts.to_hash}" unless
-          out_klass && out_klass.is_a?(Class)
+        output_klass = application.args.output_class
 
-        self.output_proc = out_klass.new(self).output_proc
+        unless output_klass && output_klass.is_a?(Class)
+          raise "Can not determine output class from arguments #{opts.to_hash}"
+        end
+
+        self.output_proc = output_klass.new(self).output_proc
       end
 
       def configure_color(argv)
         if opts[:no_color]
           Colored2.disable! # reparse options without the colors to create new help msg
           self.opts = parse(argv.dup)
-        end
-      end
-
-      def initialize_input_handler(handler = Input::Handler.new)
-        self.input_handler = handler
-      end
-
-      def initialize_key_handler
-        self.key_handler = PrivateKey::Handler.new(self.opts, input_handler)
-      end
-
-
-      def command_not_found_error!
-        if key
-          h             = opts.to_hash
-          supplied_opts = h.keys.select { |k| h[k] }.join(', ')
-          error type:    'Options Error',
-                details: 'Unable to determined what command to run',
-                reason:  "You provided the following options: #{supplied_opts.bold.yellow}",
-                comments: opts.to_s
-        else
-          raise Shhh::Errors::NoPrivateKeyFound.new('Private key is required')
         end
       end
 
@@ -177,7 +117,7 @@ module Shhh
           o.separator 'Modes:'.yellow
           o.bool '-h', '--help', '           show help'
           o.bool '-d', '--decrypt', '           decrypt mode'
-          o.bool '-t', '--edit', '           decrypt, open an encr. file in ' + editor
+          o.bool '-t', '--edit', '           decrypt, open an encr. file in an $EDITOR'
           o.separator ' '
           o.separator 'Create a private key:'.yellow
           o.bool '-g', '--generate', '           generate a new private key'
@@ -199,20 +139,20 @@ module Shhh
           o.string '-s', '--string', '[string]'.blue + '   specify a string to encrypt/decrypt'
           o.string '-f', '--file', '[file]  '.blue + '   filename to read from'
           o.string '-o', '--output', '[file]  '.blue + '   filename to write to'
-          o.bool '-b',  '--backup',      '           create a backup file in the edit mode'
+          o.bool '-b', '--backup', '           create a backup file in the edit mode'
           o.separator ' '
           o.separator 'Flags:'.bold.yellow
-          o.bool '-v',  '--verbose',     '           show additional information'
-          o.bool '-q',  '--quiet',       '           silence all output'
-          o.bool '-T',  '--trace',       '           print a backtrace of any errors'
-          o.bool '-E',  '--examples',    '           show several examples'
-          o.bool '-L',  '--language',    '           natural language examples'
-          o.bool '-V',  '--version',     '           print library version'
-          o.bool '-N',  '--no-color',    '           disable color output'
-          o.bool '-e',  '--encrypt',     '           encrypt mode'
+          o.bool '-v', '--verbose', '           show additional information'
+          o.bool '-q', '--quiet', '           silence all output'
+          o.bool '-T', '--trace', '           print a backtrace of any errors'
+          o.bool '-E', '--examples', '           show several examples'
+          o.bool '-L', '--language', '           natural language examples'
+          o.bool '-V', '--version', '           print library version'
+          o.bool '-N', '--no-color', '           disable color output'
+          o.bool '-e', '--encrypt', '           encrypt mode'
           o.separator ''
           o.on '--dictionary' do
-            puts o.to_a.map{ |w| "#{w.flags.reject{|f| f.to_s !~ /--/ }.first.to_s}" }.join(' ')
+            puts o.to_a.map { |w| "#{w.flags.reject { |f| f.to_s !~ /--/ }.first.to_s}" }.join(' ')
             exit 0
           end
         end

@@ -10,7 +10,7 @@ module Shhh
 
 
 
-        def run
+        def execute
           output = []
 
           output << Shhh::App::NLP::Base.usage

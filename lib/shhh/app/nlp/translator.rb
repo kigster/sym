@@ -53,7 +53,7 @@ module Shhh
           ::Shhh::App::CLI.new(self.translated_argv)
         end
 
-        alias_method :cli, :and
+        alias_method :application, :and
 
       end
     end

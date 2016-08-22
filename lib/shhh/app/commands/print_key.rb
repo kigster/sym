@@ -4,12 +4,10 @@ module Shhh
   module App
     module Commands
       class PrintKey < Command
-        include Shhh
         required_options [ :keychain, :keyfile ]
 
-        try_after :show_examples
-        def run
-          cli.key
+        def execute
+          self.key
         end
       end
     end

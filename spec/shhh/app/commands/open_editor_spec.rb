@@ -12,7 +12,7 @@ module Shhh
         let(:command_class) { OpenEditor }
 
         def before_cli_run
-          expect(cli.command).to receive(:launch_editor).once.and_return(true)
+          expect(application.command).to receive(:launch_editor).once.and_return(true)
         end
 
         context 'no changes' do

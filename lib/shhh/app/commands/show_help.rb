@@ -4,10 +4,10 @@ module Shhh
     module Commands
       class ShowHelp < Command
 
-        required_options :help, ->(opts) { opts.keys.all? { |k| !opts[k] } }
+        required_options :help, ->(opts) { opts.to_hash.keys.all? { |k| !opts[k] } }
         try_after :generate_key, :open_editor, :encrypt_decrypt
 
-        def run
+        def execute
           opts.to_s(prefix: ' ' * 2)
         end
       end

@@ -1,6 +1,6 @@
 require 'shhh'
 require_relative 'fake_terminal'
-
+require 'shhh/app/output'
 TEST_KEY = 'LxRV7pqW5XY5DDcuh128byukvsr3JLGX54v6eKNl8a0='
 class TestClass
   include Shhh
@@ -16,15 +16,15 @@ class TestClass
 end
 
 
-unless Shhh::App::CLI.instance_methods.include?(:old_run)
+unless Shhh::App::CLI.instance_methods.include?(:old_execute)
   class Shhh::App::CLI
     attr_accessor :already_ran
-    alias_method :old_run, :run
+    alias_method :old_execute, :execute
 
-    def run
+    def execute
       raise ArgumentError.new('CLI already ran this example') if already_ran
       self.already_ran = true
-      self.old_run
+      self.old_execute
     end
   end
 end
@@ -67,9 +67,10 @@ RSpec.shared_context :run_command do
   include_context :encryption
 
   let(:private_key) { TEST_KEY }
-  let(:cli) { Shhh::App::CLI.new(argv.reject{ |a| a.to_s =~ /verbose|-v/ }) }
+  let(:cli) { Shhh::App::CLI.new(argv.reject { |a| a.to_s =~ /verbose|-v/ }) }
   let(:opts) { cli.opts }
   let(:run_cli) { true }
+  let(:application) { cli.application }
 
   after do
     console.clear!
@@ -79,8 +80,8 @@ RSpec.shared_context :run_command do
     console.clear!
     self.before_cli_run if self.respond_to?(:before_cli_run)
     # overwrite output proc on CLI so that we can collect and test the output
-    cli.output_proc = console.output_proc
-    cli.run if run_cli
+    cli.output_proc = console.output_proc unless opts[:quiet]
+    cli.execute if run_cli
   end
 
   def expect_command_to_have(klass:, output: [], option: nil, value: nil, lines: nil)
@@ -89,8 +90,8 @@ RSpec.shared_context :run_command do
 
     if klass
       klass.is_a?(Symbol) ?
-        expect(cli.command.send(klass)).to(be_truthy) :
-        expect(cli.command.class).to(eql(klass))
+        expect(application.command.send(klass)).to(be_truthy) :
+        expect(application.command.class).to(eql(klass))
     end
     expect_some_output output.is_a?(Array) ? output : [output]
     expect(program_output_lines.size).to eql(lines) if lines

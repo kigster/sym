@@ -8,11 +8,31 @@ module Shhh
       let(:opts) { { keyfile: true, edit: true } }
       let(:args) { Args.new(opts) }
 
-      %i(mode key).each do |type|
-        context type.to_s do
-          it "responds to #{type}? method" do
-            expect(args.send(:"#{type}?")).to be_truthy
+      %i(do_options_specify_mode?
+         do_options_specify_key?
+         do_options_require_key?).each do |type|
+        context "##{type.to_s}"do
+          subject { args.send(type) }
+          it { is_expected.to be_truthy}
+        end
+      end
+
+      context 'requires key or not?' do
+        subject { args.do_options_require_key? }
+        context '--examples' do
+          let(:opts) { { examples: true } }
+          it { is_expected.to be_falsey }
+        end
+        context '--generate' do
+          let(:opts) { { generate: true } }
+          it 'should only have :generate in the options' do
+            expect(opts.keys).to eql([:generate])
           end
+          it { is_expected.to be_falsey }
+        end
+        context '--decrypt' do
+          let(:opts) { { decrypt: true } }
+          it { is_expected.to be_truthy }
         end
       end
 

@@ -18,7 +18,7 @@ module Shhh
 
         attr_accessor :tempfile
 
-        def run
+        def execute
           begin
             self.tempfile = ::Tempfile.new(::Base64.urlsafe_encode64(opts[:file]))
             decrypt_content(self.tempfile)
@@ -31,7 +31,7 @@ module Shhh
         end
 
         def launch_editor
-          system("#{cli.editor} #{tempfile.path}")
+          system("#{application.editor} #{tempfile.path}")
         end
 
         private
@@ -72,7 +72,7 @@ module Shhh
             out << "\n\nDiff:\n#{diff}"
             out
           else
-            raise Shhh::Errors::EditorExitedAbnormally.new("#{cli.editor} exited with #{$<}")
+            raise Shhh::Errors::EditorExitedAbnormally.new("#{application.editor} exited with #{$<}")
           end
         end
 

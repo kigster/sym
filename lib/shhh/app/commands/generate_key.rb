@@ -8,13 +8,13 @@ module Shhh
 
         required_options :generate
 
-        def run
+        def execute
           retries         ||= 0
           new_private_key = self.class.create_private_key
 
           if opts[:password]
             new_private_key = encr_password(new_private_key,
-                                            cli.input_handler.new_password)
+                                            application.input_handler.new_password)
           end
 
           clipboard_copy(new_private_key) if opts[:copy]
