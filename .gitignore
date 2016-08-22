@@ -10,4 +10,4 @@
 /tmp/
 /data
 /spec/coverage/
-*.enc
+/*.enc
