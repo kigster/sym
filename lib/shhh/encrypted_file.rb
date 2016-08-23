@@ -15,8 +15,8 @@ module Shhh
 
     def initialize(file:, key_id:, key_type:)
       @file        = file
-      @key_id         = key_id
-      @key_type     = key_type.to_sym
+      @key_id      = key_id
+      @key_type    = key_type.to_sym
       @app_args    = { file: file, key_type => key_id, decrypt: true }
       @application = Shhh::Application.new(self.app_args)
     end
