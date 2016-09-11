@@ -146,8 +146,10 @@ module Shhh
           o.separator ' '
           o.separator 'Create a private key:'.yellow
           o.bool '-g', '--generate', '           generate a new private key'
-          o.bool '-p', '--password', '           encrypt the key with a password'
+          o.bool '-p', '--passsword', '           encrypt the key with a password'
           o.bool '-c', '--copy', '           copy the new key to the clipboard'
+          o.integer '--pass-cache-timeout', '[timeout]'.blue + '  when passwords expire (in seconds)'
+          o.bool '--pass-cache-off', '           disables key password caching'
           if Shhh::App.is_osx?
             o.string '-x', '--keychain', '[key-name] '.blue + 'add to (or read from) the OS-X Keychain'
           end

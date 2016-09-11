@@ -1,7 +1,8 @@
-require "codeclimate-test-reporter"
+require 'codeclimate-test-reporter'
 CodeClimate::TestReporter.start
 
 $LOAD_PATH.unshift File.expand_path('../../lib', __FILE__)
+
 require 'shhh'
 require 'base64'
 require 'openssl'
@@ -14,4 +15,5 @@ RSpec.configure do |spec|
   spec.before do
     Shhh::App.exit_code = 0
   end
+
 end

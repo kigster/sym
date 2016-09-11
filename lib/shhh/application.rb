@@ -1,5 +1,7 @@
-require 'shhh'
 require 'colored2'
+require 'shhh'
+require_dir 'shhh/app'
+
 module Shhh
   class Application
 
@@ -10,12 +12,15 @@ module Shhh
                   :key,
                   :input_handler,
                   :key_handler,
-                  :result
+                  :result,
+                  :password_cache
 
     def initialize(opts)
       self.opts      = opts
       self.opts_hash = opts.respond_to?(:to_hash) ? opts.to_hash : opts
       self.args      = ::Shhh::App::Args.new(opts_hash)
+
+      initialize_password_cache
       initialize_input_handler
       initialize_key_handler
       initialize_action
@@ -31,7 +36,7 @@ module Shhh
 
     def execute!
       if args.do_options_require_key? || args.do_options_specify_key?
-        self.key = Shhh::App::PrivateKey::Handler.new(opts, input_handler).key
+        self.key = Shhh::App::PrivateKey::Handler.new(opts, input_handler, password_cache).key
         raise Shhh::Errors::NoPrivateKeyFound.new('Private key is required') unless self.key
       end
 
@@ -77,8 +82,16 @@ module Shhh
     end
 
     def initialize_key_handler
-      self.key_handler = ::Shhh::App::PrivateKey::Handler.new(self.opts, input_handler)
+      self.key_handler = ::Shhh::App::PrivateKey::Handler.new(self.opts, input_handler, password_cache)
     end
 
+    def initialize_password_cache
+      password_timeout = opts[:pass_cache_timeout] || 300
+      cache_enabled    = opts[:pass_cache_off] ? false : true
+
+      self.password_cache = Shhh::App::Password::Cache.new(provider: Coin,
+                                                           timeout:  password_timeout,
+                                                           enabled:  cache_enabled)
+    end
   end
 end

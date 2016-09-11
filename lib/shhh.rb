@@ -1,6 +1,6 @@
-require 'require_dir'
 require 'colored2'
 require 'zlib'
+require 'coin'
 
 require_relative 'shhh/configuration'
 
@@ -10,7 +10,7 @@ Shhh::Configuration.configure do |config|
   config.private_key_cipher = config.data_cipher
   config.compression_enabled = true
   config.compression_level = Zlib::BEST_COMPRESSION
-  config.password_cache = { provider: :drb, timeout: 30 }
+
 end
 
 #
@@ -78,12 +78,18 @@ end
 #
 #
 
-module Shhh
-  extend RequireDir
-  init(__FILE__)
+module Kernel
+  def require_dir(___dir)
+    @___dir ||= File.dirname(__FILE__)
+    # require files using a consistent order based on the dir/file name.
+    # this should be OS-neutral
+    Dir["#{@___dir}/#{___dir}/*.rb"].sort.each do |___file|
+      require(___file)
+    end
+  end
 end
 
-Shhh.dir 'shhh/extensions'
+require_dir 'shhh/extensions'
 
 module Shhh
   def self.included(klass)
@@ -106,5 +112,3 @@ module Shhh
   end
 end
 
-Shhh.dir 'shhh'
-Shhh.dir 'shhh/app/commands'

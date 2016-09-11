@@ -53,3 +53,4 @@ module Shhh
   end
 end
 
+require_dir 'shhh/app/commands'

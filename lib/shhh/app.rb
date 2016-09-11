@@ -1,5 +1,6 @@
-require 'shhh/data'
+require 'shhh'
 require 'active_support/inflector'
+
 module Shhh
 
   # The {Shhh::App} Module is responsible for handing user input and executing commands.
@@ -48,4 +49,6 @@ module Shhh
   end
 end
 
-Shhh.dir_r 'shhh/app'
+require 'shhh/app/short_name'
+require 'shhh/version'
+require_dir 'shhh/app'

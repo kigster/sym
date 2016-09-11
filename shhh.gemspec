@@ -29,7 +29,6 @@ Thank you for installing Shhh!
    -- KG (github.com/kigster)
 "
 
-  spec.add_dependency 'require_dir', '~> 0.1'
   spec.add_dependency 'colored2', '~> 2.0'
   spec.add_dependency 'slop', '~> 4.3'
   spec.add_dependency 'activesupport'
@@ -42,4 +41,5 @@ Thank you for installing Shhh!
   spec.add_development_dependency 'rake', '~> 10.0'
   spec.add_development_dependency 'rspec', '~> 3.0'
   spec.add_development_dependency 'yard', '~> 0.9'
+  spec.add_development_dependency 'irbtools'
 end

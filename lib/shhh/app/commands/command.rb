@@ -1,6 +1,8 @@
-require 'shhh/app/short_name'
-require 'shhh/app/commands'
+require 'shhh'
+require 'shhh/app'
+
 require 'active_support/inflector'
+
 module Shhh
   module App
     module Commands

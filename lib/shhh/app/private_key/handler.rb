@@ -10,12 +10,13 @@ module Shhh
       class Handler
         include Shhh
 
-        attr_accessor :opts, :input_handler
+        attr_accessor :opts, :input_handler, :password_cache
         attr_writer :key
 
-        def initialize(opts, input_handler)
-          self.opts          = opts
-          self.input_handler = input_handler
+        def initialize(opts, input_handler, password_cache)
+          self.opts           = opts
+          self.input_handler  = input_handler
+          self.password_cache = password_cache
         end
 
 
@@ -32,7 +33,7 @@ module Shhh
           end
 
           if @key && @key.length > 45
-            @key = Decryptor.new(Base64Decoder.new(key).key, input_handler).key
+            @key = Decryptor.new(Base64Decoder.new(key).key, input_handler, password_cache).key
           end
 
           @key

@@ -34,6 +34,6 @@ module Shhh
     end
 
     attr_accessor :data_cipher, :password_cipher, :private_key_cipher
-    attr_accessor :compression_enabled, :compression_level, :password_cache
+    attr_accessor :compression_enabled, :compression_level
   end
 end

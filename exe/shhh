@@ -4,6 +4,7 @@ lib_path = File.expand_path(File.dirname(__FILE__) + '/../lib')
 $LOAD_PATH << lib_path if File.exist?(lib_path) && !$LOAD_PATH.include?(lib_path)
 
 require 'shhh'
+require 'shhh/app'
 
 #ARGV.any?{ |a| a =~ /^-/ } ?
 begin

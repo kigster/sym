@@ -1,17 +1,18 @@
-require_relative 'decryptor'
-require 'shhh/app/cache'
+require 'shhh/app/private_key/decryptor'
+require 'shhh/app/password/cache'
 module Shhh
   module App
     module PrivateKey
       class Decryptor
         include Shhh
 
-        attr_accessor :encrypted_key, :input_handler
+        attr_accessor :encrypted_key, :input_handler, :password_cache
 
-        def initialize(encrypted_key, input_handler)
-          self.encrypted_key = encrypted_key
-          self.input_handler = input_handler
-          @cache_checked = false
+        def initialize(encrypted_key, input_handler, password_cache)
+          self.encrypted_key  = encrypted_key
+          self.input_handler  = input_handler
+          self.password_cache = password_cache
+          @cache_checked      = false
         end
 
         def key
@@ -19,16 +20,21 @@ module Shhh
           decrypted_key = nil
           if should_decrypt?
             begin
-              retries ||= 0
+              retries                                   ||= 0
+              p                                         = determine_key_password
+              decrypted_key                             = decrypt(p)
 
-              p = password
-              decrypted_key = decrypt(p)
               # if the password is valid, let's add it to the cache.
-              Shhh::App::Cache.instance[encrypted_key] = p
+              password_cache[encrypted_key] = p
 
             rescue ::OpenSSL::Cipher::CipherError => e
               input_handler.puts 'Invalid password. Please try again.'
-              ((retries += 1) < 3) ? retry : raise(Shhh::Errors::InvalidPasswordPrivateKey.new('Invalid password.'))
+
+              if ((retries += 1) < 3)
+                retry
+              else
+                raise(Shhh::Errors::InvalidPasswordPrivateKey.new('Invalid password.'))
+              end
             end
           else
             decrypted_key = encrypted_key
@@ -46,7 +52,7 @@ module Shhh
           decr_password(encrypted_key, password)
         end
 
-        def password
+        def determine_key_password
           check_cache || ask_user
         end
 
@@ -57,9 +63,8 @@ module Shhh
         def check_cache
           return nil if @cache_checked
           @cache_checked = true
-          Shhh::App::Cache.instance[encrypted_key]
+          password_cache[encrypted_key]
         end
-
       end
     end
   end

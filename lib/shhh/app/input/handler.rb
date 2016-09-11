@@ -4,6 +4,7 @@ module Shhh
   module App
     module Input
       class Handler
+
         def ask
           retries ||= 0
           prompt('Password: ', :green)
@@ -22,7 +23,7 @@ module Shhh
         end
 
         def new_password
-          password         = prompt('New Password     :  ', :blue)
+          password = prompt('New Password     :  ', :blue)
 
           raise Shhh::Errors::PasswordTooShort.new(
             'Minimum length is 7 characters.') if password.length < 7
@@ -30,7 +31,7 @@ module Shhh
           password_confirm = prompt('Confirm Password :  ', :blue)
 
           raise Shhh::Errors::PasswordsDontMatch.new(
-          'The passwords you entered do not match.') if password != password_confirm
+            'The passwords you entered do not match.') if password != password_confirm
 
           password
         end

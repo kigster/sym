@@ -1,6 +1,8 @@
 require 'shhh'
+require 'shhh/app'
+
 require_relative 'fake_terminal'
-require 'shhh/app/output'
+
 TEST_KEY = 'LxRV7pqW5XY5DDcuh128byukvsr3JLGX54v6eKNl8a0='
 class TestClass
   include Shhh
