@@ -5,7 +5,7 @@ module Shhh
     module Password
 
       RSpec.describe Cache do
-        let(:cache) { Cache.new(provider: Coin) }
+        let(:cache) { Cache.instance.configure(provider: Coin) }
         subject { cache.provider }
 
         it { is_expected.to be(Coin)  }

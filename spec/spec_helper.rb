@@ -14,6 +14,7 @@ RSpec.configure do |spec|
 
   spec.before do
     Shhh::App.exit_code = 0
+    Shhh::App::Password::Cache.instance.enabled = false
   end
 
 end

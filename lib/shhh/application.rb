@@ -67,6 +67,7 @@ module Shhh
     def command
       @command_class ||= Shhh::App::Commands.find_command_class(opts)
       @command       ||= @command_class.new(self) if @command_class
+      @command
     end
 
     def editor
@@ -86,12 +87,13 @@ module Shhh
     end
 
     def initialize_password_cache
-      password_timeout = opts[:pass_cache_timeout] || 300
-      cache_enabled    = opts[:pass_cache_off] ? false : true
+      password_timeout = opts[:password_timeout] || 300
+      cache_enabled    = opts[:no_password_cache] ? false : true
 
-      self.password_cache = Shhh::App::Password::Cache.new(provider: Coin,
-                                                           timeout:  password_timeout,
-                                                           enabled:  cache_enabled)
+      self.password_cache = Shhh::App::Password::Cache.instance.configure(
+        provider: Coin,
+        timeout:  password_timeout,
+        enabled:  cache_enabled)
     end
   end
 end
