@@ -74,6 +74,21 @@ module Shhh
       ENV['EDITOR'] || '/bin/vi'
     end
 
+    def editors_to_try
+      [
+      ENV['EDITOR'],
+      '/usr/bin/vim',
+      '/usr/local/bin/vim',
+      '/bin/vim',
+      '/sbin/vim',
+      '/usr/sbin/vim',
+      '/usr/bin/vi',
+      '/usr/local/bin/vi',
+      '/bin/vi',
+      '/sbin/vi'
+      ]
+    end
+
     def error(hash)
       hash
     end
