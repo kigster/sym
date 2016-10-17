@@ -159,7 +159,7 @@ You can use this to add an existing key that can be used with the `shhh` later. 
 This may be a good time to take a look at the full help message for the `shhh` tool, shown naturally with a `-h` or `--help` option.
 
 ```
-Shhh (1.6.1) – encrypt/decrypt data with a private key
+Shhh (1.7.0) – encrypt/decrypt data with a private key
 
 Usage:
    # Generate a new key:
@@ -174,40 +174,43 @@ Usage:
    shhh -t -f <file> [ -b ][ -k key | -K keyfile | -x keychain | -i ] 
  
 Modes:
-  -e, --encrypt                 encrypt mode
-  -d, --decrypt                 decrypt mode
-  -t, --edit                    edit an encrypted file in an $EDITOR
+  -e, --encrypt                       encrypt mode
+  -d, --decrypt                       decrypt mode
+  -t, --edit                          decrypt, open an encr. file in an $EDITOR
  
 Create a private key:
-  -g, --generate                generate a new private key
-  -p, --password                encrypt the key with a password
-  -c, --copy                    copy the new key to the clipboard
-  -x, --keychain     [key-name] add to (or read from) the OS-X Keychain
+  -g, --generate                      generate a new private key
+  -p, --password                      encrypt the key with a password
+  -c, --copy                          copy the new key to the clipboard
+  -x, --keychain           [key-name] add to (or read from) the OS-X Keychain
+ 
+Password Caching:
+  -M, --password-timeout   [timeout]  when passwords expire (in seconds)
+  -P, --no-password-cache             disables key password caching
  
 Provide a private key:
-  -i, --interactive             Paste or type the key interactively
-  -k, --private-key  [key]      private key as a string
-  -K, --keyfile      [key-file] private key from a file
+  -i, --interactive                   Paste or type the key interactively
+  -k, --private-key        [key]      private key as a string
+  -K, --keyfile            [key-file] private key from a file
  
 Data:
-  -s, --string       [string]   specify a string to encrypt/decrypt
-  -f, --file         [file]     filename to read from
-  -o, --output       [file]     filename to write to
+  -s, --string             [string]   specify a string to encrypt/decrypt
+  -f, --file               [file]     filename to read from
+  -o, --output             [file]     filename to write to
  
 Flags:
-  --keychain-del     [key-name] delete keychain entry with that name
-  -b, --backup                  create a backup file in the edit mode
-  -v, --verbose                 show additional information
-  -T, --trace                   print a backtrace of any errors
-  -q, --quiet                   silence all output
-  -V, --version                 print library version
-  -N, --no-color                disable color output
+  --keychain-del           [key-name] delete keychain entry with that name
+  -b, --backup                        create a backup file in the edit mode
+  -v, --verbose                       show additional information
+  -T, --trace                         print a backtrace of any errors
+  -q, --quiet                         silence all output
+  -V, --version                       print library version
+  -N, --no-color                      disable color output
  
 Help & Examples:
-  -E, --examples                show several examples
-  -L, --language                natural language examples
-  -h, --help                    show help
-
+  -E, --examples                      show several examples
+  -L, --language                      natural language examples
+  -h, --help                          show help
 ```
 
 ### CLI Usage Examples
