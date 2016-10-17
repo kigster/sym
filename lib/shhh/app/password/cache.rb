@@ -7,13 +7,14 @@ module Shhh
   module App
     module Password
       class Cache
-        URI = 'druby://127.0.0.1:24924'
+        URI             = 'druby://127.0.0.1:24924'
+        DEFAULT_TIMEOUT = 300
 
         include Singleton
 
         attr_accessor :provider, :enabled, :timeout
 
-        def configure(provider: Coin, enabled: true, timeout: 300)
+        def configure(provider: Coin, enabled: true, timeout: DEFAULT_TIMEOUT)
           Coin.uri = URI if provider == Coin
 
           self.provider = provider
@@ -27,11 +28,11 @@ module Shhh
 
         def operation
           retries ||= TRIES
-          yield  if self.enabled
+          yield if self.enabled
         rescue StandardError => e
           if retries == TRIES && Coin.remote_uri.nil?
             Coin.remote_uri = URI if provider == Coin
-            retries -= 1
+            retries         -= 1
             retry
           end
           puts 'WARNING: error reading from DRB server: ' + e.message.red

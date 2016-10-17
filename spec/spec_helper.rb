@@ -17,4 +17,8 @@ RSpec.configure do |spec|
     Shhh::App::Password::Cache.instance.enabled = false
   end
 
+  spec.after :all do
+    # TODO: replace Coin with DRb-cache and gracefully shut it down
+    `kill $(ps -ef | grep ruby | grep [c]oin | awk '{print $2}') 2>/dev/null`
+  end
 end

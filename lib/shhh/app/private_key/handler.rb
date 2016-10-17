@@ -27,7 +27,7 @@ module Shhh
           @key = begin
             Detector.new(opts, input_handler).key
           rescue Shhh::Errors::Error => e
-            if Shhh::App::Args.new(opts).do_options_specify_key? && key.nil?
+            if Shhh::App::Args.new(opts).specify_key? && key.nil?
               raise e
             end
           end
