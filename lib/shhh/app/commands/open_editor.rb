@@ -22,6 +22,7 @@ module Shhh
           begin
             self.tempfile = ::Tempfile.new(::Base64.urlsafe_encode64(opts[:file]))
             decrypt_content(self.tempfile)
+
             result = process launch_editor
           ensure
             self.tempfile.close if tempfile

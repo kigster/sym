@@ -8,23 +8,29 @@ module Shhh
       let(:opts) { { keyfile: true, edit: true } }
       let(:args) { Args.new(opts) }
 
-      %i(do_options_specify_mode?
-         do_options_specify_key?
-         do_options_require_key?).each do |type|
-        context "##{type.to_s}"do
+      %i(specify_key?
+         require_key?).each do |type|
+        context "##{type.to_s}" do
           subject { args.send(type) }
-          it { is_expected.to be_truthy}
+          it { is_expected.to be_truthy }
         end
       end
 
       context 'requires key or not?' do
-        subject { args.do_options_require_key? }
+        subject { args.require_key? }
         context '--examples' do
           let(:opts) { { examples: true } }
           it { is_expected.to be_falsey }
         end
         context '--generate' do
           let(:opts) { { generate: true } }
+          %i(generate_key?).each do |type|
+            context "##{type.to_s}" do
+              subject { args.send(type) }
+              it { is_expected.to be_truthy }
+            end
+          end
+
           it 'should only have :generate in the options' do
             expect(opts.keys).to eql([:generate])
           end

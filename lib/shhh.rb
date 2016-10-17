@@ -10,7 +10,6 @@ Shhh::Configuration.configure do |config|
   config.private_key_cipher = config.data_cipher
   config.compression_enabled = true
   config.compression_level = Zlib::BEST_COMPRESSION
-
 end
 
 #

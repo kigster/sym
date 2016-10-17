@@ -35,7 +35,8 @@ module Shhh
     end
 
     def execute!
-      if args.do_options_require_key? || args.do_options_specify_key?
+      if !args.generate_key? &&
+        (args.require_key? || args.specify_key?)
         self.key = Shhh::App::PrivateKey::Handler.new(opts, input_handler, password_cache).key
         raise Shhh::Errors::NoPrivateKeyFound.new('Private key is required') unless self.key
       end
@@ -67,10 +68,26 @@ module Shhh
     def command
       @command_class ||= Shhh::App::Commands.find_command_class(opts)
       @command       ||= @command_class.new(self) if @command_class
+      @command
     end
 
     def editor
-      ENV['EDITOR'] || '/bin/vi'
+      editors_to_try.find { |editor| File.exist?(editor) }
+    end
+
+    def editors_to_try
+      [
+        ENV['EDITOR'],
+        '/usr/bin/vim',
+        '/usr/local/bin/vim',
+        '/bin/vim',
+        '/sbin/vim',
+        '/usr/sbin/vim',
+        '/usr/bin/vi',
+        '/usr/local/bin/vi',
+        '/bin/vi',
+        '/sbin/vi'
+      ]
     end
 
     def error(hash)
@@ -86,12 +103,12 @@ module Shhh
     end
 
     def initialize_password_cache
-      password_timeout = opts[:pass_cache_timeout] || 300
-      cache_enabled    = opts[:pass_cache_off] ? false : true
+      args            = {}
+      args[:provider] = Coin
+      args[:timeout]  = opts[:password_timeout].to_i if opts[:password_timeout]
+      args[:enabled]  = false if opts[:no_password_cache]
 
-      self.password_cache = Shhh::App::Password::Cache.new(provider: Coin,
-                                                           timeout:  password_timeout,
-                                                           enabled:  cache_enabled)
+      self.password_cache = Shhh::App::Password::Cache.instance.configure(args)
     end
   end
 end

@@ -11,17 +11,13 @@ module Shhh
         def execute
           retries         ||= 0
           new_private_key = self.class.create_private_key
-
-          if opts[:password]
-            new_private_key = encr_password(new_private_key,
-                                            application.input_handler.new_password)
-          end
+          new_private_key = encr_password(new_private_key,
+                                          application.input_handler.new_password) if opts[:password]
 
           clipboard_copy(new_private_key) if opts[:copy]
 
-          if opts[:keychain] && Shhh::App.is_osx?
-            Shhh::App::KeyChain.new(opts[:keychain], opts).add(new_private_key)
-          end
+          Shhh::App::KeyChain.new(opts[:keychain], opts).
+            add(new_private_key) if opts[:keychain] && Shhh::App.is_osx?
 
           new_private_key
         rescue Shhh::Errors::PasswordsDontMatch, Shhh::Errors::PasswordTooShort => e

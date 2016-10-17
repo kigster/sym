@@ -4,7 +4,9 @@ require 'active_support/inflector'
 module Shhh
 
   # The {Shhh::App} Module is responsible for handing user input and executing commands.
-  # Central class in this module is the {Shhh::App::CLI} class.
+  # Central class in this module is the {Shhh::App::CLI} class. However, it is
+  # recommended that ruby integration with the {Shhh::App} module functionality
+  # is done via the {Shhh::Application} class.
   #
   # Methods in this module are responsible for reporting errors and
   # maintaining the future exit code class-global variable.

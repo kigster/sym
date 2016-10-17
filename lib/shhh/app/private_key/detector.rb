@@ -26,7 +26,7 @@ module Shhh
                         ->(*, detector) { detector.input_handler.prompt('Please paste your private key: ', :magenta) }
 
       Detector.register :keychain,
-                        ->(key_name, * ) { KeyChain.new(key_name).find }
+                        ->(key_name, * ) { KeyChain.new(key_name).find rescue nil }
 
       Detector.register :keyfile,
                         ->(file, *) {

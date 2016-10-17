@@ -70,7 +70,7 @@ module Shhh
           self.opts = parse(argv_copy)
           if dict
             options = opts.parser.unused_options + opts.parser.used_options
-            puts options.map{|o| o.to_s.gsub(/.*(--[\w-]+).*/, '\1') }.sort.join(' ')
+            puts options.map { |o| o.to_s.gsub(/.*(--[\w-]+).*/, '\1') }.sort.join(' ')
             exit 0
           end
         rescue StandardError => e
@@ -81,9 +81,7 @@ module Shhh
         configure_color(argv)
 
         self.application = ::Shhh::Application.new(opts)
-
         select_output_stream
-
       end
 
       def execute
@@ -126,33 +124,40 @@ module Shhh
           o.banner = "Shhh (#{Shhh::VERSION}) – encrypt/decrypt data with a private key\n".bold.white
           o.separator 'Usage:'.yellow
           o.separator '   # Generate a new key:'.dark
-          o.separator '   shhh -g '.green.bold +
-                      '[ -c ] [ -p ] [ -x keychain ] [ -o keyfile | -q | ]  '.green
+          o.separator '   shhh -g '.green.bold + '[ -c ] [ -p ] [ -x keychain ] [ -o keyfile | -q | ]  '.green
           o.separator ''
           o.separator '   # Encrypt/Decrypt '.dark
-          o.separator '   shhh [ -d | -e ] '.green.bold +
-          '[ -f <file> | -s <string> ] '.green
+          o.separator '   shhh [ -d | -e ] '.green.bold + '[ -f <file> | -s <string> ] '.green
           o.separator '        [ -k key | -K keyfile | -x keychain | -i ] '.green
           o.separator '        [ -o <output file> ] '.green
           o.separator ' '
           o.separator '   # Edit an encrypted file in $EDITOR '.dark
-          o.separator '   shhh -t -f <file> [ -b ]'.green.bold +
-          '[ -k key | -K keyfile | -x keychain | -i ] '.green
+          o.separator '   shhh -t -f <file> [ -b ]'.green.bold + '[ -k key | -K keyfile | -x keychain | -i ] '.green
+
           o.separator ' '
           o.separator 'Modes:'.yellow
+
           o.bool '-e', '--encrypt', '           encrypt mode'
           o.bool '-d', '--decrypt', '           decrypt mode'
-          o.bool '-t', '--edit', '           decrypt, open an encr. file in an $EDITOR'
+          o.bool '-t', '--edit',    '           decrypt, open an encr. file in an $EDITOR'
+
           o.separator ' '
           o.separator 'Create a private key:'.yellow
+
           o.bool '-g', '--generate', '           generate a new private key'
-          o.bool '-p', '--passsword', '           encrypt the key with a password'
-          o.bool '-c', '--copy', '           copy the new key to the clipboard'
-          o.integer '--pass-cache-timeout', '[timeout]'.blue + '  when passwords expire (in seconds)'
-          o.bool '--pass-cache-off', '           disables key password caching'
+          o.bool '-p', '--password', '           encrypt the key with a password'
+          o.bool '-c', '--copy',     '           copy the new key to the clipboard'
+
           if Shhh::App.is_osx?
             o.string '-x', '--keychain', '[key-name] '.blue + 'add to (or read from) the OS-X Keychain'
           end
+
+          o.separator ' '
+          o.separator 'Password Caching:'.yellow
+
+          o.integer '-M', '--password-timeout', '[timeout]'.blue + '  when passwords expire (in seconds)'
+          o.bool '-P', '--no-password-cache', '           disables key password caching'
+
           o.separator ' '
           o.separator 'Provide a private key:'.yellow
           o.bool '-i', '--interactive', '           Paste or type the key interactively'

@@ -7,7 +7,7 @@ module Shhh
 
       let(:private_key) { test_class.create_private_key }
       let(:input_handler) { Shhh::App::Input::Handler.new }
-      let(:password_handler) { Shhh::App::Password::Cache.new(enabled: false) }
+      let(:password_handler) { Shhh::App::Password::Cache.instance.configure(enabled: false) }
 
       subject { Shhh::App::PrivateKey::Handler.new(opts, input_handler, password_handler).key }
 
