@@ -1,29 +1,32 @@
 require 'spec_helper'
 
 RSpec.describe 'CLI execution', :type => :aruba do
-  let(:args) { ' -g ' }
-  let(:command) { "bash -c 'shhh #{args}'" }
 
-  before do
-    run_simple command
-  end
+  context 'using Aruba framework' do
 
-  let(:output) { last_command_started.stdout.chomp }
+    let(:args) { ' -g ' }
+    let(:command) { "bash -c 'shhh #{args}'" }
+    let(:output) { last_command_started.stdout.chomp }
 
-  COMMANDS = [
-    { args: '-g' ,
-      output: ->(example, o) { example.expect(o.size).to example.be_between(42,44) },
-      desc: 'generate a key thats\' less than 44 characters long'}
-  ]
+    before do
+      run_simple command
+    end
+
+    CommandSpec = Struct.new(:args, :desc, :proc)
 
 
-  context 'running commands' do
-    COMMANDS.each do |command_to_test|
-      args = command_to_test[:args]
-      out_proc  = command_to_test[:output]
-      desc = command_to_test[:desc]
-      it "command 'shhh #{args}' should #{desc}" do
-        out_proc.call(self, output)
+    COMMANDS_TO_TEST = [
+      CommandSpec.new('-g',
+                      'generate a key that\'s less than 44 characters long',
+                      ->(e, o) { e.expect(o.size).to e.be_between(42, 44) })
+    ]
+
+    context 'while running commands' do
+      let(:output) { last_command_started.stdout.chomp }
+      COMMANDS_TO_TEST.each do |cmd|
+        it "command 'shhh #{cmd.args}' should #{cmd.desc}" do
+          cmd.proc.call(self, output)
+        end
       end
     end
   end
