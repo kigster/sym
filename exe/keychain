@@ -3,9 +3,9 @@
 lib_path = File.expand_path(File.dirname(__FILE__) + '/../lib')
 $LOAD_PATH << lib_path if File.exist?(lib_path) && !$LOAD_PATH.include?(lib_path)
 
-require 'shhh'
-require 'shhh/app'
-require 'shhh/app/keychain'
+require 'sym'
+require 'sym/app'
+require 'sym/app/keychain'
 require 'colored2'
 
 def usage
@@ -29,8 +29,8 @@ end
 
 begin
 puts data ? \
-  Shhh::App::KeyChain.new(key_name).send(action.to_sym, data) :
-  Shhh::App::KeyChain.new(key_name).send(action.to_sym)
+  Sym::App::KeyChain.new(key_name).send(action.to_sym, data) :
+  Sym::App::KeyChain.new(key_name).send(action.to_sym)
 rescue StandardError => e
   STDERR.puts "#{e.message.red}"
 end

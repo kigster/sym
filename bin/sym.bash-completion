@@ -1,0 +1,24 @@
+#!/usr/bin/env bash
+#
+# Sym command line completion
+#
+# © 2015-2016, Konstantin Gredeskoul,  https://github.com/kigster/sym
+# MIT LICENSE
+#
+
+_sym() {
+    local SYM_OPTS SYM_POINTS cur prev
+
+    cur="${COMP_WORDS[COMP_CWORD]}"
+    prev="${COMP_WORDS[COMP_CWORD-1]}"
+
+    COMPREPLY=()
+
+    SYM_COMP_OPTIONS=$(sym --dictionary)
+    [[ $COMP_CWORD == 1 ]] && SYM_COMP_OPTIONS="${SYM_COMP_OPTIONS} ${SYM_COMMANDS}"
+    COMPREPLY=( $(compgen -W "${SYM_COMP_OPTIONS}" -- ${cur}) )
+    return 0
+}
+
+complete -F _sym sym
+

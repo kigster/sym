@@ -1,5 +1,5 @@
 require 'singleton'
-module Shhh
+module Sym
   module App
     class FakeTerminal
       def self.appender(console)

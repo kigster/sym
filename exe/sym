@@ -1,0 +1,20 @@
+#!/usr/bin/env ruby
+
+lib_path = File.expand_path(File.dirname(__FILE__) + '/../lib')
+$LOAD_PATH << lib_path if File.exist?(lib_path) && !$LOAD_PATH.include?(lib_path)
+
+require 'sym'
+require 'sym/app'
+
+#ARGV.any?{ |a| a =~ /^-/ } ?
+begin
+ARGV.first =~ /^-/  ?
+  ::Sym::App::CLI.new(ARGV.dup).execute :
+  ::Sym::App::NLP::Translator.new(ARGV.dup).translate.and.execute
+rescue Interrupt => e
+  STDERR.flush
+  STDERR.puts "Interrupt, #{e.message}, exiting."
+  STDERR.flush
+end
+
+

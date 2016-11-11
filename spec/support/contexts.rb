@@ -1,11 +1,11 @@
-require 'shhh'
-require 'shhh/app'
+require 'sym'
+require 'sym/app'
 
 require_relative 'fake_terminal'
 
 TEST_KEY = 'LxRV7pqW5XY5DDcuh128byukvsr3JLGX54v6eKNl8a0='
 class TestClass
-  include Shhh
+  include Sym
   private_key TEST_KEY # Use ENV['SECRET'] in prod
 
   def secure_value=(value)
@@ -18,8 +18,8 @@ class TestClass
 end
 
 
-unless Shhh::App::CLI.instance_methods.include?(:old_execute)
-  class Shhh::App::CLI
+unless Sym::App::CLI.instance_methods.include?(:old_execute)
+  class Sym::App::CLI
     attr_accessor :already_ran
     alias_method :old_execute, :execute
 
@@ -40,7 +40,7 @@ end
 
 
 RSpec.shared_context :console do
-  let(:console) { Shhh::App::FakeTerminal.new }
+  let(:console) { Sym::App::FakeTerminal.new }
   let(:program_output_lines) { console.lines }
   let(:program_output) { program_output_lines.join("\n") }
 
@@ -69,7 +69,7 @@ RSpec.shared_context :run_command do
   include_context :encryption
 
   let(:private_key) { TEST_KEY }
-  let(:cli) { Shhh::App::CLI.new(argv.reject { |a| a.to_s =~ /verbose|-v/ }) }
+  let(:cli) { Sym::App::CLI.new(argv.reject { |a| a.to_s =~ /verbose|-v/ }) }
   let(:opts) { cli.opts }
   let(:run_cli) { true }
   let(:application) { cli.application }
@@ -105,7 +105,7 @@ RSpec.shared_context :commands do
   include_context :run_command
 
   def before_cli_runs
-    expect(Shhh::App::Commands).to receive(:find_command_class).and_return(command_class)
+    expect(Sym::App::Commands).to receive(:find_command_class).and_return(command_class)
   end
 end
 
@@ -113,13 +113,13 @@ RSpec.shared_context :abc_classes do
   let(:c_private_key) { 'BOT+8SVzRKQSl5qecjB4tUW1ENakJQw8wojugYQnEHc=' }
   before do
     class AClass
-      include Shhh
+      include Sym
     end
     class BClass
-      include Shhh
+      include Sym
     end
     class CClass
-      include Shhh
+      include Sym
       private_key 'BOT+8SVzRKQSl5qecjB4tUW1ENakJQw8wojugYQnEHc='
     end
 

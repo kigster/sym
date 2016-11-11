@@ -5,7 +5,7 @@ require 'yard'
 
 YARD::Rake::YardocTask.new(:doc) do |t|
   t.files = %w(lib/**/*.rb exe/*.rb - README.md MANAGING-KEYS.md LICENSE)
-  t.options.unshift('--title', '"Shhh – Symmetric Key Encryption for Your Data"')
+  t.options.unshift('--title', '"Sym – Symmetric Key Encryption for Your Data"')
   t.after = ->() { exec('open doc/index.html') }
 end
 

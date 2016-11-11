@@ -1,9 +1,9 @@
-require 'codeclimate-test-reporter'
-CodeClimate::TestReporter.start
+#require 'codeclimate-test-reporter'
+#CodeClimate::TestReporter.start
 
 $LOAD_PATH.unshift File.expand_path('../../lib', __FILE__)
 
-require 'shhh'
+require 'sym'
 require 'base64'
 require 'openssl'
 require 'aruba'
@@ -14,8 +14,8 @@ require_relative 'support/matchers'
 RSpec.configure do |spec|
   spec.include Aruba::Api
   spec.before do
-    Shhh::App.exit_code = 0
-    Shhh::App::Password::Cache.instance.enabled = false
+    Sym::App.exit_code = 0
+    Sym::App::Password::Cache.instance.enabled = false
   end
 
   spec.after :all do

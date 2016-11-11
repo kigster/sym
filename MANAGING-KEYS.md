@@ -45,7 +45,7 @@ done
 
 ### Retrieving Secret from the KeyChain
 
-Using the below bash function, you can retrieve and export the shhh as environment variables, which can later be read by your code:
+Using the below bash function, you can retrieve and export the sym as environment variables, which can later be read by your code:
 
 ```bash
 # append this function to your ~/.bashrc or ~/.bash_profile

@@ -4,7 +4,7 @@ require 'rspec/expectations'
 
 RSpec::Matchers.define :map_to do |expected|
   match do |actual|
-    @translator =  Shhh::App::NLP::Translator.new(actual.split(' ')).translate
+    @translator =  Sym::App::NLP::Translator.new(actual.split(' ')).translate
     @translator.translated_argv == expected
   end
   failure_message do |actual|
