@@ -1,4 +1,5 @@
 
+
 # Sym — Your Encryption Best Friend
 
 [![Gem Version](https://badge.fury.io/rb/sym.svg)](https://badge.fury.io/rb/sym)
