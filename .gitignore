@@ -11,3 +11,4 @@
 /data
 /spec/coverage/
 /*.enc
+**/.DS_Store
