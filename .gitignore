@@ -12,3 +12,4 @@
 /spec/coverage/
 /*.enc
 **/.DS_Store
+.ruby-version
