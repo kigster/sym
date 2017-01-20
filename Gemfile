@@ -4,3 +4,4 @@ source 'https://rubygems.org'
 gemspec
 
 gem 'ffi', :platforms => [:mswin, :mingw]
+gem 'coin', git: 'git@github.com:kigster/coin'
