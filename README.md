@@ -7,10 +7,9 @@
 [![Documentation](http://inch-ci.org/github/kigster/sym.png)](http://inch-ci.org/github/kigster/sym)
 
 [![Build Status](https://travis-ci.org/kigster/sym.svg?branch=master)](https://travis-ci.org/kigster/sym)
-[![Code Climate](https://codeclimate.com/github/kigster/secrets-cipher-base64/badges/gpa.svg)](https://codeclimate.com/github/kigster/secrets-cipher-base64)
-[![Test Coverage](https://codeclimate.com/github/kigster/secrets-cipher-base64/badges/coverage.svg)](https://codeclimate.com/github/kigster/secrets-cipher-base64/coverage)
-[![Issue Count](https://codeclimate.com/github/kigster/secrets-cipher-base64/badges/issue_count.svg)](https://codeclimate.com/github/kigster/secrets-cipher-base64)
-
+[![Code Climate](https://codeclimate.com/github/kigster/sym/badges/gpa.svg)](https://codeclimate.com/github/kigster/sym)
+[![Test Coverage](https://codeclimate.com/github/kigster/sym/badges/coverage.svg)](https://codeclimate.com/github/kigster/sym/coverage)
+[![Issue Count](https://codeclimate.com/github/kigster/sym/badges/issue_count.svg)](https://codeclimate.com/github/kigster/sym)
 
 ## Description
 
