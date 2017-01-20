@@ -1,31 +1,65 @@
 require 'spec_helper'
+require 'sym/app/commands/generate_key'
 
 RSpec.describe 'CLI execution', :type => :aruba do
 
-  context 'using Aruba framework' do
+  BASE62_REGEX    = %r{^[a-zA-Z0-9=.\-_]+=$}
+  KEY_PLAIN       = 'm4G6b7Lb-0bom5l8uxog_cL1x08mvH1ASsv1Svl3UGQ='
+  HELLO_ENCRYPTED = 'BAhTOh1TeW06OkRhdGE6OldyYXBwZXJTdHJ1Y3QLOhNlbmNyeXB0ZWRfZGF0YSIluUtFV4ibk5B65MTjQMXvphsSi7pKPVXt9B2atfMD7cg6B2l2IhWp0jYYSo0CHrm0gWh57mDPOhBjaXBoZXJfbmFtZSIQQUVTLTI1Ni1DQkM6CXNhbHQwOgx2ZXJzaW9uaQY6DWNvbXByZXNzVA=='
+  TEMP_FILE       = "/tmp/sym.#{rand % 8984798712}"
+  RESET_TEMP_FILE = ->(*) { File.unlink(TEMP_FILE) if File.exist?(TEMP_FILE) }
 
-    let(:args) { ' -g ' }
+  context 'using Aruba framework' do
     let(:command) { "bash -c 'sym #{args}'" }
     let(:output) { last_command_started.stdout.chomp }
 
-    before do
-      run_simple command
-    end
-
-    CommandSpec = Struct.new(:args, :desc, :proc)
-
-
-    COMMANDS_TO_TEST = [
-      CommandSpec.new('-g',
-                      'generate a key that\'s less than 44 characters long',
-                      ->(e, o) { e.expect(o.size).to e.be_between(42, 44) })
-    ]
+    before { run_simple command }
 
     context 'while running commands' do
-      let(:output) { last_command_started.stdout.chomp }
-      COMMANDS_TO_TEST.each do |cmd|
-        it "command 'sym #{cmd.args}' should #{cmd.desc}" do
-          cmd.proc.call(self, output)
+
+      context 'generate' do
+        let(:args) { '-g' }
+        it 'should run command' do
+          expect(output.size).to be_between(42, 44)
+          expect(output).to match(BASE62_REGEX)
+        end
+      end
+
+      context 'encrypt a string' do
+        let(:args) { %Q{-e -k #{KEY_PLAIN} -s "hello"} }
+        it 'should run command' do
+          expect(output).to end_with('==')
+          expect(output).to match(BASE62_REGEX)
+        end
+      end
+
+      context 'decrypt a string' do
+        let(:args) { "-d -k #{KEY_PLAIN} -s #{HELLO_ENCRYPTED}" }
+        it 'should run command' do
+          expect(output).to eq('hello')
+        end
+      end
+
+      context 'with a temporary file' do
+        let(:result) { output; File.read(TEMP_FILE) }
+
+        context 'encrypt with redirect' do
+          let(:args) { %Q[-e -k #{KEY_PLAIN} -s "hello" > #{TEMP_FILE} ] }
+          it 'should run command' do
+            expect(result).to end_with('==')
+            expect(result).to match(BASE62_REGEX)
+          end
+
+          context 'decrypt from a redirect' do
+            let(:args) { "-d -k #{KEY_PLAIN} -f #{TEMP_FILE}" }
+
+            it 'should run command' do
+              expect(File.exist?(TEMP_FILE)).to be true
+              expect(output).to eq('hello')
+            end
+
+            after &RESET_TEMP_FILE
+          end
         end
       end
     end

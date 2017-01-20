@@ -89,8 +89,6 @@ module Sym
       #–––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––
 
       context 'perform decryption' do
-
-
         SAVE_TO_TEMPFILE = ->(content) {
           tempfile = Tempfile.new('sym');
           tempfile.instance_eval { write(content); flush }

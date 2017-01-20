@@ -1,13 +1,16 @@
 language: ruby
 env:
-  - CODECLIMATE_REPO_TOKEN=be1a1a266b0ffc81fa0bd1e432a229f2a4ab420dcb9e9e15c1e75e2acad573b7 
+- CODECLIMATE_REPO_TOKEN=be1a1a266b0ffc81fa0bd1e432a229f2a4ab420dcb9e9e15c1e75e2acad573b7
 rvm:
-  - 2.2.5
-  - 2.3.1
-script: "rake"
+- 2.4.0
+- 2.3.3
+script: rake
 notifications:
   email:
     recipients:
-      - kigster@gmail.com
+    - kigster@gmail.com
     on_success: change
     on_failure: always
+  slack:
+    rooms:
+      secure: GcACCHmcmo99lYE5dgt2TmY4YIPMWr75q0Bkm4Lddegq/1eMXgcZDz00j8iHWtnveyJSjEUpZFQ9uyx+P7dvxT7D5gl43arKZEylS4vMRg9QRgZu7/ROrXbJtrUyKulFRUTdFrmOiK9nDKpAzlvLvMKC4kaQnn88Xtu9pYMU8y4n5fCtl29gZM9ZjVbrBBvV/SumnTDLla2oQ7oFgUZdZhQZ1qsevYknxNq4eIcvPDjbon+bovfsIISEVRSNo2C3yjO+mqWKed3jfuCA4taAZ8/aVVFEKURMH10HFms1CiC3lE/gF4YfBXsqKpjnB+bKjBcWox2FQrp96FulMEIfkKQrnuncO96o7MGHX9oNqKSMoycf3+SZFwNa+5Mfq7SBepbHYCoU7/ow31UTyStrc5idG19XzYgI85yjQHdzQN299Xf0O8cGf9q9qAu7rS7JlM3ekR+3rZYO+OxNYTF8rcW1fYIj6GKcbsV8BvuhAVQRFOsk/ibcIb2N7rGVd/ZbU4HAk3RE1ywt+XowinpIHktu2PQUPDNpgRQwM6xqZHO/7s9r7oW0ULmZCMLZ9CMKNjKzrQ9wfh90+v+FiEiUKsaVj4cCwF3PvhVYvxU2AKbCeHtSEb7K6to86+DYNoIKnGH1ryKoyCtyOTZpNMLGFt34Msv7WfEylhG+DpVMvkM=
