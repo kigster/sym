@@ -1,3 +1,4 @@
+
 #!/usr/bin/env bash
 #
 # Sym command line completion
@@ -14,8 +15,15 @@ _sym() {
 
     COMPREPLY=()
 
-    SYM_COMP_OPTIONS=$(sym --dictionary)
-    [[ $COMP_CWORD == 1 ]] && SYM_COMP_OPTIONS="${SYM_COMP_OPTIONS} ${SYM_COMMANDS}"
+    #[[ $COMP_CWORD == 1 ]] && SYM_COMP_OPTIONS="${SYM_COMP_OPTIONS} ${SYM_COMMANDS}"
+    if [[ $prev =~ "-f" || $prev =~ "-o" || $prev =~ "-K" || $prev == "--keyfile" ]] ; then 
+      SYM_COMP_OPTIONS="$(find . -type f -depth 1 | sed 's#./##g')"
+    elif  [[ "${cur}" == '--' || "${cur}" == --* ]] ; then 
+      SYM_COMP_OPTIONS=$(sym --dictionary | sed -E 's/ /\n/g')
+    else 
+      SYM_COMP_OPTIONS=$(sym -h | egrep '  \-' | grep -v '^  --' | cut -d ',' -f 1)
+    fi
+
     COMPREPLY=( $(compgen -W "${SYM_COMP_OPTIONS}" -- ${cur}) )
     return 0
 }
