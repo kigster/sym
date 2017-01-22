@@ -123,7 +123,7 @@ module Sym
           o.banner = "Sym (#{Sym::VERSION}) – encrypt/decrypt data with a private key\n".bold.white
           o.separator 'Usage:'.yellow
           o.separator '   # Generate a new key:'.dark
-          o.separator '   sym -g '.green.bold + '[ -c ] [ -p ] [ -x keychain ] [ -o keyfile | -q | ]  '.green
+          o.separator '   sym -g '.green.bold + '[ -p ] [ -x keychain ] [ -o keyfile | -q | ]  '.green
           o.separator ''
           o.separator '   # Encrypt/Decrypt '.dark
           o.separator '   sym [ -d | -e ] '.green.bold + '[ -f <file> | -s <string> ] '.green
@@ -145,7 +145,6 @@ module Sym
 
           o.bool '-g', '--generate', '           generate a new private key'
           o.bool '-p', '--password', '           encrypt the key with a password'
-          o.bool '-c', '--copy',     '           copy generated key to the clipboard'
 
           if Sym::App.is_osx?
             o.string '-x', '--keychain', '[key-name] '.blue + 'add to (or read from) the OS-X Keychain'

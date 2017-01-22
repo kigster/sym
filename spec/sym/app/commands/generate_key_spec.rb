@@ -9,7 +9,7 @@ module Sym
 
           include_context :run_command
 
-          let(:argv) { %w(-gcT) }
+          let(:argv) { %w(-gT) }
           it 'should be generated' do
             expect_command_to_have klass: GenerateKey,
                                    output: [ %r([a-zA-Z0-9\-_=]{44,45}) ],

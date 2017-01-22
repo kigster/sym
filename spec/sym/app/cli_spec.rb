@@ -6,7 +6,7 @@ module Sym
     RSpec.describe 'Sym::App::CLI' do
 
       context 'basic initialization' do
-        let(:argv) { %w(-gc) }
+        let(:argv) { %w(-g) }
         let(:cli) { Sym::App::CLI.new(argv) }
 
         it 'should properly initialize' do

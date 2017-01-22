@@ -14,8 +14,6 @@ module Sym
           new_private_key = encr_password(new_private_key,
                                           application.input_handler.new_password) if opts[:password]
 
-          clipboard_copy(new_private_key) if opts[:copy]
-
           Sym::App::KeyChain.new(opts[:keychain], opts).
             add(new_private_key) if opts[:keychain] && Sym::App.is_osx?
 
@@ -25,12 +23,6 @@ module Sym
           retry if (retries += 1) < 3
         end
 
-        private
-
-        def clipboard_copy(key)
-          require 'clipboard'
-          Clipboard.copy(key)
-        end
       end
     end
   end

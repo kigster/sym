@@ -15,8 +15,8 @@ module Sym
                             echo:    'echo $KEY',
                             result:  '75ngenJpB6zL47/8Wo7Ne6JN1pnOsqNEcIqblItpfg4='.green)
 
-          output << example(comment: 'generate a new password-protected key, copy to the clipboard & save to a file',
-                            command: 'sym -gpc -o ~/.key',
+          output << example(comment: 'generate a new password-protected key & save to a file',
+                            command: 'sym -gp -o ~/.key',
                             echo:    'New Password     : ' + '••••••••••'.green,
                             result:  'Confirm Password : ' + '••••••••••'.green)
 

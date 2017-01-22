@@ -43,7 +43,6 @@ EOF
   spec.add_dependency 'slop', '~> 4.3'
   spec.add_dependency 'activesupport'
   spec.add_dependency 'highline', '~> 1.7'
-  spec.add_dependency 'clipboard', '~> 1.1'
   spec.add_dependency 'coin', '~> 0.1.8'
 
   spec.add_development_dependency 'codeclimate-test-reporter', '~> 1.0'
