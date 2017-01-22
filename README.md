@@ -161,53 +161,53 @@ You can use this to add an existing key that can be used with the `sym` later. O
 This may be a good time to take a look at the full help message for the `sym` tool, shown naturally with a `-h` or `--help` option.
 
 ```
-Sym (1.7.0) – encrypt/decrypt data with a private key
+Sym (2.0.2) – encrypt/decrypt data with a private key
 
 Usage:
    # Generate a new key:
-   sym -g [ -c ] [ -p ] [ -x keychain ] [ -o keyfile | -q | ]
+   sym -g [ -c ] [ -p ] [ -x keychain ] [ -o keyfile | -q | ]  
 
    # Encrypt/Decrypt 
-   sym [ -d | -e ] [ -f <file> | -s <string> ]
+   sym [ -d | -e ] [ -f <file> | -s <string> ] 
         [ -k key | -K keyfile | -x keychain | -i ] 
         [ -o <output file> ] 
  
    # Edit an encrypted file in $EDITOR 
-   sym -t -f <file> [ -b ][ -k key | -K keyfile | -x keychain | -i ]
+   sym -t -f <file> [ -b ][ -k key | -K keyfile | -x keychain | -i ] 
  
 Modes:
   -e, --encrypt                       encrypt mode
   -d, --decrypt                       decrypt mode
   -t, --edit                          decrypt, open an encr. file in an $EDITOR
  
-Create a private key:
+Create a new private key:
   -g, --generate                      generate a new private key
   -p, --password                      encrypt the key with a password
-  -c, --copy                          copy the new key to the clipboard
+  -c, --copy                          copy generated key to the clipboard
   -x, --keychain           [key-name] add to (or read from) the OS-X Keychain
- 
-Password Caching:
   -M, --password-timeout   [timeout]  when passwords expire (in seconds)
-  -P, --no-password-cache             disables key password caching
+  -P, --no-password-cache             disables caching of key passwords
  
-Provide a private key:
+Read existing private key from:
   -i, --interactive                   Paste or type the key interactively
   -k, --private-key        [key]      private key as a string
   -K, --keyfile            [key-file] private key from a file
  
-Data:
+Data to Encrypt/Decrypt:
   -s, --string             [string]   specify a string to encrypt/decrypt
   -f, --file               [file]     filename to read from
   -o, --output             [file]     filename to write to
  
 Flags:
-  --keychain-del           [key-name] delete keychain entry with that name
   -b, --backup                        create a backup file in the edit mode
   -v, --verbose                       show additional information
   -T, --trace                         print a backtrace of any errors
   -q, --quiet                         silence all output
   -V, --version                       print library version
   -N, --no-color                      disable color output
+ 
+Utility:
+  -a, --bash-completion    [file]     append shell completion to a file
  
 Help & Examples:
   -E, --examples                      show several examples
