@@ -143,41 +143,42 @@ module Sym
           o.separator ' '
           o.separator 'Create a new private key:'.yellow
 
-          o.bool '-g', '--generate', '           generate a new private key'
-          o.bool '-p', '--password', '           encrypt the key with a password'
+          o.bool '-g', '--generate',              '           generate a new private key'
+          o.bool '-p', '--password',              '           encrypt the key with a password'
 
           if Sym::App.is_osx?
             o.string '-x', '--keychain', '[key-name] '.blue + 'add to (or read from) the OS-X Keychain'
           end
 
-          o.integer '-M', '--password-timeout', '[timeout]'.blue + '  when passwords expire (in seconds)'
-          o.bool    '-P', '--no-password-cache', '           disables caching of key passwords'
+          o.integer '-M', '--password-timeout',   '[timeout]'.blue + '  when passwords expire (in seconds)'
+          o.bool    '-P', '--no-password-cache',  '           disables caching of key passwords'
 
           o.separator ' '
           o.separator 'Read existing private key from:'.yellow
-          o.bool      '-i', '--interactive', '           Paste or type the key interactively'
-          o.string    '-k', '--private-key', '[key]   '.blue + '   private key as a string'
-          o.string    '-K', '--keyfile', '[key-file]'.blue + ' private key from a file'
+          o.bool      '-i', '--interactive',      '           Paste or type the key interactively'
+          o.string    '-k', '--private-key',      '[key]   '.blue + '   private key as a string'
+          o.string    '-K', '--keyfile',          '[key-file]'.blue + ' private key from a file'
           o.separator ' '
           o.separator 'Data to Encrypt/Decrypt:'.yellow
-          o.string '-s', '--string', '[string]'.blue + '   specify a string to encrypt/decrypt'
-          o.string '-f', '--file', '[file]  '.blue + '   filename to read from'
-          o.string '-o', '--output', '[file]  '.blue + '   filename to write to'
+          o.string    '-s', '--string',           '[string]'.blue + '   specify a string to encrypt/decrypt'
+          o.string    '-f', '--file',             '[file]  '.blue + '   filename to read from'
+          o.string    '-o', '--output',           '[file]  '.blue + '   filename to write to'
           o.separator ' '
           o.separator 'Flags:'.yellow
-          o.bool '-b', '--backup', '           create a backup file in the edit mode'
-          o.bool '-v', '--verbose', '           show additional information'
-          o.bool '-T', '--trace', '           print a backtrace of any errors'
-          o.bool '-q', '--quiet', '           silence all output'
-          o.bool '-V', '--version', '           print library version'
-          o.bool '-N', '--no-color', '           disable color output'
+          o.bool      '-b', '--backup',           '           create a backup file in the edit mode'
+          o.bool      '-v', '--verbose',          '           show additional information'
+          o.bool      '-T', '--trace',            '           print a backtrace of any errors'
+          o.bool      '-D', '--debug',            '           print debugging information'
+          o.bool      '-q', '--quiet',            '           silence all output'
+          o.bool      '-V', '--version',          '           print library version'
+          o.bool      '-N', '--no-color',         '           disable color output'
           o.separator ' '
           o.separator 'Utility:'.yellow
-          o.string '-a', '--bash-completion',    '[file]'.blue + '     append shell completion to a file'
+          o.string    '-a', '--bash-completion',  '[file]'.blue + '     append shell completion to a file'
           o.separator ' '
           o.separator 'Help & Examples:'.yellow
-          o.bool '-E', '--examples', '           show several examples'
-          o.bool '-h', '--help', '           show help'
+          o.bool      '-E', '--examples',         '           show several examples'
+          o.bool      '-h', '--help',             '           show help'
 
         end
       end

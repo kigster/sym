@@ -1,3 +1,17 @@
+**2.1.0** (January 22, 2017)
+
+* Added two sub-commands to handle updating and moving existing keys:
+  - adding a password to an existing key
+  - adding an existing key to the keychain.
+  
+To add a password to an existing key: 
+
+> `sym [ -k key | -K keyfile | -i | -x <name> ] -p `
+
+To add existing key to a keychain:  
+ 
+> `sym [ -k key | -K keyfile | -i ] -x <name> `
+
 **2.0.3** (January 22, 2017)
 
 * Removed clipboard copy functionality, as it's easy to achieve with `pbcopy`.

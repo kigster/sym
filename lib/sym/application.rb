@@ -40,7 +40,6 @@ module Sym
         self.key = Sym::App::PrivateKey::Handler.new(opts, input_handler, password_cache).key
         raise Sym::Errors::NoPrivateKeyFound.new('Private key is required') unless self.key
       end
-
       unless command
         raise Sym::Errors::InsufficientOptionsError.new(
           'Can not determine what to do from the options ' + opts_hash.keys.reject { |k| !opts[k] }.to_s)

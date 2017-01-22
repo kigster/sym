@@ -46,6 +46,8 @@ module Sym
           end
         end
 
+        include Sym
+
         attr_accessor :application
 
         def initialize(application)
@@ -71,6 +73,25 @@ module Sym
           "#{self.class.short_name.to_s.bold.yellow}, with options: #{application.args.argv.join(' ').gsub(/--/, '').bold.green}"
         end
 
+        def create_key
+          self.class.create_private_key
+        end
+
+        def add_to_keychain_if_needed(key)
+          if opts[:keychain] && Sym::App.is_osx?
+            Sym::App::KeyChain.new(opts[:keychain], opts).add(key)
+          else
+            key
+          end
+        end
+
+        def encrypt_password_if_needed(key)
+          if opts[:password]
+            encr_password(key, application.input_handler.new_password)
+          else
+            key
+          end
+        end
       end
     end
   end

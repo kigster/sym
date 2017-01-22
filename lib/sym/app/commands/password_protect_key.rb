@@ -1,16 +1,19 @@
 require_relative 'command'
-require 'sym/app/keychain'
+
 module Sym
   module App
     module Commands
-      class GenerateKey < Command
+      class PasswordProtectKey < Command
 
-        required_options :generate
+        required_options [:private_key, :keyfile, :keychain, :interactive],
+                         :password
+
+        try_after :generate_key, :encrypt_decrypt
 
         def execute
           retries ||= 0
 
-          the_key = create_key
+          the_key = self.key
           the_key = encrypt_password_if_needed(the_key)
           add_to_keychain_if_needed(the_key)
 

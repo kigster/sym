@@ -11,8 +11,8 @@ module Sym
           output = []
 
           output << example(comment: 'generate a new private key into an environment variable:',
-                            command: 'export KEY=$(sym -g)',
-                            echo:    'echo $KEY',
+                            command: 'export mykey=$(sym -g)',
+                            echo:    'echo $mykey',
                             result:  '75ngenJpB6zL47/8Wo7Ne6JN1pnOsqNEcIqblItpfg4='.green)
 
           output << example(comment: 'generate a new password-protected key & save to a file',
@@ -21,19 +21,19 @@ module Sym
                             result:  'Confirm Password : ' + '••••••••••'.green)
 
           output << example(comment: 'encrypt a plain text string with a key, and save the output to a file',
-                            command: 'sym -e -s ' + '"secret string"'.bold.yellow + ' -k $KEY -o file.enc',
+                            command: 'sym -e -s ' + '"secret string"'.bold.yellow + ' -k $mykey -o file.enc',
                             echo:    'cat file.enc',
                             result:  'Y09MNDUyczU1S0UvelgrLzV0RTYxZz09CkBDMEw4Q0R0TmpnTm9md1QwNUNy%T013PT0K'.green)
 
           output << example(comment: 'decrypt a previously encrypted string:',
-                            command: 'sym -d -s $(cat file.enc) -k $KEY',
+                            command: 'sym -d -s $(cat file.enc) -k $mykey',
                             result:  'secret string'.green)
 
           output << example(comment: 'encrypt sym.yml and save it to sym.enc:',
-                            command: 'sym -e -f sym.yml -o sym.enc -k $KEY')
+                            command: 'sym -e -f sym.yml -o sym.enc -k $mykey')
 
           output << example(comment: 'decrypt an encrypted file and print it to STDOUT:',
-                            command: 'sym -df sym.enc -k $KEY')
+                            command: 'sym -df sym.enc -k $mykey')
 
           output << example(comment: 'edit an encrypted file in $EDITOR, ask for key, create file backup',
                             command: 'sym -tibf ecrets.enc',

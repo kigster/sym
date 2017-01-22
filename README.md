@@ -73,9 +73,7 @@ Or install it into the global namespace with `gem install` command:
 
 After gem installation, an message will tell you to install bash completion into to your `~/.bashrc` or equivalent:
 
-```bash
-sym --bash-completion ~/.bashrc
-```
+    sym --bash-completion ~/.bashrc
 
 Should you choose to install it (this part is optional), you will be able to use "tab-tab" after typing `sym` and you'll be able to choose from all supported flags.
 
@@ -119,7 +117,7 @@ Or save it to a file:
 
 Or create a password-protected key, and save it to a file:
 
-    sym -gcp -o ~/.secret
+    sym -gp -o ~/.secret
     # New Password:     ••••••••••
     # Confirm Password: ••••••••••
 
@@ -147,30 +145,43 @@ Now, whenever you need to encrypt something, in addition to the `-k` and `-K` yo
 
 Finally, you can delete a key from KeyChain access by running:
 
-    sym --keychain-del staging
+    keychain <name> delete
 
 #### KeyChain Key Management
 
-Another tiny executable supplied with this library is called `keychain`
+`keychain` is an additional script installed with the gem, that can be used to read (find), update (add), and delete keychain entries used by `sym`. 
 
-```bash
-Usage: keychain item [ add <contents> | find | delete ]
-```
-You can use this to add an existing key that can be used with the `sym` later. Of course you can also use the tool to find or delete it.
+It's help message is self-explanatory:
+
+    Usage: keychain <name> [ add <contents> | find | delete ]
+
+#### Moving a Key to Keychain
+
+You can easily move a key to a keychain by combinding -k or -K to read the key, and -x to write it.
+
+    sym -k $mykey -x mykey
+
+#### Adding Password to Existing Key
+
+You can add a password to a key by combining one of the key description flags (-k, -K, -i) and then also -p. 
+
+    sym -k $mykey -p -x moo
+    
+The above example will take an unencrypted key passed in $k, ask for a password and save password protected key into the keychain with name "moo".
 
 ####  Encryption and Decryption
 
 This may be a good time to take a look at the full help message for the `sym` tool, shown naturally with a `-h` or `--help` option.
 
 ```
-Sym (2.0.2) – encrypt/decrypt data with a private key
+Sym (2.0.0) – encrypt/decrypt data with a private key
 
 Usage:
    # Generate a new key:
    sym -g [ -c ] [ -p ] [ -x keychain ] [ -o keyfile | -q | ]  
 
    # Encrypt/Decrypt 
-   sym [ -d | -e ] [ -f <file> | -s <string> ] 
+   sym  [ -d | -e ] [ -f <file> | -s <string> ] 
         [ -k key | -K keyfile | -x keychain | -i ] 
         [ -o <output file> ] 
  
@@ -182,33 +193,34 @@ Modes:
   -d, --decrypt                       decrypt mode
   -t, --edit                          decrypt, open an encr. file in an $EDITOR
  
-Create a new private key:
+Create a private key:
   -g, --generate                      generate a new private key
   -p, --password                      encrypt the key with a password
+  -c, --copy                          copy the new key to the clipboard
   -x, --keychain           [key-name] add to (or read from) the OS-X Keychain
-  -M, --password-timeout   [timeout]  when passwords expire (in seconds)
-  -P, --no-password-cache             disables caching of key passwords
  
-Read existing private key from:
+Password Caching:
+  -M, --password-timeout   [timeout]  when passwords expire (in seconds)
+  -P, --no-password-cache             disables key password caching
+ 
+Provide a private key:
   -i, --interactive                   Paste or type the key interactively
   -k, --private-key        [key]      private key as a string
   -K, --keyfile            [key-file] private key from a file
  
-Data to Encrypt/Decrypt:
+Data:
   -s, --string             [string]   specify a string to encrypt/decrypt
   -f, --file               [file]     filename to read from
   -o, --output             [file]     filename to write to
  
 Flags:
+  --keychain-del           [key-name] delete keychain entry with that name
   -b, --backup                        create a backup file in the edit mode
   -v, --verbose                       show additional information
   -T, --trace                         print a backtrace of any errors
   -q, --quiet                         silence all output
   -V, --version                       print library version
   -N, --no-color                      disable color output
- 
-Utility:
-  -a, --bash-completion    [file]     append shell completion to a file
  
 Help & Examples:
   -E, --examples                      show several examples
