@@ -27,15 +27,18 @@ Gem::Specification.new do |spec|
   spec.executables   = spec.files.grep(%r{^exe/}) { |f| File.basename(f) }
   spec.require_paths = ['lib']
   spec.required_ruby_version = '>= 2.2'
-  spec.post_install_message = "
+  spec.post_install_message = <<-EOF
+Thank you for installing this gem! 
+To enable bash command line completion, please run the following 
+command, which appends sym's shell completion to the specified file:
 
-Please copy and paste the following BASH function into your ~/.bashrc or
-equivalent, in order to enable command completion:
+  sym --bash-completion ~/.bash_profile 
 
-Thank you for installing Sym!
-   -- KG (github.com/kigster)
-"
+(or any other shell initialization file of your preference).
 
+Thank you for checking out Sym and happy crypting :)
+   -- KG ( github.com/kigster | twitter.com/kig )
+EOF
   spec.add_dependency 'colored2', '~> 2.0'
   spec.add_dependency 'slop', '~> 4.3'
   spec.add_dependency 'activesupport'

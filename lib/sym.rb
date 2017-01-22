@@ -5,11 +5,11 @@ require 'coin'
 require_relative 'sym/configuration'
 
 Sym::Configuration.configure do |config|
-  config.password_cipher = 'AES-128-CBC'
-  config.data_cipher = 'AES-256-CBC'
-  config.private_key_cipher = config.data_cipher
+  config.password_cipher     = 'AES-128-CBC'
+  config.data_cipher         = 'AES-256-CBC'
+  config.private_key_cipher  = config.data_cipher
   config.compression_enabled = true
-  config.compression_level = Zlib::BEST_COMPRESSION
+  config.compression_level   = Zlib::BEST_COMPRESSION
 end
 
 #
@@ -109,5 +109,13 @@ module Sym
       end
     end
   end
+
+  COMPLETION_FILE = '.sym.completion'
+  COMPLETION_PATH = "#{ENV['HOME']}/#{COMPLETION_FILE}"
+
+  BASH_COMPLETION = {
+    file:   File.expand_path('../../bin/sym.completion', __FILE__),
+    script: "[[ -f '#{COMPLETION_PATH}' ]] && source '#{COMPLETION_PATH}'",
+  }
 end
 

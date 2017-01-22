@@ -5,8 +5,6 @@ module Sym
     module Commands
       if Sym::App.is_osx?
         RSpec.describe PrintKey do
-
-
           let(:key_name) { 'boochen-topolski' }
           let(:argv) { "-x #{key_name} -v -T ".split(' ') }
           let(:command_class) { PrintKey }
@@ -17,7 +15,6 @@ module Sym
             keychain.add(private_key)
             expect(keychain.find).to eql(private_key)
           end
-
 
           context 'when only -x is provided' do
             include_context :run_command

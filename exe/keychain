@@ -9,7 +9,7 @@ require 'sym/app/keychain'
 require 'colored2'
 
 def usage
-  puts 'Usage: ' + 'keychain'.bold.blue + ' item [ add <contents> | find | delete ]'.bold.green
+  puts 'Usage: ' + 'keychain'.bold.blue + ' name [ add <contents> | find | delete ]'.bold.green
   exit 0
 end
 

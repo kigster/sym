@@ -1,5 +1,6 @@
 require 'spec_helper'
 require 'sym/app/commands/generate_key'
+require 'sym'
 
 RSpec.describe 'CLI execution', :type => :aruba do
 
@@ -13,9 +14,23 @@ RSpec.describe 'CLI execution', :type => :aruba do
     let(:command) { "bash -c 'sym #{args}'" }
     let(:output) { last_command_started.stdout.chomp }
 
-    before { run_simple command }
+    context 'install bash completion' do
+      before &RESET_TEMP_FILE
+      after &RESET_TEMP_FILE
+
+      let(:args) { "--bash-completion #{TEMP_FILE}" }
+      let(:contents) { File.read(TEMP_FILE) }
+
+      it 'should run command' do
+        run_simple command
+        expect(File.exist?(TEMP_FILE))
+        expect(contents).to include(Sym::BASH_COMPLETION[:script])
+      end
+    end
 
     context 'while running commands' do
+
+      before { run_simple command }
 
       context 'generate' do
         let(:args) { '-g' }

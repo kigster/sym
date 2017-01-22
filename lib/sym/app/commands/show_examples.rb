@@ -35,7 +35,7 @@ module Sym
           output << example(comment: 'decrypt an encrypted file and print it to STDOUT:',
                             command: 'sym -df sym.enc -k $KEY')
 
-          output << example(comment: 'edit an encrypted file in $EDITOR, ask for key, create a backup',
+          output << example(comment: 'edit an encrypted file in $EDITOR, ask for key, create file backup',
                             command: 'sym -tibf ecrets.enc',
                             result:  '
 Private Key: ••••••••••••••••••••••••••••••••••••••••••••
