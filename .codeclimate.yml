@@ -12,6 +12,11 @@ engines:
     enabled: true
   rubocop:
     enabled: true
+      checks:
+        Rubocop/Metrics/MethodLength:
+          enabled: false
+        Rubocop/Metrics/CyclomaticComplexity:
+          enabled: false
 ratings:
   paths:
   - "**.inc"
