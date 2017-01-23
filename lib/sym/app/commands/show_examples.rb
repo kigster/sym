@@ -1,9 +1,9 @@
 require 'colored2'
-require_relative 'command'
+require 'sym/app/commands/base_command'
 module Sym
   module App
     module Commands
-      class ShowExamples < Command
+      class ShowExamples < BaseCommand
         required_options :examples
         try_after :show_help
 

@@ -4,7 +4,7 @@ require 'singleton'
 module Sym
   module App
     module Commands
-      class FakeCommand < ::Sym::App::Commands::Command
+      class FakeCommand < ::Sym::App::Commands::BaseCommand
         include Sym
         required_options :fake, [:one, :other], ->(arg) { arg[:booboo].eql?(:doodoo) }
       end

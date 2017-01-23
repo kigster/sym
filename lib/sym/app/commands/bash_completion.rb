@@ -1,8 +1,8 @@
-require_relative 'command'
+require 'sym/app/commands/base_command'
 module Sym
   module App
     module Commands
-      class BashCompletion < Command
+      class BashCompletion < BaseCommand
 
         required_options [:bash_completion]
         try_after :generate_key, :open_editor, :encrypt_decrypt

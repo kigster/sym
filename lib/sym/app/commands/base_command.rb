@@ -6,7 +6,7 @@ require 'active_support/inflector'
 module Sym
   module App
     module Commands
-      class Command
+      class BaseCommand
 
         def self.inherited(klass)
           klass.instance_eval do

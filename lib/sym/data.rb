@@ -1,10 +1,10 @@
-require_relative 'errors'
+require 'sym/errors'
 require 'base64'
 require 'zlib'
 
-require_relative 'data/wrapper_struct'
-require_relative 'data/encoder'
-require_relative 'data/decoder'
+require 'sym/data/wrapper_struct'
+require 'sym/data/encoder'
+require 'sym/data/decoder'
 
 module Sym
   # This module is responsible for taking arbitrary data of any format, and safely compressing

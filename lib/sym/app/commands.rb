@@ -4,7 +4,6 @@ require 'pp'
 module Sym
   module App
     module Commands
-
       class DependencyResolver < Hash
         include TSort
         alias tsort_each_node each_key
@@ -53,4 +52,14 @@ module Sym
   end
 end
 
-require_dir 'sym/app/commands'
+require 'sym/app/commands/base_command'
+require 'sym/app/commands/bash_completion'
+require 'sym/app/commands/encrypt_decrypt'
+require 'sym/app/commands/generate_key'
+require 'sym/app/commands/keychain_add_key'
+require 'sym/app/commands/open_editor'
+require 'sym/app/commands/password_protect_key'
+require 'sym/app/commands/print_key'
+require 'sym/app/commands/show_examples'
+require 'sym/app/commands/show_help'
+require 'sym/app/commands/show_version'

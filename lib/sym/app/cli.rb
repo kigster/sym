@@ -40,7 +40,7 @@ module Sym
     # instance. See there for more details.
     #
     # Subsequently, +#run+ method handles the finding of the appropriate
-    # {Sym::App::Commands::Command} subclass to respond to user's request.
+    # {Sym::App::Commands::BaseCommand} subclass to respond to user's request.
     # Command registry, sorting, command dependencies, and finding them is
     # done by the {Sym::App::Coommands} module.
     #

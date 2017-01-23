@@ -29,6 +29,7 @@ Gem::Specification.new do |spec|
   spec.required_ruby_version = '>= 2.2'
   spec.post_install_message = <<-EOF
 Thank you for installing this gem! 
+
 To enable bash command line completion, please run the following 
 command, which appends sym's shell completion to the specified file:
 

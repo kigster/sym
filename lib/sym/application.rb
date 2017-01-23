@@ -1,6 +1,6 @@
 require 'colored2'
 require 'sym'
-require_dir 'sym/app'
+require 'sym/app'
 
 module Sym
   class Application

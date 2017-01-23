@@ -51,6 +51,11 @@ module Sym
   end
 end
 
-require 'sym/app/short_name'
 require 'sym/version'
-require_dir 'sym/app'
+require 'sym/app/short_name'
+
+require 'sym/app/args'
+require 'sym/app/cli'
+require 'sym/app/commands'
+require 'sym/app/keychain'
+require 'sym/app/output'

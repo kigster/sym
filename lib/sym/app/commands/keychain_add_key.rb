@@ -1,9 +1,9 @@
-require_relative 'command'
+require 'sym/app/commands/base_command'
 require 'sym/app/keychain'
 module Sym
   module App
     module Commands
-      class KeychainAddKey < Command
+      class KeychainAddKey < BaseCommand
 
         required_options [:private_key, :keyfile, :interactive],
                          :keychain

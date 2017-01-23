@@ -1,8 +1,8 @@
-require_relative 'command'
+require 'sym/app/commands/base_command'
 module Sym
   module App
     module Commands
-      class EncryptDecrypt < Command
+      class EncryptDecrypt < BaseCommand
         include Sym
 
         required_options [ :private_key, :keyfile, :keychain, :interactive ],

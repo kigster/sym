@@ -1,9 +1,9 @@
-require_relative 'command'
+require 'sym/app/commands/base_command'
 require 'sym/app/keychain'
 module Sym
   module App
     module Commands
-      class GenerateKey < Command
+      class GenerateKey < BaseCommand
 
         required_options :generate
 

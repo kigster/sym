@@ -1,5 +1,5 @@
 require 'base64'
-require_relative 'configuration'
+require 'sym/configuration'
 
 module Sym
 

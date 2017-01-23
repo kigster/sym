@@ -3,11 +3,11 @@ require 'fileutils'
 require 'tempfile'
 require 'sym'
 require 'sym/errors'
-require_relative 'command'
+require 'sym/app/commands/base_command'
 module Sym
   module App
     module Commands
-      class OpenEditor < Command
+      class OpenEditor < BaseCommand
         include Sym
 
         required_options [ :private_key, :keyfile, :keychain, :interactive ],
