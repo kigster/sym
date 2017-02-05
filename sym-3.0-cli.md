@@ -84,9 +84,9 @@ Each URI type is supported by a corresponding plugin, and new ones can be easily
 Some examples:
    
 ```bash   
-   ——key-in string://234234234           # read from the literal data
+   ——key-in  string://234234234           # read from the literal data
    ——key-out file://home/kig/.mykey      # read/write from/to file
-   ——key-in env://MY_VARIABLE            # read from environment variable
+   ——key-in  env://MY_VARIABLE            # read from environment variable
    ——key-out stdio://                    # read/write using stdin/out
    
    --data-in  https://mysite.com/remote/secrets.json.enc

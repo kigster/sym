@@ -29,8 +29,14 @@ RSpec.describe 'CLI execution', :type => :aruba do
     end
 
     context 'while running commands' do
-
       before { run_simple command }
+
+      context 'examples' do
+        let(:args) { '-E' }
+        it 'should print examples' do
+          expect(output).to match(/generate a new private key into an environment variable:/)
+        end
+      end
 
       context 'generate' do
         let(:args) { '-g' }

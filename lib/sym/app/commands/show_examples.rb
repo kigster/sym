@@ -65,9 +65,9 @@ Diff:
         def example(comment: nil, command: nil, echo: nil, result: nil)
           out = []
           out << "# #{comment}".white.dark.italic if comment
-          out << "#{command}" if command
-          out << "#{echo}" if echo
-          out << "#{result}" if result
+          out << command if command
+          out << echo if echo
+          out << result if result
           out << '—'*80
         end
       end

@@ -5,7 +5,7 @@ module Sym
       class Stdout < ::Sym::App::Output::Base
         required_option nil
         def output_proc
-          ->(argument) { printf argument }
+          ->(argument) { printf "%s", argument }
         end
       end
     end
