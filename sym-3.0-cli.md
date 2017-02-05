@@ -1,70 +1,123 @@
-## Sym 
+# Sym 
 
-> Sym is a versatile encryption gem, based on the symmetric encryption cipher provided by the OpenSSL. It provides easy to remember commands to manage encryption key: you can generate a key, import an existing key, password protect an open key, store the key in OS-X KeyChain, and use it for encryption/decryption later. The key is used to encrypt, decrypt and edit any sensitive information, such application secrets.
+__Sym__ is a versatile encryption gem, based on the symmetric encryption cipher provided by the OpenSSL. It provides easy to remember commands to manage encryption key: you can generate a key, import an existing key, password protect an open key, store the key in OS-X KeyChain, and use it for encryption/decryption later. The key is used to encrypt, decrypt and edit any sensitive information, such application secrets.
 
-### Complete Usage
+## Usage
 
     sym [ global options ] [ sub command ] [ command options ] 
     
-##### Global Options
+### Global Options
     
 ```bash
--M, ——password-timeout   [timeout]  when passwords expire (in seconds)
--P, ——no-password-cache             disables caching of key passwords   
--v, ——verbose                       show additional information
--T, ——trace                         print a backtrace of any errors
--q, ——quiet                         silence all output
--V, ——version                       print library version
--N, ——no-color                      disable color output
+-t, --password-timeout   [timeout]  when passwords expire (in seconds)
+-p, --no-password-cache             disables caching of key passwords   
+-v, --verbose                       show additional information
+-T, --trace                         print a backtrace of any errors
+-q, --quiet                         silence all output
+-V, --version                       print library version
+-N, --no-color                      disable color output
 ```
 
-##### Help & Examples:
+### Help & Examples:
 
 ```bash
--h, ——help                          show help
--l, ——long                          show help and detailed examples
+-h, --help                          show help
+-l, --long                          show help and detailed examples
 ```
 
-##### Commands
+### Commands
 
-    # Genereate new key
-    sym key ——save [ key-source ]
+###### Genereate a new key
+```bash
+sym key [ [ --out      | -o ] uri ] # or STDOUT by default
+# eg.
+> sym key -o stdout
+> sym key -o file://~/.key
+```
+
+###### Copy or Re-Import a Key
+
+Typically applied to an existing key, optionally password-protecting it:
+
+```bash
+sym key   [ --in       | -k ] uri 
+        [ [ --out      | -o ] uri ] # or STDOUT by default
+          [ --password | -p ] 
+# eg.
+> sym key -k file://~/.key -o keychain://mykey -p 
+
+> sym key -k stdin -o keychain://mykey -p           
+Please enter the encryption key: 75ngenJpB6zL47/8Wo7Ne6JN1pnOsqNEcIqblItpfg4=
+Please enter new password:
+Please confirm the new password: 
+```
+
+###### Delete an existing key (assuming URI supports deletion):
+
+```bash
+sym key   [ --delete   | -d ] uri
+
+# eg.
+> sym key -d keychain://mykey
+> sym key -d redis://127.0.0.1:6379/1/symkey
+```
+
+###### Encrypt or Decrypt a Resource
+
+```bash
+sym decrypt   [ --key      | -k ] uri 
+              [ --data     | -d ] uri
+            [ [ --out      | -o ] uri ]
+
+sym encrypt   [ --key      | -k ] uri 
+              [ --data     | -d ] uri
+            [ [ --out      | -o ] uri ]
+```
+
+###### Open Encrypted Resource in an Editor
+
+```bash
+sym edit      [ --key      | -k ] uri 
+              [ --data     | -d ] uri
+            [ [ --backup   | -b ] data-backup-uri
+```
+###### Re-encrypt data, and rotate the key
+
+For key and data URIs that support update operation (eg, `file://`, `keychain://`)
+this operation decrypts the resource with the current key, generates
+a new key, re-encrypts the data, and updates both the resource and the 
+key URIs.
+
+```bash
+sym cycle     [ --key      | -k ] uri 
+              [ --data     | -d ] uri
+            [ [ --out      | -o ] uri ]
+# eg:
+sym cycle -k file://~/.key -d file://./secrets.yml
+```
+
+###### Installation, Help, and Other Commands
+
+```bash            
+sym install bash-completion
+
+sym --help | -h
+
+sym command --help | -h
    
-    # Copy existing key, optionally password-protected:
-    sym key ——save [ key-source ] ——key [ key-source ] [ -p ] 
-   
-    # Delete existing key:
-    sym key ——rm [ key-source ]
-
-    sym decrypt ——key  | -k   key-source 
-                ——data | -d   data-source
-                ——to   | -t   data-source | ——in-place
- 
-    sym encrypt ——key  | -k   key-source 
-                ——data | -d   data-source
-                ——to   | -t   data-source | ——in-place
-   
-    sym edit    ——data | -d   data-source
-                ——key  | -k   key-source
-                ——bak  | -b   data-backup-source
-                
-    sym recrypt ——data | -d   data-source
-                ——key  | -k   key-source 
-                ——save | -s   key-source
-                 
-    sym install bash-completion
-
-    sym --help | -h
-    
-    sym command --help | -h
-    
-    sym examples
-
+sym examples
+```
 
 ##### Arguments via Environment
 
-    export SYM_ARGS_KEY='@file "~/.sym.key"'
-    export SYM_ARGS_DATA='@file "~/.sym.key"'
+Common arguments can be passed in an environment variable called `SYM_ARGS`:
+
+    export SYM_ARGS='-k file://~/.sym.key'
+    
+The name of the variable can be read from the `-B <name>` argument, eg:
+
+    SYM_ARGUMENTS='-k 75ngenJpB6zL47/8Wo7Ne6JN1pnOsqNEcIqblItpfg4'
+    sym -B SYM_ARGUMENS -d file://file.enc
 
 ##### Subcommands
 
@@ -84,13 +137,13 @@ Each URI type is supported by a corresponding plugin, and new ones can be easily
 Some examples:
    
 ```bash   
-   ——key-in  string://234234234           # read from the literal data
-   ——key-out file://home/kig/.mykey      # read/write from/to file
-   ——key-in  env://MY_VARIABLE            # read from environment variable
-   ——key-out stdio://                    # read/write using stdin/out
-   
-   --data-in  https://mysite.com/remote/secrets.json.enc
-   --data-out file:///usr/local/etc/secrets.json
+ string://234234234          # read from the literal data
+ file://home/kig/.mykey      # read/write from/to file
+ env://MY_VARIABLE           # read from environment variable
+ stdio://                    # read/write using stdin/out
+
+ https://mysite.com/remote/secrets.json.enc
+ file:///usr/local/etc/secrets.json
 ```
 
 Below is the list of supported types planned for 3.0:
