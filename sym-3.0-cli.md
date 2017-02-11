@@ -1,4 +1,9 @@
+
 # Sym 
+
+## Table of Contents
+
+[TOC]
 
 __Sym__ is a versatile encryption gem, based on the symmetric encryption cipher provided by the OpenSSL. It provides easy to remember commands to manage encryption key: you can generate a key, import an existing key, password protect an open key, store the key in OS-X KeyChain, and use it for encryption/decryption later. The key is used to encrypt, decrypt and edit any sensitive information, such application secrets.
 
@@ -6,7 +11,7 @@ __Sym__ is a versatile encryption gem, based on the symmetric encryption cipher 
 
     sym [ global options ] [ sub command ] [ command options ] 
     
-### Global Options
+## Global Options
     
 ```bash
 -t, --password-timeout   [timeout]  when passwords expire (in seconds)
@@ -18,16 +23,16 @@ __Sym__ is a versatile encryption gem, based on the symmetric encryption cipher 
 -N, --no-color                      disable color output
 ```
 
-### Help & Examples:
+## Help & Examples:
 
 ```bash
 -h, --help                          show help
 -l, --long                          show help and detailed examples
 ```
 
-### Commands
+## Commands
 
-###### Genereate a new key
+### Genereate a new key
 ```bash
 sym key [ [ --out      | -o ] uri ] # or STDOUT by default
 # eg.
@@ -35,7 +40,7 @@ sym key [ [ --out      | -o ] uri ] # or STDOUT by default
 > sym key -o file://~/.key
 ```
 
-###### Copy or Re-Import a Key
+### Copy or Re-Import a Key
 
 Typically applied to an existing key, optionally password-protecting it:
 
@@ -52,7 +57,7 @@ Please enter new password:
 Please confirm the new password: 
 ```
 
-###### Delete an existing key (assuming URI supports deletion):
+### Delete an existing key (assuming URI supports deletion):
 
 ```bash
 sym key   [ --delete   | -d ] uri
@@ -62,7 +67,7 @@ sym key   [ --delete   | -d ] uri
 > sym key -d redis://127.0.0.1:6379/1/symkey
 ```
 
-###### Encrypt or Decrypt a Resource
+### Encrypt or Decrypt a Resource
 
 ```bash
 sym decrypt   [ --key      | -k ] uri 
@@ -74,14 +79,14 @@ sym encrypt   [ --key      | -k ] uri
             [ [ --out      | -o ] uri ]
 ```
 
-###### Open Encrypted Resource in an Editor
+### Open Encrypted Resource in an Editor
 
 ```bash
 sym edit      [ --key      | -k ] uri 
               [ --data     | -d ] uri
             [ [ --backup   | -b ] data-backup-uri
 ```
-###### Re-encrypt data, and rotate the key
+### Re-encrypt data, and rotate the key
 
 For key and data URIs that support update operation (eg, `file://`, `keychain://`)
 this operation decrypts the resource with the current key, generates
@@ -96,7 +101,7 @@ sym cycle     [ --key      | -k ] uri
 sym cycle -k file://~/.key -d file://./secrets.yml
 ```
 
-###### Installation, Help, and Other Commands
+### Installation, Help, and Other Commands
 
 ```bash            
 sym install bash-completion
@@ -108,7 +113,7 @@ sym command --help | -h
 sym examples
 ```
 
-##### Arguments via Environment
+### Arguments via Environment
 
 Common arguments can be passed in an environment variable called `SYM_ARGS`:
 
@@ -118,15 +123,6 @@ The name of the variable can be read from the `-B <name>` argument, eg:
 
     SYM_ARGUMENTS='-k 75ngenJpB6zL47/8Wo7Ne6JN1pnOsqNEcIqblItpfg4'
     sym -B SYM_ARGUMENS -d file://file.enc
-
-##### Subcommands
-
-When loading the commands, we use the hierarchical loading:
-
-    require 'sym/app/cmd'
-    require 'sym/app/cmd/bash'
-    require 'sym/app/cmd/bash/completion'
-
 
 ### Reading and Writing Data and Keys
 
@@ -138,11 +134,15 @@ Some examples:
    
 ```bash   
  string://234234234          # read from the literal data
- file://home/kig/.mykey      # read/write from/to file
  env://MY_VARIABLE           # read from environment variable
+ 
+ file://home/kig/.mykey      # read/write from/to file
  stdio://                    # read/write using stdin/out
 
+ # Real URLs could potentially support writes with PUT or POST
  https://mysite.com/remote/secrets.json.enc
+ 
+ # Files support read/write
  file:///usr/local/etc/secrets.json
 ```
 
@@ -163,4 +163,6 @@ Below is the list of supported types planned for 3.0:
  memcached://127.0.0.1:11211/mykey       yes   yes   yes
  scp://user@host/path/file               yes   yes   yes
  http[s]://user@host/path/file           yes   yes   yes
+ ftp[s]://user@host/path/file            yes   yes   yes
+
 ```

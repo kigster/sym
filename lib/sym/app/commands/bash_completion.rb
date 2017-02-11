@@ -7,7 +7,6 @@ module Sym
         required_options [:bash_completion]
         try_after :generate_key, :open_editor, :encrypt_decrypt
 
-
         def execute
           install_completion_file
           file = opts[:bash_completion]
