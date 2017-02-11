@@ -61,15 +61,17 @@ module Sym
             end
           end
         rescue Timeout::Error => e
-          error(e)
+          error(nil, "Password Cache server timed out...")
         rescue StandardError => e
-          error(e, 'error connecting to dRB server')
+          error(e, 'Error connecting to Password Caching server')
         end
 
-        def error(exception, message = nil)
+        def error(exception = nil, message = nil)
           if self.verbose
-            puts "WARNING: #{message ? message.yellow + "\n  ⇨ " : '' }#{exception.message.red}"
-            puts 'Password caching disabled.'.yellow.underlined
+            print "WARNING: "
+            print message ? message.yellow : ''
+            print exception ? exception.message.red : ''
+            puts
           end
           self.enabled = false
           nil
