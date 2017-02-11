@@ -485,12 +485,24 @@ The library offers a typical `Sym::Configuration` class which can be used to twe
 require 'zlib'
 require 'sym'
 Sym::Configuration.configure do |config|
-  config.password_cipher = 'AES-128-CBC'  #
-  config.data_cipher = 'AES-256-CBC'
-  config.private_key_cipher = config.data_cipher
+  config.password_cipher     = 'AES-128-CBC'
+  config.private_key_cipher  = config.data_cipher
   config.compression_enabled = true
-  config.compression_level = Zlib::BEST_COMPRESSION
-end
+  config.compression_level   = Zlib::BEST_COMPRESSION
+
+  config.password_cache_timeout = 300
+
+  config.password_cache_coin_provider = {
+    uri: 'druby://127.0.0.1:24924'
+  }
+
+  config.password_cache_memcached_provider = {
+    args: %w(127.0.0.1:11211),
+    opts: { namespace:  'sym',
+            compress:   true,
+            expires_in: config.password_cache_timeout
+    }
+  }end
 ```
 
 As you can see, it's possible to change the default cipher type, although not all ciphers will be code-compatible with the current algorithm, and may require additional code changes.
