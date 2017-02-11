@@ -152,6 +152,7 @@ module Sym
 
           o.integer '-M', '--password-timeout',   '[timeout]'.blue + '  when passwords expire (in seconds)'
           o.bool    '-P', '--no-password-cache',  '           disables caching of key passwords'
+          o.string  '-c', '--cache-provider',     '[provider]'.blue + ' cache to use, one of: memcached, coin'
 
           o.separator ' '
           o.separator 'Read existing private key from:'.yellow

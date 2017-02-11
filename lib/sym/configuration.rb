@@ -33,7 +33,11 @@ module Sym
       end
     end
 
+    # See file +lib/sym.rb+ where these values are defined.
+
     attr_accessor :data_cipher, :password_cipher, :private_key_cipher
     attr_accessor :compression_enabled, :compression_level
+    attr_accessor :password_cache_memcached_provider, :password_cache_timeout
+    attr_accessor :password_cache_coin_provider
   end
 end

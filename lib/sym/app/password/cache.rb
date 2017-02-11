@@ -4,8 +4,9 @@ require 'colored2'
 require 'timeout'
 require 'sym/extensions/with_retry'
 require 'sym/extensions/with_timeout'
-
+require 'sym/configuration'
 require_relative 'coin_provider'
+require_relative 'memcached_provider'
 
 module Sym
   module App
@@ -26,23 +27,32 @@ module Sym
       # it must be intantiatable via #new
 
       class Cache
-        DEFAULT_TIMEOUT = 300
-
         include Singleton
         include Sym::Extensions::WithRetry
         include Sym::Extensions::WithTimeout
 
         attr_accessor :provider, :enabled, :timeout, :verbose
 
-        def configure(provider: CoinProvider.new,
+        def configure(provider: MemcachedProvider.new,
                       enabled: true,
-                      timeout: DEFAULT_TIMEOUT,
+                      timeout: ::Sym::Configuration.config.password_cache_timeout,
                       verbose: false)
+          self.enabled = enabled
+          self.timeout = timeout
+          self.verbose = verbose
 
-          self.provider = provider
-          self.enabled  = enabled
-          self.timeout  = timeout
-          self.verbose  = verbose
+          case provider
+            when String, Symbol
+              provider_class_name = "#{provider.capitalize}Provider"
+              if Sym::App::Password.const_defined?(provider_class_name)
+                provider_class = Sym::App::Password.const_get(provider_class_name)
+                self.provider  = provider_class.new
+              else
+                self.enabled = false
+              end
+            else
+              self.provider = provider
+          end
           self
         end
 
@@ -74,14 +84,14 @@ module Sym
             end
           end
         rescue Timeout::Error => e
-          error(nil, "Password cache server timed out...")
+          error(nil, 'Password cache server timed out...')
         rescue StandardError => e
           error(e, 'Error connecting to password caching server...')
         end
 
         def error(exception = nil, message = nil)
           if self.verbose
-            print "WARNING: "
+            print 'WARNING: '
             print message ? message.yellow : ''
             print exception ? exception.message.red : ''
             puts

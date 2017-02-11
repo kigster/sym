@@ -36,10 +36,7 @@ module Sym
             expect(cache['foo']).to be_nil
           end
         end
-
-
       end
-
     end
   end
 end
