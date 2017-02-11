@@ -13,7 +13,97 @@
 
 > __sym__ is a utility and an API that makes it _trivial to encrypt and decrypt sensitive data_. Unlike many other existing tools, __sym__'s goal is to dramatically simplify the command line interface (CLI), and make symmetric encryption as routine as listing directories in Terminal.
 
-[TOC]
+
+<hr />
+## Table of Contents
+
+<ul class="small site-footer-links">
+<li>
+<a href="#description">Description</a>
+<ul>
+<li>
+<a href="#motivation">Motivation</a>
+</li>
+<li>
+<a href="#whats-included">What&#39;s Included</a>
+</li>
+<li>
+<a href="#how-it-works">How It Works</a>
+</li>
+</ul>
+</li>
+<li>
+<a href="#installation">Installation</a>
+</li>
+<li>
+<a href="#using-sym-with-the-command-line">Using <code>sym</code> with the Command Line</a>
+<ul>
+<li>
+<a href="#private-keys">Private Keys</a>
+<ul>
+<li>
+<a href="#generating-private-keys">Generating Private Keys</a>
+</li>
+<li>
+<a href="#using-keychain-access-on-mac-os-x">Using KeyChain Access on Mac OS-X</a>
+</li>
+<li>
+<a href="#keychain-key-management">KeyChain Key Management</a>
+</li>
+<li>
+<a href="#moving-a-key-to-the-keychain">Moving a Key to the Keychain</a>
+</li>
+<li>
+<a href="#adding-password-to-existing-key">Adding Password to Existing Key</a>
+</li>
+<li>
+<a href="#encryption-and-decryption">Encryption and Decryption</a>
+</li>
+</ul>
+</li>
+<li>
+<a href="#cli-usage-examples">CLI Usage Examples</a>
+<ul>
+<li>
+<a href="#inline-editing">Inline Editing</a>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+<li>
+<a href="#ruby-api">Ruby API</a>
+<ul>
+<li>
+<a href="#encryption-and-decryption-operations">Encryption and Decryption Operations</a>
+</li>
+<li>
+<a href="#full-application-api">Full Application API</a>
+</li>
+<li>
+<a href="#configuration">Configuration</a>
+</li>
+</ul>
+</li>
+<li>
+<a href="#encryption-features--cipher-used">Encryption Features &amp; Cipher Used</a>
+</li>
+<li>
+<a href="#development">Development</a>
+<ul>
+<li>
+<a href="#contributing">Contributing</a>
+</li>
+</ul>
+</li>
+<li>
+<a href="#license">License</a>
+</li>
+<li>
+<a href="#acknowledgements">Acknowledgements</a>
+</li>
+</ul>
+<hr />
 
 ### Motivation
 
@@ -32,7 +122,7 @@ __Sym__ is a layer built on top of the [`OpenSSL`](https://www.openssl.org/) lib
 This gem includes two primary components:
 
  * [Ruby API](#ruby-api) for enabling encryption/decryption of any data within any Ruby class, with extremely easy-to-use methods
- * [Rich command line interface (CLI)](#cli) with many additional features to streamline handling of encrypted data.
+ * [Rich command line interface CLI](#cli) with many additional features to streamline handling of encrypted data.
 
 _Symmetric Encryption_ simply means that we are using the same private key to encrypt and decrypt. In addition to the private key, the encryption uses an IV vector. The library completely hides `iv` generation from the user, and automatically generates a random `iv` per encryption.
 
@@ -100,7 +190,7 @@ Or install it into the global namespace with `gem install` command:
     $ sym -h
     $ sym -E # see examples
 
-### BASH Completion
+__BASH Completion__
 
 Optionally, after gem installation, you can also install bash-completion of gem's command line options, but running the following command (and feel free to use any of the "dot" files you prefer):
 
@@ -108,7 +198,9 @@ Optionally, after gem installation, you can also install bash-completion of gem'
 
 Should you choose to install it (this part is optional), you will be able to use "tab-tab" after typing `sym`, and you'll be able to choose from all of the supported flags.
 
-## <a name="#cli"></a>Using `sym` with the Command Line
+<a name="#cli"></a>
+
+## Using `sym` with the Command Line
 
 ### Private Keys
 
@@ -293,7 +385,7 @@ Decrypt an encrypted file and print it to STDOUT:
 
 <a name="inline"></a>
 
-##### Inline Editing
+#### Inline Editing
 
 The `sym` CLI tool supports one particularly interesting mode, that streamlines handling of encrypted files. The mode is called __edit mode__, and is activated with the `-t` flag. 
 
@@ -348,7 +440,7 @@ end
 @key.eql?(SomeClass.private_key)  # => true (it was assigned)
 ```
 
-### Encryption and Decryption
+### Encryption and Decryption Operations
 
 So how would we use this library from another Ruby project to encrypt and decrypt values?
 
