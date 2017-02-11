@@ -1,4 +1,3 @@
-require 'coin'
 require 'digest'
 require 'singleton'
 require 'colored2'
@@ -6,11 +5,27 @@ require 'timeout'
 require 'sym/extensions/with_retry'
 require 'sym/extensions/with_timeout'
 
+require_relative 'coin_provider'
+
 module Sym
   module App
     module Password
+
+      # +Provider+ is the primary implementation of the underlying cache.
+      # It should support the following API:
+      #
+      #        def initialize(*args, **opts, &block)
+      #        end
+      #
+      #        def read(key)
+      #        end
+      #
+      #        def write(key, value, expire_timeout_seconds)
+      #        end
+      #
+      # it must be intantiatable via #new
+
       class Cache
-        URI             = 'druby://127.0.0.1:24924'
         DEFAULT_TIMEOUT = 300
 
         include Singleton
@@ -19,12 +34,10 @@ module Sym
 
         attr_accessor :provider, :enabled, :timeout, :verbose
 
-        def configure(provider: Coin,
+        def configure(provider: CoinProvider.new,
                       enabled: true,
                       timeout: DEFAULT_TIMEOUT,
                       verbose: false)
-
-          Coin.uri = URI if provider == Coin
 
           self.provider = provider
           self.enabled  = enabled
@@ -56,14 +69,14 @@ module Sym
         def operation
           return nil unless self.enabled
           with_timeout(1) do
-            with_retry(fail_block: -> { Coin.remote_uri = URI if provider == Coin }) do
+            with_retry do
               yield if block_given?
             end
           end
         rescue Timeout::Error => e
-          error(nil, "Password Cache server timed out...")
+          error(nil, "Password cache server timed out...")
         rescue StandardError => e
-          error(e, 'Error connecting to Password Caching server')
+          error(e, 'Error connecting to password caching server...')
         end
 
         def error(exception = nil, message = nil)

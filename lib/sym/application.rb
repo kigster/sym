@@ -103,7 +103,6 @@ module Sym
 
     def initialize_password_cache
       args            = {}
-      args[:provider] = Coin
       args[:timeout]  = opts[:password_timeout].to_i if opts[:password_timeout]
       args[:enabled]  = false if opts[:no_password_cache]
       args[:verbose]  = true if opts[:verbose]

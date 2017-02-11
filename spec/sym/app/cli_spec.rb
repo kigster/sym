@@ -125,11 +125,11 @@ module Sym
         end
 
         context 'when the key is password-protected' do
-          let(:password) { 'pIA44z!w04DS' }
-          let(:encrypted_key) { test_instance.encr_password(private_key, password) }
-          let(:argv) { "-d -s #{encrypted_string} -K #{tempfile.path} -v -T".split(' ') }
-          let(:tempfile) { SAVE_TO_TEMPFILE.call(encrypted_key) }
-          let(:input_handler) { Sym::App::Input::Handler.new }
+          let!(:password) { 'pIA44z!w04DS' }
+          let!(:encrypted_key) { test_instance.encr_password(private_key, password) }
+          let!(:argv) { "-d -s #{encrypted_string} -K #{tempfile.path} -v -T".split(' ') }
+          let!(:tempfile) { SAVE_TO_TEMPFILE.call(encrypted_key) }
+          let!(:input_handler) { Sym::App::Input::Handler.new }
           before do
             expect(input_handler).to receive(:ask).exactly(attempts).times.and_return(decryption_password)
             application.input_handler = input_handler
