@@ -2,23 +2,16 @@
 lib = File.expand_path('../lib', __FILE__)
 $LOAD_PATH.unshift(lib) unless $LOAD_PATH.include?(lib)
 require 'sym/version'
+
 Gem::Specification.new do |spec|
   spec.name          = 'sym'
   spec.version       = Sym::VERSION
   spec.authors       = ['Konstantin Gredeskoul']
   spec.email         = %w(kigster@gmail.com)
 
-  spec.summary       = %q{Easy to use symmetric encryption library & CLI with a strong aes-256-cbc cipher used by the US Government.}
+  spec.summary       = %q{Super easy to use encryption library & a CLI with a strong aes-256-cbc cipher that can be used to transparently encrypt/decrypt/edit application secrets.}
 
-  spec.description = <<-EOF
-    Sym is a versatile command line utility and a library, that streamlines access to a 
-    symmetric encryption offered by OpenSSL library. Use its rich CLI interface, or the Ruby 
-    API to generate a key used for both encryption and decryption. You can 
-    additionally password protect the key, and optionally store the key in the named 
-    OS-X keychain. Use the key to reliably encrypt, decrypt and re-encrypt your application 
-    secrets. Use the -t CLI switch to open an encrypted file in an editor of your choice. 
-    Sym uses a symmetric aes-256-cbc cipher with a private key and an IV vector.
-  EOF
+  spec.description   = Sym::DESCRIPTION
 
   spec.homepage      = 'https://github.com/kigster/sym'
 
@@ -40,7 +33,7 @@ command, which appends sym's shell completion to the specified file:
 Thank you for checking out Sym and happy crypting :)
    -- KG ( github.com/kigster | twitter.com/kig )
 EOF
-  spec.add_dependency 'colored2', '~> 2.0'
+  spec.add_dependency 'colored2', '~> 3'
   spec.add_dependency 'slop', '~> 4.3'
   spec.add_dependency 'activesupport'
   spec.add_dependency 'highline', '~> 1.7'

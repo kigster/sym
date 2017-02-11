@@ -11,8 +11,7 @@
 
 ## Description
 
-> __sym__ is a utility and an API that makes it _trivial to encrypt and decrypt sensitive data_. Unlike many other existing tools, __sym__'s goal is to dramatically simplify the command line interface (CLI), and make symmetric encryption as routine as listing directories in Terminal.
-
+> __sym__ is a command line utility and a Ruby API that makes it _trivial to encrypt and decrypt sensitive data_. Unlike many other existing encryption tools, __sym__ focuses on usability and streamlined interface (CLI), with the goal of making encryption easy and transparent. The result? There is no excuse for keeping your application secrets unencrypted :) 
 
 <hr />
 ## Table of Contents
