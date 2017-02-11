@@ -319,7 +319,8 @@ Create a new private key:
   -x, --keychain           [key-name] add to (or read from) the OS-X Keychain
   -M, --password-timeout   [timeout]  when passwords expire (in seconds)
   -P, --no-password-cache             disables caching of key passwords
-
+  -c, --cache-provider     [provider] cache to use, one of: memcached, coin
+  
 Read existing private key from:
   -i, --interactive                   Paste or type the key interactively
   -k, --private-key        [key]      private key as a string
