@@ -7,6 +7,7 @@ require 'sym'
 require 'base64'
 require 'openssl'
 require 'aruba'
+require 'rspec/its'
 
 require_relative 'support/contexts'
 require_relative 'support/matchers'

@@ -13,97 +13,6 @@
 
 > __sym__ is a command line utility and a Ruby API that makes it _trivial to encrypt and decrypt sensitive data_. Unlike many other existing encryption tools, __sym__ focuses on usability and streamlined interface (CLI), with the goal of making encryption easy and transparent. The result? There is no excuse for keeping your application secrets unencrypted :) 
 
-<hr />
-## Table of Contents
-
-<ul class="small site-footer-links">
-<li>
-<a href="#description">Description</a>
-<ul>
-<li>
-<a href="#motivation">Motivation</a>
-</li>
-<li>
-<a href="#whats-included">What&#39;s Included</a>
-</li>
-<li>
-<a href="#how-it-works">How It Works</a>
-</li>
-</ul>
-</li>
-<li>
-<a href="#installation">Installation</a>
-</li>
-<li>
-<a href="#using-sym-with-the-command-line">Using <code>sym</code> with the Command Line</a>
-<ul>
-<li>
-<a href="#private-keys">Private Keys</a>
-<ul>
-<li>
-<a href="#generating-private-keys">Generating Private Keys</a>
-</li>
-<li>
-<a href="#using-keychain-access-on-mac-os-x">Using KeyChain Access on Mac OS-X</a>
-</li>
-<li>
-<a href="#keychain-key-management">KeyChain Key Management</a>
-</li>
-<li>
-<a href="#moving-a-key-to-the-keychain">Moving a Key to the Keychain</a>
-</li>
-<li>
-<a href="#adding-password-to-existing-key">Adding Password to Existing Key</a>
-</li>
-<li>
-<a href="#encryption-and-decryption">Encryption and Decryption</a>
-</li>
-</ul>
-</li>
-<li>
-<a href="#cli-usage-examples">CLI Usage Examples</a>
-<ul>
-<li>
-<a href="#inline-editing">Inline Editing</a>
-</li>
-</ul>
-</li>
-</ul>
-</li>
-<li>
-<a href="#ruby-api">Ruby API</a>
-<ul>
-<li>
-<a href="#encryption-and-decryption-operations">Encryption and Decryption Operations</a>
-</li>
-<li>
-<a href="#full-application-api">Full Application API</a>
-</li>
-<li>
-<a href="#configuration">Configuration</a>
-</li>
-</ul>
-</li>
-<li>
-<a href="#encryption-features--cipher-used">Encryption Features &amp; Cipher Used</a>
-</li>
-<li>
-<a href="#development">Development</a>
-<ul>
-<li>
-<a href="#contributing">Contributing</a>
-</li>
-</ul>
-</li>
-<li>
-<a href="#license">License</a>
-</li>
-<li>
-<a href="#acknowledgements">Acknowledgements</a>
-</li>
-</ul>
-<hr />
-
 ### Motivation
 
 The primary goal of this tool is to streamline and simplify handling of relatively sensitive data in the most trasparent and easy to use way as possible, without sacrificing security.
@@ -150,18 +59,18 @@ New Password     :  •••••••••
 Confirm Password :  •••••••••
 BAhTOh1TeW06OkRhdGE6OldyYXBwZXJTdH.....
 
-❯ sym -ex my-new-key -s 'My secret data' -o secret.enc
+❯ sym -ex my-new-key -s 'My secret data' -o secret.enc -C
 Coin::Vault listening at: druby://127.0.0.1:24924
 Password: •••••••••
 
 ❯ cat secret.enc
 BAhTOh1TeW06OkRhdGE6OldyYXBFefDFFD.....
 
-❯ sym -dx my-new-key -f secret.enc
+❯ sym -dx my-new-key -f secret.enc -C
 My secret data
 ```
 
-The line that says `Coin::Vault listening at: druby://127.0.0.1:24924` is the indication that the local dRB server used for caching passwords has been started. Password caching can be easily disabled with `-P` flag. In the example above, the decryption step fetched the password from the cache, and so the user was not required to re-enter the password.
+The line that says `Coin::Vault listening at: druby://127.0.0.1:24924` is the indication that the local dRB server used for caching passwords has been started. Password caching is off by default, but is enabled with `-C` flag. In the example above, the decryption step fetched the password from the cache, and so the user was not required to re-enter the password.
 
 __Direct Editing Encrypted Files__
 
@@ -208,13 +117,12 @@ The private key is the cornerstone of the symmetric encryption. Using `sym`, the
  * generated and printed to STDOUT, or saved to Mac OS-X KeyChain or a file
  * fetched from the Keychain in subsequent operations
  * password-protected during generation (or import) with the `-p` flag.
+ * password can be cached using either `memcached` or `dRB` server, if the `-C` flag is provided.
  * must be kept very well protected and secure from attackers.
 
 The __unencrypted private__ key will be in the form of a base64-encoded string, 45 characters long.
 
 __Encrypted (with password) private key__ will be considerably longer, perhaps 200-300 characters long.
-
-When the private key is encrypted, `sym` will request the password only once per 15 minute period. The password is cached using a local dRB server, but this caching can be disabled with `-P` flag.
 
 #### Generating Private Keys
 
@@ -289,63 +197,81 @@ You can add a password to a key by combining one of the key description flags (-
     
 The above example will take an unencrypted key passed in `$mykey`, ask for a password and save password protected key into the keychain with name "moo."
 
+#### Password Caching
+
+Nobody likes to re-type passwords over and over again, and for this reason *Sym* supports password caching via either a locally running `memcached` instance (the default, if available), or a locally started `dRB` (distributed Ruby) server based on the `Coin` gem.
+
+Specifics of configuring both Cache Providers is left to the `Configuration` class, an example of which is shown below in the Ruby API section.
+
+In order to control password caching, the following flags are available:
+
+ * `-C` turns on caching
+ * `-T seconds` sets the expiration for cached passwords
+ * `-P memcached | drb` controls which of the providers is used. Without this flag, *sym* auto-detects caching provider by first checking for `memcached`, and then starting the `dRB` server.
+
 #### Encryption and Decryption
 
 This may be a good time to take a look at the full help message for the `sym` tool, shown naturally with a `-h` or `--help` option.
 
 ```
-Sym (2.1.1) – encrypt/decrypt data with a private key
+Sym (2.2.0) – encrypt/decrypt data with a private key
 
 Usage:
    # Generate a new key:
-   sym -g [ -p ] [ -x keychain ] [ -o keyfile | -q | ]
+   sym -g [ -p ] [ -x keychain | -o keyfile | -q | ]  
 
-   # Encrypt/Decrypt
-   sym [ -d | -e ] [ -f <file> | -s <string> ]
-        [ -k key | -K keyfile | -x keychain | -i ]
-        [ -o <output file> ]
+   # To specify a key for an operation use any one of:
+   <key-spec> = -k key | -K file | -x keychain | -i 
 
-   # Edit an encrypted file in $EDITOR
-   sym -t -f <file> [ -b ][ -k key | -K keyfile | -x keychain | -i ]
-
+   # Encrypt/Decrypt to STDOUT or output file 
+   sym -e <key-spec> [-f <file> | -s <string>] [-o <file>] 
+   sym -d <key-spec> [-f <file> | -s <string>] [-o <file>] 
+ 
+   # Edit an encrypted file in $EDITOR 
+   sym -t <key-spec>  -f <file> [ -b ]
+ 
 Modes:
-  -e, --encrypt                       encrypt mode
-  -d, --decrypt                       decrypt mode
-  -t, --edit                          decrypt, open an encr. file in an $EDITOR
-
+  -e, --encrypt                     encrypt mode
+  -d, --decrypt                     decrypt mode
+  -t, --edit                        edit encrypted file in an $EDITOR
+ 
 Create a new private key:
-  -g, --generate                      generate a new private key
-  -p, --password                      encrypt the key with a password
-  -x, --keychain           [key-name] add to (or read from) the OS-X Keychain
-  -M, --password-timeout   [timeout]  when passwords expire (in seconds)
-  -P, --no-password-cache             disables caching of key passwords
-  -c, --cache-provider     [provider] cache to use, one of: memcached, coin
-  
+  -g, --generate                    generate a new private key
+  -p, --password                    encrypt the key with a password
+ 
 Read existing private key from:
-  -i, --interactive                   Paste or type the key interactively
-  -k, --private-key        [key]      private key as a string
-  -K, --keyfile            [key-file] private key from a file
-
+  -k, --private-key      [key]      private key (or key file)
+  -K, --keyfile          [key-file] private key from a file
+  -x, --keychain         [key-name] add to (or read from) the OS-X Keychain
+  -i, --interactive                 Paste or type the key interactively
+ 
+Password Cache:
+  -C, --cache-password              enable the cache (off by default)
+  -T, --cache-for        [seconds]  to cache the password for
+  -P, --cache-provider   [provider] type of cache, one of: 
+				    [ memcached, drb ]
+ 
 Data to Encrypt/Decrypt:
-  -s, --string             [string]   specify a string to encrypt/decrypt
-  -f, --file               [file]     filename to read from
-  -o, --output             [file]     filename to write to
-
+  -s, --string           [string]   specify a string to encrypt/decrypt
+  -f, --file             [file]     filename to read from
+  -o, --output           [file]     filename to write to
+ 
 Flags:
-  -b, --backup                        create a backup file in the edit mode
-  -v, --verbose                       show additional information
-  -T, --trace                         print a backtrace of any errors
-  -D, --debug                         print debugging information
-  -q, --quiet                         silence all output
-  -V, --version                       print library version
-  -N, --no-color                      disable color output
-
+  -b, --backup                      create a backup file in the edit mode
+  -v, --verbose                     show additional information
+  -A, --trace                       print a backtrace of any errors
+  -D, --debug                       print debugging information
+  -q, --quiet                       do not print to STDOUT
+  -V, --version                     print library version
+  -N, --no-color                    disable color output
+ 
 Utility:
-  -a, --bash-completion    [file]     append shell completion to a file
-
+  -a, --bash-completion  [file]     append shell completion to a file
+ 
 Help & Examples:
-  -E, --examples                      show several examples
-  -h, --help                          show help
+  -E, --examples                    show several examples
+  -h, --help                        show help
+
 ```
 
 ### CLI Usage Examples
@@ -492,18 +418,22 @@ Sym::Configuration.configure do |config|
   config.compression_level   = Zlib::BEST_COMPRESSION
 
   config.password_cache_timeout = 300
+  config.password_cache_arguments        = {
+    drb:       {
+      opts: {
+        uri: 'druby://127.0.0.1:24924'
+      }
+    },
+    memcached: {
+      args: %w(127.0.0.1:11211),
+      opts: { namespace:  'sym',
+              compress:   true,
+              expires_in: config.password_cache_timeout
+      }
 
-  config.password_cache_coin_provider = {
-    uri: 'druby://127.0.0.1:24924'
-  }
-
-  config.password_cache_memcached_provider = {
-    args: %w(127.0.0.1:11211),
-    opts: { namespace:  'sym',
-            compress:   true,
-            expires_in: config.password_cache_timeout
     }
-  }end
+  }
+end
 ```
 
 As you can see, it's possible to change the default cipher type, although not all ciphers will be code-compatible with the current algorithm, and may require additional code changes.
@@ -517,7 +447,7 @@ The `sym` executable as well as the Ruby API provide:
    * 256-bit private key, that
      *  can be generated and is a *base64-encoded* string about 45 characters long. The *decoded* key is always 32 characters (or 256 bytes) long.
      * can be optionally password-encrypted using the 128-bit key, and then be automatically detected (and password requested) when the key is used
-     * can have its password cached for 15 minutes locally on the machine using dRB server (or used without the cache with `-P` flag).
+     * can optionally have its password cached for 15 minutes locally on the machine using `memcached` or using a `dRB` server
  * Rich command line interface with some innovative features, such as inline editing of an encrypted file, using your favorite `$EDITOR`.
  * Data handling:
    * Automatic compression of the data upon encryption

@@ -6,7 +6,7 @@ module Sym
       if Sym::App.is_osx?
         RSpec.describe PrintKey do
           let(:key_name) { 'boochen-topolski' }
-          let(:argv) { "-x #{key_name} -v -T ".split(' ') }
+          let(:argv) { "-x #{key_name} -v --trace ".split(' ') }
           let(:command_class) { PrintKey }
           let(:keychain) { Sym::App::KeyChain.new(key_name) }
           let(:private_key) { TestClass.create_private_key }
@@ -25,7 +25,7 @@ module Sym
           end
 
           context 'when -q is provided its not printed' do
-            let(:argv) { "-x #{key_name} -q -T".split(' ') }
+            let(:argv) { "-x #{key_name} -q --trace".split(' ') }
             include_context :run_command
             it 'should not print anything for -q' do
               expect(program_output).to eql('')

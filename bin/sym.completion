@@ -16,11 +16,12 @@ _sym() {
 
     #[[ $COMP_CWORD == 1 ]] && SYM_COMP_OPTIONS="${SYM_COMP_OPTIONS} ${SYM_COMMANDS}"
     if [[ $prev =~ "-f" || $prev =~ "-o" || $prev =~ "-K" || $prev == "--keyfile" ]] ; then 
-      SYM_COMP_OPTIONS="$(find . -type f -depth 1 | sed 's#./##g')"
-    elif  [[ "${cur}" == '--' || "${cur}" == --* ]] ; then 
-      SYM_COMP_OPTIONS=$(sym --dictionary | sed -E 's/ /\n/g')
+      SYM_COMP_OPTIONS="$(find . -type f -depth 1 | sed 's#^.\/##g')"
+    elif  [[ "${cur}" == '-' || "${cur}" == -* ]] ; then 
+      export DICT_SYM_COMP_OPTIONS=${DICT_SYM_COMP_OPTIONS:-$(sym --dictionary | sed -E 's/ /\n/g')}
+      SYM_COMP_OPTIONS=${DICT_SYM_COMP_OPTIONS}
     else 
-      SYM_COMP_OPTIONS=$(sym -h | egrep '  \-' | grep -v '^  --' | cut -d ',' -f 1)
+      SYM_COMP_OPTIONS="$(find . -type f -depth 1 -name "${prev}*" | sed 's#^.\/##g')"
     fi
 
     COMPREPLY=( $(compgen -W "${SYM_COMP_OPTIONS}" -- ${cur}) )

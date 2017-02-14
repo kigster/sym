@@ -103,10 +103,9 @@ module Sym
 
     def initialize_password_cache
       args            = {}
-      args[:timeout]  = opts[:password_timeout].to_i if opts[:password_timeout]
-      args[:enabled]  = false if opts[:no_password_cache]
-      args[:verbose]  = true if opts[:verbose]
-
+      args[:timeout]  = opts[:cache_for].to_i if opts[:cache_for]
+      args[:enabled]  = opts[:cache_password]
+      args[:verbose]  = opts[:verbose]
       args[:provider] = opts[:cache_provider] if opts[:cache_provider]
 
       self.password_cache = Sym::App::Password::Cache.instance.configure(args)

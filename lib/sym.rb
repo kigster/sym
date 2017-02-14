@@ -1,6 +1,6 @@
 require 'colored2'
 require 'zlib'
-require 'coin'
+require 'logger'
 
 require_relative 'sym/configuration'
 
@@ -13,15 +13,21 @@ Sym::Configuration.configure do |config|
 
   config.password_cache_timeout = 300
 
-  config.password_cache_coin_provider = {
-    uri: 'druby://127.0.0.1:24924'
-  }
+  # When nil is selected, providers are auto-detected.
+  config.password_cache_default_provider = nil
+  config.password_cache_arguments        = {
+    drb:       {
+      opts: {
+        uri: 'druby://127.0.0.1:24924'
+      }
+    },
+    memcached: {
+      args: %w(127.0.0.1:11211),
+      opts: { namespace:  'sym',
+              compress:   true,
+              expires_in: config.password_cache_timeout
+      }
 
-  config.password_cache_memcached_provider = {
-    args: %w(127.0.0.1:11211),
-    opts: { namespace:  'sym',
-            compress:   true,
-            expires_in: config.password_cache_timeout
     }
   }
 end
@@ -132,5 +138,7 @@ module Sym
     file:   File.expand_path('../../bin/sym.completion', __FILE__),
     script: "[[ -f '#{COMPLETION_PATH}' ]] && source '#{COMPLETION_PATH}'",
   }
+
+  LOGGER = Logger.new(nil) # empty logger
 end
 

@@ -93,7 +93,7 @@ end
 
 
 #
-# Usage: add-generic-password [-a account] [-s service] [-w password] [options...] [-A|-T appPath] [keychain]
+# Usage: add-generic-password [-a account] [-s service] [-w password] [options...] [-A|--trace appPath] [keychain]
 #     -a  Specify account name (required)
 #     -c  Specify item creator (optional four-character code)
 #     -C  Specify item type (optional four-character code)
@@ -105,7 +105,7 @@ end
 #     -p  Specify password to be added (legacy option, equivalent to -w)
 #     -w  Specify password to be added
 #     -A  Allow any application to access this item without warning (insecure, not recommended!)
-#     -T  Specify an application which may access this item (multiple -T options are allowed)
+#     --trace  Specify an application which may access this item (multiple --trace options are allowed)
 #     -U  Update item if it already exists (if omitted, the item cannot already exist)
 #
 # Usage: find-generic-password [-a account] [-s service] [options...] [-g] [keychain...]

@@ -35,7 +35,7 @@ module Sym
       end
 
       context 'show version' do
-        let(:argv) { %w(-V -T) }
+        let(:argv) { %w(-V --trace) }
         include_context :run_command
         it 'should output the version number' do
           expect_command_to_have klass:  Commands::ShowVersion,
@@ -70,7 +70,7 @@ module Sym
 
       context 'perform encryption' do
         let(:string) { 'HelloWorld' }
-        let(:argv) { "-e -s #{string} -k #{private_key} -v -T".split(' ') }
+        let(:argv) { "-e -s #{string} -k #{private_key} -v --trace".split(' ') }
         let(:encrypted_string) { program_output }
 
         include_context :run_command
@@ -114,7 +114,7 @@ module Sym
           end
 
           context 'and is supplied via -K file' do
-            let(:argv) { "-d -s #{encrypted_string} -K #{tempfile.path} -v -T".split(' ') }
+            let(:argv) { "-d -s #{encrypted_string} -K #{tempfile.path} -v --trace".split(' ') }
             let!(:tempfile) { SAVE_TO_TEMPFILE.call(private_key) }
 
             include_context :decrypting
@@ -127,7 +127,7 @@ module Sym
         context 'when the key is password-protected' do
           let!(:password) { 'pIA44z!w04DS' }
           let!(:encrypted_key) { test_instance.encr_password(private_key, password) }
-          let!(:argv) { "-d -s #{encrypted_string} -K #{tempfile.path} -v -T".split(' ') }
+          let!(:argv) { "-d -s #{encrypted_string} -K #{tempfile.path} -v --trace".split(' ') }
           let!(:tempfile) { SAVE_TO_TEMPFILE.call(encrypted_key) }
           let!(:input_handler) { Sym::App::Input::Handler.new }
           before do

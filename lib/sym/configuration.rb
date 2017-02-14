@@ -37,7 +37,7 @@ module Sym
 
     attr_accessor :data_cipher, :password_cipher, :private_key_cipher
     attr_accessor :compression_enabled, :compression_level
-    attr_accessor :password_cache_memcached_provider, :password_cache_timeout
-    attr_accessor :password_cache_coin_provider
+    attr_accessor :password_cache_default_provider, :password_cache_timeout
+    attr_accessor :password_cache_arguments
   end
 end

@@ -1,15 +1,15 @@
 require 'spec_helper'
-require 'coin'
+require 'sym/app/password/providers'
+
 module Sym
   module App
     module Password
-
       RSpec.describe Cache do
         let(:enabled) { true }
-        let(:cache) { Cache.instance.configure(provider: Coin, timeout: 200, enabled: enabled) }
+        let(:cache) { Cache.instance.configure(provider: :drb, timeout: 200, enabled: enabled) }
         context 'cache provider' do
           subject { cache.provider }
-          it { is_expected.to be(Coin) }
+          it { is_expected.to be_kind_of(Providers::DrbProvider) }
         end
 
         context 'cache enabled' do
