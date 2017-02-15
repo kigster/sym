@@ -209,7 +209,28 @@ In order to control password caching, the following flags are available:
  * `-T seconds` sets the expiration for cached passwords
  * `-P memcached | drb` controls which of the providers is used. Without this flag, *sym* auto-detects caching provider by first checking for `memcached`, and then starting the `dRB` server.
 
-#### Encryption and Decryption
+#### Saving Common Flags in an Environment Variable
+
+You can optionally store frequently used flags for `sym` in the `SYM_ARGS` environment variable. For example, to always cache passwords, and to always use the same encryption key from the keychain named "production", set the following in your `~/.bashrc`:
+
+```
+export SYM_ARGS="-x production -C"
+```
+
+This will always be appended to the command line, and so to encrypt/decrypt anything with password caching enabled and using that particular key, you would simply type:
+
+```bash
+# -x production -C are added from SYM_ARGS
+sym -ef file -o file.enc
+
+# And to decrypt:
+sym -df file.enc -o file.original
+
+# Or edit the encrypted file:
+sym -tf file.enc
+```
+
+#### Complete CLI Usage
 
 This may be a good time to take a look at the full help message for the `sym` tool, shown naturally with a `-h` or `--help` option.
 

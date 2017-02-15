@@ -2,9 +2,14 @@
 
 ## [HEAD](https://github.com/kigster/sym/tree/HEAD)
 
-[Changes since the last tag](https://github.com/kigster/sym/compare/v2.2.0...HEAD)
+[Changes since the last tag](https://github.com/kigster/sym/compare/v2.2.1...HEAD)
 
+## [v2.2.1](https://github.com/kigster/sym/tree/v2.2.1) (2017-02-15)
+[Full Changelog](https://github.com/kigster/sym/compare/v2.2.0...v2.2.1)
 
+* [`53bb95f`](https://github.com/kigster/sym/commit/53bb95f) Ability to read flags from SYM_ARGS environment
+* [`c3d0b86`] (https://github.com/kigster/sym/commit/c3d0b86) Switched to using bash-completion-style syntax
+* [`9368bf5`] (https://github.com/kigster/sym/commit/9368bf5) Adding CHANGELOG.md
 
 ## [v2.2.0](https://github.com/kigster/sym/tree/v2.2.0) (2017-02-14)
 [Full Changelog](https://github.com/kigster/sym/compare/v2.1.2...v2.2.0)
