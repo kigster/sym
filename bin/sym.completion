@@ -5,28 +5,75 @@
 # © 2015-2016, Konstantin Gredeskoul,  https://github.com/kigster/sym
 # MIT LICENSE
 #
-
-_sym() {
-    local SYM_OPTS SYM_POINTS cur prev
-
-    cur="${COMP_WORDS[COMP_CWORD]}"
-    prev="${COMP_WORDS[COMP_CWORD-1]}"
-
-    COMPREPLY=()
-
-    #[[ $COMP_CWORD == 1 ]] && SYM_COMP_OPTIONS="${SYM_COMP_OPTIONS} ${SYM_COMMANDS}"
-    if [[ $prev =~ "-f" || $prev =~ "-o" || $prev =~ "-K" || $prev == "--keyfile" ]] ; then 
-      SYM_COMP_OPTIONS="$(find . -type f -depth 1 | sed 's#^.\/##g')"
-    elif  [[ "${cur}" == '-' || "${cur}" == -* ]] ; then 
-      export DICT_SYM_COMP_OPTIONS=${DICT_SYM_COMP_OPTIONS:-$(sym --dictionary | sed -E 's/ /\n/g')}
-      SYM_COMP_OPTIONS=${DICT_SYM_COMP_OPTIONS}
-    else 
-      SYM_COMP_OPTIONS="$(find . -type f -depth 1 -name "${prev}*" | sed 's#^.\/##g')"
-    fi
-
-    COMPREPLY=( $(compgen -W "${SYM_COMP_OPTIONS}" -- ${cur}) )
-    return 0
+ [[ -z "$(type _filedir 2>/dev/null)" ]] && {
+  _filedir ()
+  {
+      local i IFS='
+  ' xspec;
+      _tilde "$cur" || return 0;
+      local -a toks;
+      local quoted tmp;
+      _quote_readline_by_ref "$cur" quoted;
+      toks=(${toks[@]-} $(
+          compgen -d -- "$cur" | {
+              while read -r tmp; do
+                  # TODO: I have removed a "[ -n $tmp ] &&" before 'printf ..',
+                  #       and everything works again. If this bug suddenly
+                  #       appears again (i.e. "cd /b<TAB>" becomes "cd /"),
+                  #       remember to check for other similar conditionals (here
+                  #       and _filedir_xspec()). --David
+                  printf '%s\n' $tmp
+              done
+          }
+      ));
+      if [[ "$1" != -d ]]; then
+          [[ ${BASH_VERSINFO[0]} -ge 4 ]] && xspec=${1:+"!*.@($1|${1^^})"} || xspec=${1:+"!*.@($1|$(printf %s $1 | tr '[:lower:]' '[:upper:]'))"};
+          toks=(${toks[@]-} $( compgen -f -X "$xspec" -- $quoted));
+      fi;
+      [ ${#toks[@]} -ne 0 ] && _compopt_o_filenames;
+      COMPREPLY=("${COMPREPLY[@]}" "${toks[@]}")
+  }
 }
 
-complete -F _sym sym
+_sym()
+{
+    local cur prev shell i path
 
+    COMPREPLY=()
+    cur=`_get_cword`
+    prev=${COMP_WORDS[COMP_CWORD-1]}
+
+    _expand || return 0
+
+    case "$prev" in
+    --@(key-file|file|output|))
+        _filedir
+        return 0
+        ;;
+    -@(f|K|o))
+        _filedir
+        return 0
+        ;;
+    esac
+
+    case "$cur" in
+    -*)
+        export DICT_SYM_COMP_OPTIONS=${DICT_SYM_COMP_OPTIONS:-$(sym --dictionary | sed -E 's/ /\n/g')}
+        COMPREPLY=( $( compgen -W "$DICT_SYM_COMP_OPTIONS" -- "$cur" ))
+        ;;
+    *)
+        _filedir
+        ;;
+    esac
+
+    return 0
+} &&
+complete -F _sym $nospace $filenames sym
+
+# Local variables:
+# mode: shell-script
+# sh-basic-offset: 4
+# sh-indent-comment: t
+# indent-tabs-mode: nil
+# End:
+# ex: ts=4 sw=4 et filetype=sh
