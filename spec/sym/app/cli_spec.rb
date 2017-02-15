@@ -17,6 +17,40 @@ module Sym
         end
       end
 
+      context 'basic initialization from SYM_ARGS' do
+        let(:argv) { %w(-e -s hello) }
+        let(:key) { 'YJOkFraX1JDuQWEbV1JpeYvwUpt0h9tbuSO4XAZ8Asc=' }
+        let(:cli) { Sym::App::CLI.new(argv) }
+
+        before do
+          expect(ENV).to receive(:[]).with(Sym::ENV_ARGS_VARIABLE_NAME).and_return("-k #{key} -v -D")
+          allow(ENV).to receive(:[])
+        end
+
+        it 'should properly initialize' do
+          expect(cli.command).to be_a_kind_of(Sym::App::Commands::EncryptDecrypt)
+        end
+
+        context 'opts' do
+          let(:opts) { cli.opts }
+          it 'should contain flags specified in ENV variable' do
+            expect(opts[:encrypt]).to be true
+            expect(opts[:string]).to eq('hello')
+            expect(opts[:encrypt]).to be true
+            expect(opts[:debug]).to be true
+            expect(opts[:verbose]).to be true
+          end
+          context 'with -M' do
+            let(:argv) { %w(-e -s hello -M) }
+            it 'should contain flags specified in ENV variable' do
+              expect(opts[:encrypt]).to be true
+              expect(opts[:private_key]).to be_nil
+            end
+          end
+        end
+      end
+
+
       context 'generate private key' do
         let(:argv) { %w(-g -v) }
         before do

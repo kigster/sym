@@ -6,18 +6,27 @@ module Sym
 
           o.banner = "Sym (#{Sym::VERSION}) – encrypt/decrypt data with a private key\n".bold.white
           o.separator 'Usage:'.yellow
-          o.separator '   # Generate a new key:'.dark
+          o.separator '   # Generate a new key...'.dark
           o.separator '   sym -g '.green.bold + '[ -p ] [ -x keychain | -o keyfile | -q | ]  '.green
           o.separator ''
-          o.separator '   # To specify a key for an operation use any one of:'.dark
+          o.separator '   # To specify a key for an operation use one of...'.dark
           o.separator '   ' + key_spec + ' = -k key | -K file | -x keychain | -i '.green.bold
           o.separator ''
-          o.separator '   # Encrypt/Decrypt to STDOUT or output file '.dark
+          o.separator '   # Encrypt/Decrypt to STDOUT or an output file '.dark
           o.separator '   sym -e '.green.bold + key_spec + ' [-f <file> | -s <string>] [-o <file>] '.green
           o.separator '   sym -d '.green.bold + key_spec + ' [-f <file> | -s <string>] [-o <file>] '.green
           o.separator ' '
           o.separator '   # Edit an encrypted file in $EDITOR '.dark
           o.separator '   sym -t '.green.bold + key_spec + '  -f <file> [ -b ]'.green.bold
+
+          o.separator ' '
+          o.separator '   # Specify any common flags in the BASH variable:'.dark
+          o.separator '   export SYM_ARGS="'.green + '-x staging -C'.bold.green + '"'.green
+          o.separator ' '
+          o.separator '   # And now encrypt without having to specify key location:'.dark
+          o.separator '   sym -e '.green.bold '-f <file>'.green.bold
+          o.separator '   # May need to disable SYM_ARGS with -M, eg for help:'.dark
+          o.separator '   sym -h -M '.green.bold
 
           o.separator ' '
           o.separator 'Modes:'.yellow
@@ -61,6 +70,7 @@ module Sym
           o.bool      '-q', '--quiet',              '           do not print to STDOUT'
           o.bool      '-V', '--version',            '           print library version'
           o.bool      '-N', '--no-color',           '           disable color output'
+          o.bool      '-M', '--no-environment',     '           disable reading flags from SYM_ARGS'
 
           o.separator ' '
           o.separator 'Utility:'.yellow

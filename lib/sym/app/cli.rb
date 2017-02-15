@@ -61,8 +61,11 @@ module Sym
       attr_accessor :opts, :application, :outputs, :output_proc
 
       def initialize(argv_original)
+        env_args = ENV[ENV_ARGS_VARIABLE_NAME]
         begin
-          argv      = argv_original.dup
+          argv = argv_original.dup
+          argv << env_args.split(' ') if env_args && !(argv.include?('-M') or argv.include?('--no-environment'))
+          argv.flatten!
           dict      = argv.delete('--dictionary')
           self.opts = parse(argv)
           command_dictionary if dict

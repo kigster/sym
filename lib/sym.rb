@@ -11,7 +11,7 @@ Sym::Configuration.configure do |config|
   config.compression_enabled = true
   config.compression_level   = Zlib::BEST_COMPRESSION
 
-  config.password_cache_timeout = 300
+  config.password_cache_timeout          = 300
 
   # When nil is selected, providers are auto-detected.
   config.password_cache_default_provider = nil
@@ -131,14 +131,14 @@ module Sym
     end
   end
 
-  COMPLETION_FILE = '.sym.completion'
-  COMPLETION_PATH = "#{ENV['HOME']}/#{COMPLETION_FILE}"
+  COMPLETION_FILE        = '.sym.completion'.freeze
+  COMPLETION_PATH        = "#{ENV['HOME']}/#{COMPLETION_FILE}".freeze
+  LOGGER                 = Logger.new(nil).freeze # empty logger
+  ENV_ARGS_VARIABLE_NAME = 'SYM_ARGS'.freeze
 
-  BASH_COMPLETION = {
+  BASH_COMPLETION        = {
     file:   File.expand_path('../../bin/sym.completion', __FILE__),
     script: "[[ -f '#{COMPLETION_PATH}' ]] && source '#{COMPLETION_PATH}'",
-  }
-
-  LOGGER = Logger.new(nil) # empty logger
+  }.freeze
 end
 
