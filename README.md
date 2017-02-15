@@ -68,13 +68,18 @@ BAhTOh1TeW06OkRhdGE6OldyYXBFefDFFD.....
 
 ❯ sym -dx my-new-key -f secret.enc -C
 My secret data
+
+# Lets now save common flags in the SYM_ARGS bash variable:
+❯ export SYM_ARGS="-x my-new-key -C"
+❯ sym -d -f secret.enc 
+My secret data
 ```
 
 The line that says `Coin::Vault listening at: druby://127.0.0.1:24924` is the indication that the local dRB server used for caching passwords has been started. Password caching is off by default, but is enabled with `-C` flag. In the example above, the decryption step fetched the password from the cache, and so the user was not required to re-enter the password.
 
 __Direct Editing Encrypted Files__
 
-Instead of decrypting data anytime you need to change it, you can use the shortcut flag `-t` (for "edi__T__"), which decrypts your data into a temporary file, automatically opening it with an `$EDITOR`. 
+Instead of decrypting data anytime you need to change it, you can use the shortcut flag `-t` (for "edi**t**"), which decrypts your data into a temporary file, automatically opening it with an `$EDITOR`. 
 
 Example:
 
@@ -235,21 +240,29 @@ sym -tf file.enc
 This may be a good time to take a look at the full help message for the `sym` tool, shown naturally with a `-h` or `--help` option.
 
 ```
-Sym (2.2.0) – encrypt/decrypt data with a private key
+Sym (2.2.1) – encrypt/decrypt data with a private key
 
 Usage:
-   # Generate a new key:
+   # Generate a new key...
    sym -g [ -p ] [ -x keychain | -o keyfile | -q | ]  
 
-   # To specify a key for an operation use any one of:
+   # To specify a key for an operation use one of...
    <key-spec> = -k key | -K file | -x keychain | -i 
 
-   # Encrypt/Decrypt to STDOUT or output file 
+   # Encrypt/Decrypt to STDOUT or an output file 
    sym -e <key-spec> [-f <file> | -s <string>] [-o <file>] 
    sym -d <key-spec> [-f <file> | -s <string>] [-o <file>] 
  
    # Edit an encrypted file in $EDITOR 
    sym -t <key-spec>  -f <file> [ -b ]
+ 
+   # Specify any common flags in the BASH variable:
+   export SYM_ARGS="-x staging -C"
+ 
+   # And now encrypt without having to specify key location:
+   sym -e -f <file>
+   # May need to disable SYM_ARGS with -M, eg for help:
+   sym -h -M 
  
 Modes:
   -e, --encrypt                     encrypt mode
@@ -269,8 +282,7 @@ Read existing private key from:
 Password Cache:
   -C, --cache-password              enable the cache (off by default)
   -T, --cache-for        [seconds]  to cache the password for
-  -P, --cache-provider   [provider] type of cache, one of: 
-				    [ memcached, drb ]
+  -P, --cache-provider   [provider] type of cache, one of memcached, drb
  
 Data to Encrypt/Decrypt:
   -s, --string           [string]   specify a string to encrypt/decrypt
@@ -285,6 +297,7 @@ Flags:
   -q, --quiet                       do not print to STDOUT
   -V, --version                     print library version
   -N, --no-color                    disable color output
+  -M, --no-environment              disable reading flags from SYM_ARGS
  
 Utility:
   -a, --bash-completion  [file]     append shell completion to a file
@@ -292,7 +305,6 @@ Utility:
 Help & Examples:
   -E, --examples                    show several examples
   -h, --help                        show help
-
 ```
 
 ### CLI Usage Examples
