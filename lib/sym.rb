@@ -133,7 +133,8 @@ module Sym
 
   COMPLETION_FILE        = '.sym.completion'.freeze
   COMPLETION_PATH        = "#{ENV['HOME']}/#{COMPLETION_FILE}".freeze
-  LOGGER                 = Logger.new(nil).freeze # empty logger
+  NIL_LOGGER             = Logger.new(nil).freeze # empty logger
+  LOGGER                 = Logger.new(STDOUT).freeze
   ENV_ARGS_VARIABLE_NAME = 'SYM_ARGS'.freeze
 
   BASH_COMPLETION        = {

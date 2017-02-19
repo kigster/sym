@@ -27,24 +27,38 @@ module Sym
 
     def self.error(
       config: {},
-      exception: nil,
-      type: nil,
-      details: nil,
-      reason: nil,
-      comments: nil)
+        exception: nil,
+        type: nil,
+        details: nil,
+        reason: nil,
+        comments: nil,
+        command: nil)
 
-      self.out.puts([\
-                    "#{(type || exception.class.name).titleize}:".red.bold.underlined +
-                    (sprintf '  %s', details || exception.message).red.italic,
-                    (reason ? "\n#{reason.blue.bold.italic}" : nil),
-                    (comments ? "\n\n#{comments}" : nil)].compact.join("\n"))
-      self.out.puts "\n" + exception.backtrace.join("\n").bold.red if exception && config && config[:trace]
+      lines = []
+
+      error_type    = "#{(type || exception.class.name).titleize}"
+      error_details = (details || exception.message).split(/\s/).map(&:capitalize).join(' ')
+
+      if exception && (config && config[:trace])
+        lines << "#{error_type.red.underlined}: #{error_details.white.on.red}\n"
+        lines << exception.backtrace.join("\n").red.bold if config[:trace]
+        lines << "\n"
+      end
+
+      operation = command ? command.class.short_name.to_s.humanize.downcase : ''
+      reason = exception.message if reason.nil? && exception
+      lines << "Oops, failed to #{operation.bold}: " + " #{reason} ".bold.white.on.red if reason
+      lines << "#{comments}" if comments
+
+      self.out.puts(lines.compact.join("\n"))
+
       self.exit_code = 1
     end
 
     def self.is_osx?
       Gem::Platform.local.os.eql?('darwin')
     end
+
     def self.this_os
       Gem::Platform.local.os
     end

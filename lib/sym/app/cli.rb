@@ -103,7 +103,7 @@ module Sym
       end
 
       def error(hash)
-        Sym::App.error(hash.merge(config: (opts ? opts.to_hash : {})))
+        Sym::App.error(hash.merge(config: (opts ? opts.to_hash : {}), command: command))
       end
 
       def select_output_stream

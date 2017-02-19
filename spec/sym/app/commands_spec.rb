@@ -15,15 +15,16 @@ module Sym
           subject { Sym::App::Commands }
           it 'should have registered the commands' do
             expect(subject.commands).to include(Sym::App::Commands::FakeCommand)
-            expect(subject.commands).to include(Sym::App::Commands::EncryptDecrypt)
+            expect(subject.commands).to include(Sym::App::Commands::Encrypt)
+            expect(subject.commands).to include(Sym::App::Commands::Decrypt)
           end
         end
 
         context 'command ordering' do
           subject { Sym::App::Commands }
           it 'should have registered the commands' do
-            expect(subject.sorted_commands.map(&:short_name).first).to eql(:generate_key)
-            expect(subject.sorted_commands.first).to eql(Sym::App::Commands::GenerateKey)
+            expect(subject.sorted_commands.map(&:short_name).first).to eql(:show_help)
+            expect(subject.sorted_commands.first).to eql(Sym::App::Commands::ShowHelp)
           end
         end
 
@@ -45,13 +46,27 @@ module Sym
           end
         end
 
-        context 'EncryptDecrypt' do
-          subject { Sym::App::Commands::EncryptDecrypt }
+        context 'Encrypt' do
+          subject { Sym::App::Commands::Encrypt }
+          let(:options_variations) {
+            [
+              { encrypt: true, string: 'hello', private_key: FakeCommand.private_key },
+              { encrypt: true, file: 'file.txt', private_key: FakeCommand.private_key },
+            ]
+          }
+          it 'should find the command' do
+            expect(Sym::App::Commands.commands.size).to be >= 9
+            options_variations.each do |opts|
+              expect(Sym::App::Commands.find_command_class(opts)).to eql(subject), opts.inspect
+            end
+          end
+        end
+        context 'Decrypt' do
+          subject { Sym::App::Commands::Decrypt }
           let(:options_variations) {
             [
               { decrypt: true, string: 'hello', private_key: FakeCommand.private_key },
-              { encrypt: true, file: 'file.txt', private_key: FakeCommand.private_key },
-              { decrypt: true, string: 'hello', keyfile: 'file.txt', verbose: true, trace: true}
+              { decrypt: true, file: 'file.txt', keyfile: 'file.txt', verbose: true, trace: true}
             ]
           }
           it 'should find the command' do

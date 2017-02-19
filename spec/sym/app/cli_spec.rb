@@ -28,7 +28,7 @@ module Sym
         end
 
         it 'should properly initialize' do
-          expect(cli.command).to be_a_kind_of(Sym::App::Commands::EncryptDecrypt)
+          expect(cli.command).to be_a_kind_of(Sym::App::Commands::Encrypt)
         end
 
         context 'opts' do

@@ -69,6 +69,10 @@ module Sym
           raise Sym::Errors::AbstractMethodCalled.new(:run)
         end
 
+        def content
+          @content ||= (opts[:string] || (opts[:file].eql?('-') ? STDIN.read : File.read(opts[:file])))
+        end
+
         def to_s
           "#{self.class.short_name.to_s.bold.yellow}, with options: #{application.args.argv.join(' ').gsub(/--/, '').bold.green}"
         end

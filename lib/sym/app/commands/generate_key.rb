@@ -6,6 +6,7 @@ module Sym
       class GenerateKey < BaseCommand
 
         required_options :generate
+        try_after :show_version
 
         def execute
           retries ||= 0

@@ -35,14 +35,17 @@ module Sym
     end
 
     def execute!
-      if !args.generate_key? &&
-        (args.require_key? || args.specify_key?)
+      if !command && !args.generate_key? && (args.require_key? || args.specify_key?)
+        log_debug 'operation requires a key...'
         self.key = Sym::App::PrivateKey::Handler.new(opts, input_handler, password_cache).key
-        raise Sym::Errors::NoPrivateKeyFound.new('Private key is required') unless self.key
+        unless self.key
+          log_error 'Unable to determine the key, which appears to be required'
+          raise Sym::Errors::NoPrivateKeyFound, 'Private key is required'
+        end
       end
+      log_info "detected command [#{command.class.name}]"
       unless command
-        raise Sym::Errors::InsufficientOptionsError.new(
-          'Can not determine what to do from the options ' + opts_hash.keys.reject { |k| !opts[k] }.to_s)
+        raise Sym::Errors::InsufficientOptionsError, 'Can not determine what to do from the options ' + opts_hash.keys.reject { |k| !opts[k] }.to_s
       end
       self.result = command.execute
     end
@@ -51,17 +54,16 @@ module Sym
       execute!
 
     rescue ::OpenSSL::Cipher::CipherError => e
-      error type:      'Cipher Error',
-            details:   e.message,
-            reason:    'Perhaps either the secret is invalid, or encrypted data is corrupt.',
+      error reason:    'Invalid key provided',
             exception: e
 
     rescue Sym::Errors::Error => e
-      error type:    e.class.name.split(/::/)[-1],
-            details: e.message
+      error reason:    e.class.name.split(/::/)[-1].underscore.humanize.downcase,
+            exception: e
 
     rescue StandardError => e
-      error exception: e
+      error reason:    'Unknown Error',
+            exception: e
     end
 
     def command
@@ -91,6 +93,16 @@ module Sym
 
     def error(hash)
       hash
+    end
+
+    def log_error(*args)
+      Sym::LOGGER.error(*args) if opts[:debug]
+    end
+    def log_debug(*args)
+      Sym::LOGGER.debug(*args) if opts[:debug]
+    end
+    def log_info(*args)
+      Sym::LOGGER.info(*args) if opts[:debug]
     end
 
     def initialize_input_handler(handler = ::Sym::App::Input::Handler.new)

@@ -8,7 +8,7 @@ module Sym
         required_options [:private_key, :keyfile, :keychain, :interactive],
                          :password
 
-        try_after :generate_key, :encrypt_decrypt
+        try_after :generate_key, :encrypt, :decrypt
 
         def execute
           retries ||= 0

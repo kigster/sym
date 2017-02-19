@@ -11,7 +11,7 @@ module Sym
 
           def initialize
             # disable logging
-            Dalli.logger = Sym::LOGGER
+            Dalli.logger = Sym::NIL_LOGGER
             self.dalli = ::Dalli::Client.new(
               * Sym::Configuration.config.password_cache_arguments[:memcached][:args],
               ** Sym::Configuration.config.password_cache_arguments[:memcached][:opts]

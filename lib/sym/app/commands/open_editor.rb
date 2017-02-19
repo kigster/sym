@@ -14,7 +14,7 @@ module Sym
                            :edit,
                            :file
 
-        try_after :generate_key, :encrypt_decrypt
+        try_after :generate_key, :encrypt, :decrypt
 
         attr_accessor :tempfile
 

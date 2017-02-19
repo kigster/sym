@@ -76,7 +76,7 @@ module Sym
               detected = subject.detect
               expect(detected).to be_kind_of(Providers::MemcachedProvider)
               expect(detected.class).to eq(Providers::MemcachedProvider)
-              expect(Dalli.logger).to eq(Sym::LOGGER)
+              expect(Dalli.logger).to eq(Sym::NIL_LOGGER)
             end
           end
         end

@@ -4,7 +4,7 @@ module Sym
     module Commands
       class ShowHelp < BaseCommand
 
-        required_options :help, ->(opts) { opts.to_hash.keys.all? { |k| !opts[k] } }
+        required_options [ :help ]
 
         def execute
           opts.to_s(prefix: ' ' * 2)
