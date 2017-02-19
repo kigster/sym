@@ -1,7 +1,7 @@
 # Sym — Light Weight Symmetric Encryption for Humans
 
 <hr/>
-
+[![Gitter](https://img.shields.io/gitter/room/gitterHQ/gitter.svg)](https://gitter.im/kigster/sym)
 [![Gem Version](https://badge.fury.io/rb/sym.svg)](https://badge.fury.io/rb/sym)
 [![Downloads](http://ruby-gem-downloads-badge.herokuapp.com/sym?type=total)](https://rubygems.org/gems/sym)
 [![Documentation](http://inch-ci.org/github/kigster/sym.png)](http://inch-ci.org/github/kigster/sym)
@@ -11,7 +11,6 @@
 [![Test Coverage](https://codeclimate.com/github/kigster/sym/badges/coverage.svg)](https://codeclimate.com/github/kigster/sym/coverage)
 [![Issue Count](https://codeclimate.com/github/kigster/sym/badges/issue_count.svg)](https://codeclimate.com/github/kigster/sym)
 
-[![Gitter](https://img.shields.io/gitter/room/gitterHQ/gitter.svg)](https://gitter.im/kigster/sym)
 <hr/>
 
 ## Description
