@@ -25,14 +25,13 @@ module Sym
       STDERR
     end
 
-    def self.error(
-      config: {},
-        exception: nil,
-        type: nil,
-        details: nil,
-        reason: nil,
-        comments: nil,
-        command: nil)
+    def self.error(config: {},
+      exception: nil,
+      type: nil,
+      details: nil,
+      reason: nil,
+      comments: nil,
+      command: nil)
 
       lines = []
 
@@ -46,12 +45,13 @@ module Sym
       end
 
       operation = command ? command.class.short_name.to_s.humanize.downcase : ''
-      reason = exception.message if reason.nil? && exception
+      reason    = exception.message if reason.nil? && exception
+
       lines << "Oops, failed to #{operation.bold}: " + " #{reason} ".bold.white.on.red if reason
       lines << "#{comments}" if comments
 
-      self.out.puts(lines.compact.join("\n"))
-
+      error_report = lines.compact.join("\n") || 'Undefined error'
+      self.out.puts(error_details) if error_report.present?
       self.exit_code = 1
     end
 

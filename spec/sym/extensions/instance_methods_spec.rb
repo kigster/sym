@@ -1,5 +1,5 @@
 require 'spec_helper'
-
+require 'sym/errors'
 module Sym
   module Extensions
     RSpec.describe Sym::Extensions::InstanceMethods do
@@ -47,7 +47,22 @@ module Sym
           data_decrypted = instance.decr_password(data_encrypted, password)
           expect(data_decrypted).to eql(data)
         end
+      end
 
+      context 'with nil or blank values' do
+        subject(:i) { instance }
+        let(:private_key) { i.class.create_private_key }
+        it('#encr no data') { expect { i.encr(nil, private_key) }.to raise_error(::Sym::Errors::NoDataProvided) }
+        it('#decr no data') { expect { i.decr(nil, private_key) }.to raise_error(::Sym::Errors::NoDataProvided) }
+
+        it('#encr no key') { expect { i.encr('data',  nil) }.to raise_error(::Sym::Errors::NoPrivateKeyFound) }
+        it('#decr no key') { expect { i.decr('data',  nil) }.to raise_error(::Sym::Errors::NoPrivateKeyFound) }
+
+        it('#encr_pasword no password') { expect { i.encr_password('data',  nil) }.to raise_error(::Sym::Errors::NoPasswordProvided) }
+        it('#encr_password no data') { expect { i.encr_password(nil, 'password') }.to raise_error(::Sym::Errors::NoDataProvided) }
+
+        it('#decr_pasword no password') { expect { i.decr_password('data',  nil) }.to raise_error(::Sym::Errors::NoPasswordProvided) }
+        it('#decr_password no data') { expect { i.decr_password(nil, 'password') }.to raise_error(::Sym::Errors::NoDataProvided) }
       end
     end
   end

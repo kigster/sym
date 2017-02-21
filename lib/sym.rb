@@ -109,6 +109,18 @@ module Kernel
   end
 end
 
+class Object
+  unless self.methods.include?(:present?)
+    def present?
+      return false if self.nil?
+      if self.is_a?(String)
+        return false if self == ''
+      end
+      true
+    end
+  end
+end
+
 require_dir 'sym/extensions'
 
 module Sym

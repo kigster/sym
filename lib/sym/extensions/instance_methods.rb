@@ -25,7 +25,8 @@ module Sym
 
       # Expects key to be a base64 encoded key
       def encr(data, key, iv = nil)
-        raise Sym::Errors::NoPrivateKeyFound if key.nil?
+        raise Sym::Errors::NoPrivateKeyFound unless key.present?
+        raise Sym::Errors::NoDataProvided unless data.present?
         _encr(data, encryption_config.data_cipher, iv) do |cipher_struct|
           cipher_struct.cipher.key = decode_key(key)
         end
@@ -33,13 +34,16 @@ module Sym
 
       # Expects key to be a base64 encoded key
       def decr(encrypted_data, key, iv = nil)
-        raise Sym::Errors::NoPrivateKeyFound if key.nil?
+        raise Sym::Errors::NoPrivateKeyFound unless key.present?
+        raise Sym::Errors::NoDataProvided if encrypted_data.nil?
         _decr(encrypted_data, encryption_config.data_cipher, iv) do |cipher_struct|
           cipher_struct.cipher.key = decode_key(key)
         end
       end
 
       def encr_password(data, password, iv = nil)
+        raise Sym::Errors::NoDataProvided unless data.present?
+        raise Sym::Errors::NoPasswordProvided unless password.present?
         _encr(data, encryption_config.password_cipher, iv) do |cipher_struct|
           key, salt                = _key_from_password(cipher_struct.cipher, password)
           cipher_struct.cipher.key = key
@@ -48,6 +52,8 @@ module Sym
       end
 
       def decr_password(encrypted_data, password, iv = nil)
+        raise Sym::Errors::NoDataProvided unless encrypted_data.present?
+        raise Sym::Errors::NoPasswordProvided unless password.present?
         _decr(encrypted_data, encryption_config.password_cipher, iv) do |cipher_struct|
           key,                     = _key_from_password(cipher_struct.cipher, password, cipher_struct.salt)
           cipher_struct.cipher.key = key

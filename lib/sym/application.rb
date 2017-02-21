@@ -36,14 +36,14 @@ module Sym
 
     def execute!
       if !command && !args.generate_key? && (args.require_key? || args.specify_key?)
-        log_debug 'operation requires a key...'
+        log :debug, 'operation requires a key...'
         self.key = Sym::App::PrivateKey::Handler.new(opts, input_handler, password_cache).key
         unless self.key
-          log_error 'Unable to determine the key, which appears to be required'
+          log :error, 'Unable to determine the key, which appears to be required'
           raise Sym::Errors::NoPrivateKeyFound, 'Private key is required'
         end
       end
-      log_info "detected command [#{command.class.name}]"
+      log :info, "detected command [#{command.class.name}]"
       unless command
         raise Sym::Errors::InsufficientOptionsError, 'Can not determine what to do from the options ' + opts_hash.keys.reject { |k| !opts[k] }.to_s
       end
@@ -58,7 +58,7 @@ module Sym
             exception: e
 
     rescue Sym::Errors::Error => e
-      error reason:    e.class.name.split(/::/)[-1].underscore.humanize.downcase,
+      error reason:    e.class.name.gsub(/.*::/, '').underscore.humanize.downcase,
             exception: e
 
     rescue StandardError => e
@@ -91,18 +91,12 @@ module Sym
       ]
     end
 
-    def error(hash)
-      hash
+    def error(**hash)
+      Sym::App.error(**hash)
     end
 
-    def log_error(*args)
-      Sym::LOGGER.error(*args) if opts[:debug]
-    end
-    def log_debug(*args)
-      Sym::LOGGER.debug(*args) if opts[:debug]
-    end
-    def log_info(*args)
-      Sym::LOGGER.info(*args) if opts[:debug]
+    def log(level, *args)
+      Sym::LOGGER.send(level, *args) if opts[:debug]
     end
 
     def initialize_input_handler(handler = ::Sym::App::Input::Handler.new)
