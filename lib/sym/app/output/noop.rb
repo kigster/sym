@@ -1,4 +1,5 @@
 require_relative 'base'
+
 module Sym
   module App
     module Output

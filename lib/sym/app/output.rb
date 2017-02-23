@@ -1,7 +1,7 @@
-require 'sym/app/output/base'
-require 'sym/app/output/file'
-require 'sym/app/output/stdout'
-require 'sym/app/output/noop'
+require_relative 'output/base'
+require_relative 'output/file'
+require_relative 'output/noop'
+require_relative 'output/stdout'
 
 module Sym
   module App
@@ -12,4 +12,3 @@ module Sym
     end
   end
 end
-
