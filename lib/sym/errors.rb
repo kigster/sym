@@ -20,7 +20,7 @@ module Sym
 
     class KeyError < Sym::Errors::Error; end
     class InvalidEncodingPrivateKey < Sym::Errors::KeyError; end
-    class InvalidPasswordPrivateKey < Sym::Errors::KeyError; end
+    class InvalidPasswordProvidedForThePrivateKey < Sym::Errors::KeyError; end
     class NoPrivateKeyFound < Sym::Errors::KeyError; end
 
     class NoDataProvided < Sym::Errors::Error; end

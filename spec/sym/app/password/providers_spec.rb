@@ -32,7 +32,7 @@ module Sym
 
         context '#provider' do
           before do
-            expect_any_instance_of(Providers::MemcachedProvider).to receive(:alive?).and_return(false)
+            expect_any_instance_of(Providers::MemcachedProvider).to receive(:alive?).at_least(1).times.and_return(false)
           end
           its(:provider) { should eq(subject.detect) }
         end
@@ -41,7 +41,7 @@ module Sym
           context 'none available' do
             before do
               subject.providers.each do |provider|
-                expect_any_instance_of(provider).to receive(:alive?).and_return(false)
+                expect_any_instance_of(provider).to receive(:alive?).at_least(1).times.and_return(false)
               end
             end
             its(:detect) { should be_nil }

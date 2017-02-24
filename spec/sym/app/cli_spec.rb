@@ -140,6 +140,7 @@ module Sym
 
           context 'and is supplied via -k string' do
             include_context :decrypting
+
             let(:argv) { "-d -s #{encrypted_string} -k #{private_key} -v".split(' ') }
 
             it 'should decrypt' do
@@ -148,10 +149,11 @@ module Sym
           end
 
           context 'and is supplied via -K file' do
+            include_context :decrypting
+
             let(:argv) { "-d -s #{encrypted_string} -K #{tempfile.path} -v --trace".split(' ') }
             let!(:tempfile) { SAVE_TO_TEMPFILE.call(private_key) }
 
-            include_context :decrypting
             it 'should decrypt' do
               expect(decrypted_string).to eql(string)
             end
@@ -164,6 +166,7 @@ module Sym
           let!(:argv) { "-d -s #{encrypted_string} -K #{tempfile.path} -v --trace".split(' ') }
           let!(:tempfile) { SAVE_TO_TEMPFILE.call(encrypted_key) }
           let!(:input_handler) { Sym::App::Input::Handler.new }
+
           before do
             expect(input_handler).to receive(:ask).exactly(attempts).times.and_return(decryption_password)
             application.input_handler = input_handler
@@ -184,7 +187,7 @@ module Sym
           end
 
           context 'and has a wrong password' do
-            let(:decryption_password) { 'boooadfdsf' }
+            let(:decryption_password) { 'barhoohaaa' }
             let(:attempts) { 3 }
             let(:run_cli) { false }
 
@@ -193,10 +196,8 @@ module Sym
               expect(File.read(tempfile.path)).not_to eql(private_key)
               expect(input_handler).to receive(:puts).and_return(nil).exactly(attempts).times
               expect(cli).to receive(:error).
-                with(type:    'InvalidPasswordPrivateKey',
-                     details: 'Invalid password.'
-                )
-
+                with(reason:    'invalid password provided for the private key',
+                     exception: Sym::Errors::InvalidPasswordProvidedForThePrivateKey)
               cli.execute
             end
           end

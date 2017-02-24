@@ -13,9 +13,9 @@ module Sym
 
           it 'should invoke the Encrypt command' do
             expect_command_to_have klass:  Commands::Encrypt,
-                                 output: [/[a-zA-Z0-9\-_=]{44}/],
-                                 value:  true,
-                                 lines:  1
+                                   output: [/[a-zA-Z0-9\-_=]{44}/],
+                                   value:  true,
+                                   lines:  1
           end
 
           it 'should encrypt data' do

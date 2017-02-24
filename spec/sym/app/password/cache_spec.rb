@@ -6,7 +6,7 @@ module Sym
     module Password
       RSpec.describe Cache do
         let(:enabled) { true }
-        let(:cache) { Cache.instance.configure(provider: :drb, timeout: 200, enabled: enabled) }
+        let(:cache) { Cache.instance.configure(provider: :drb, provider_opts: { uri: 'druby://127.0.0.1:19191' }, timeout: 200, enabled: enabled) }
         context 'cache provider' do
           subject { cache.provider }
           it { is_expected.to be_kind_of(Providers::DrbProvider) }
@@ -20,14 +20,16 @@ module Sym
 
           context 'storing data' do
             it 'should write and read data' do
+              expect(cache['greeting']).to be_nil
               cache['greeting'] = 'hello'
+              expect(cache.provider).to_not be_nil
               expect(cache['greeting']).to eql('hello')
             end
           end
         end
 
         context 'cache disabled' do
-          let(:enabled) { false }
+          let(:enabled) {  false }
           it 'should properly set enabled to false' do
             expect(cache.enabled).to be_falsey
           end

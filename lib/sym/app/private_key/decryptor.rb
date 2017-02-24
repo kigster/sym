@@ -33,7 +33,7 @@ module Sym
               if ((retries += 1) < 3)
                 retry
               else
-                raise(Sym::Errors::InvalidPasswordPrivateKey.new('Invalid password.'))
+                raise(Sym::Errors::InvalidPasswordProvidedForThePrivateKey.new('Invalid password.'))
               end
             end
           else

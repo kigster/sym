@@ -27,7 +27,7 @@ module Sym
       def encr(data, key, iv = nil)
         raise Sym::Errors::NoPrivateKeyFound unless key.present?
         raise Sym::Errors::NoDataProvided unless data.present?
-        _encr(data, encryption_config.data_cipher, iv) do |cipher_struct|
+        encrypt_data(data, encryption_config.data_cipher, iv) do |cipher_struct|
           cipher_struct.cipher.key = decode_key(key)
         end
       end
@@ -35,8 +35,8 @@ module Sym
       # Expects key to be a base64 encoded key
       def decr(encrypted_data, key, iv = nil)
         raise Sym::Errors::NoPrivateKeyFound unless key.present?
-        raise Sym::Errors::NoDataProvided if encrypted_data.nil?
-        _decr(encrypted_data, encryption_config.data_cipher, iv) do |cipher_struct|
+        raise Sym::Errors::NoDataProvided unless encrypted_data.present?
+        decrypt_data(encrypted_data, encryption_config.data_cipher, iv) do |cipher_struct|
           cipher_struct.cipher.key = decode_key(key)
         end
       end
@@ -44,8 +44,8 @@ module Sym
       def encr_password(data, password, iv = nil)
         raise Sym::Errors::NoDataProvided unless data.present?
         raise Sym::Errors::NoPasswordProvided unless password.present?
-        _encr(data, encryption_config.password_cipher, iv) do |cipher_struct|
-          key, salt                = _key_from_password(cipher_struct.cipher, password)
+        encrypt_data(data, encryption_config.password_cipher, iv) do |cipher_struct|
+          key, salt                = make_password_key(cipher_struct.cipher, password)
           cipher_struct.cipher.key = key
           cipher_struct.salt       = salt
         end
@@ -54,8 +54,8 @@ module Sym
       def decr_password(encrypted_data, password, iv = nil)
         raise Sym::Errors::NoDataProvided unless encrypted_data.present?
         raise Sym::Errors::NoPasswordProvided unless password.present?
-        _decr(encrypted_data, encryption_config.password_cipher, iv) do |cipher_struct|
-          key,                     = _key_from_password(cipher_struct.cipher, password, cipher_struct.salt)
+        decrypt_data(encrypted_data, encryption_config.password_cipher, iv) do |cipher_struct|
+          key,                     = make_password_key(cipher_struct.cipher, password, cipher_struct.salt)
           cipher_struct.cipher.key = key
         end
       end
@@ -68,7 +68,7 @@ module Sym
         encoded_key
       end
 
-      def _key_from_password(cipher, password, salt = nil)
+      def make_password_key(cipher, password, salt = nil)
         key_len = cipher.key_len
         salt    ||= OpenSSL::Random.random_bytes 16
         iter    = 20000
@@ -78,13 +78,13 @@ module Sym
       end
 
       # Expects key to be a base64 encoded key data
-      def _encr(data, cipher_name, iv = nil, &block)
+      def encrypt_data(data, cipher_name, iv = nil, &block)
         data, compression_enabled = encode_incoming_data(data)
         cipher_struct             = create_cipher(direction:   :encrypt,
                                                   cipher_name: cipher_name,
                                                   iv:          iv)
 
-        yield cipher_struct if block_given?
+        block.call(cipher_struct) if block
 
         encrypted_data = update_cipher(cipher_struct.cipher, data)
         wrapper_struct = WrapperStruct.new(
@@ -97,13 +97,13 @@ module Sym
       end
 
       # Expects key to be a base64 encoded key data
-      def _decr(encoded_data, cipher_name, iv = nil, &block)
+      def decrypt_data(encoded_data, cipher_name, iv = nil, &block)
         wrapper_struct = decode(encoded_data)
         cipher_struct  = create_cipher(cipher_name: cipher_name,
-                                       iv:          wrapper_struct.iv,
+                                       iv:          wrapper_struct.iv || iv,
                                        direction:   :decrypt,
                                        salt:        wrapper_struct.salt)
-        yield cipher_struct if block_given?
+        block.call(cipher_struct) if block
         decode(update_cipher(cipher_struct.cipher, wrapper_struct.encrypted_data))
       end
 

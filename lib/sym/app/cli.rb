@@ -2,19 +2,20 @@ require 'slop'
 require 'sym'
 require 'colored2'
 require 'yaml'
-require 'forwardable'
 require 'openssl'
+require 'highline'
+
 require 'sym/application'
 require 'sym/errors'
+
 require 'sym/app/commands'
 require 'sym/app/keychain'
 require 'sym/app/private_key/handler'
-require 'highline'
 
-require_relative 'output/file'
-require_relative 'output/file'
-require_relative 'output/stdout'
-require_relative 'cli_slop'
+require 'sym/app/output/base'
+require 'sym/app/output/file'
+require 'sym/app/output/stdout'
+require 'sym/app/cli_slop'
 
 module Sym
   module App
@@ -55,9 +56,6 @@ module Sym
       # brings in #parse(Array[String] args)
       include CLISlop
 
-      extend Forwardable
-      def_delegators :@application, :command
-
       attr_accessor :opts, :application, :outputs, :output_proc
 
       def initialize(argv_original)
@@ -75,23 +73,26 @@ module Sym
         end
 
         command_no_color(argv_original) if opts[:no_color]
-
         self.application = ::Sym::Application.new(opts)
-
         select_output_stream
       end
 
 
       def execute
         return Sym::App.exit_code if Sym::App.exit_code != 0
-
         result = application.execute
-        if result.is_a?(Hash)
-          self.output_proc = ::Sym::App::Args.new({}).output_class
-          error(result)
-        else
-          self.output_proc.call(result)
+        case result
+          when Hash
+            self.output_proc = ::Sym::App::Args.new({}).output_class
+            error(result)
+          else
+            self.output_proc.call(result)
         end
+        Sym::App.exit_code
+      end
+
+      def command
+        @command ||= self.application&.command
       end
 
       private
@@ -103,7 +104,9 @@ module Sym
       end
 
       def error(hash)
-        Sym::App.error(hash.merge(config: (opts ? opts.to_hash : {}), command: command))
+        hash.merge!(config: opts.to_hash) if opts
+        hash.merge!(command: @command) if @command
+        Sym::App.error(**hash)
       end
 
       def select_output_stream

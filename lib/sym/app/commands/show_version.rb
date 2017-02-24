@@ -4,7 +4,7 @@ module Sym
     module Commands
       class ShowVersion < BaseCommand
         required_options :version
-        try_after :show_examples
+        try_after :show_help
         def execute
           "sym (version #{Sym::VERSION})"
         end

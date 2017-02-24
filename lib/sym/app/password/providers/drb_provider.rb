@@ -9,9 +9,11 @@ module Sym
 
           attr_accessor :coin
 
-          def initialize
-            Coin.uri  = Sym::Configuration.config.password_cache_arguments[:drb][:opts][:uri]
+          def initialize(**opts)
+            Coin.uri  = opts[:uri] || Sym::Configuration.config.password_cache_arguments[:drb][:opts][:uri]
             self.coin = Coin
+            alive?
+            self
           end
 
           def alive?
@@ -25,6 +27,10 @@ module Sym
 
           def read(*args)
             coin.send(:read, *args)
+          end
+
+          def clear
+            coin.clear
           end
         end
 

@@ -1,6 +1,7 @@
 require 'colored2'
 require 'sym'
 require 'sym/app'
+require 'openssl'
 
 module Sym
   class Application
@@ -35,7 +36,7 @@ module Sym
     end
 
     def execute!
-      if !command && !args.generate_key? && (args.require_key? || args.specify_key?)
+      if !args.generate_key? && (args.require_key? || args.specify_key?)
         log :debug, 'operation requires a key...'
         self.key = Sym::App::PrivateKey::Handler.new(opts, input_handler, password_cache).key
         unless self.key
@@ -50,20 +51,31 @@ module Sym
       self.result = command.execute
     end
 
+    def log(*args)
+      Sym::App.log(*args, **opts)
+    end
+
     def execute
       execute!
 
     rescue ::OpenSSL::Cipher::CipherError => e
-      error reason:    'Invalid key provided',
-            exception: e
+      { reason:    'Invalid key provided',
+        exception: e }
 
     rescue Sym::Errors::Error => e
-      error reason:    e.class.name.gsub(/.*::/, '').underscore.humanize.downcase,
-            exception: e
+      { reason:    e.class.name.gsub(/.*::/, '').underscore.humanize.downcase,
+        exception: e }
+
+    rescue TypeError => e
+      if e.message =~ /marshal/
+        { reason: 'Corrupt source data or invalid/corrupt key provided',
+          exception: e }
+      else
+        { exception: e }
+      end
 
     rescue StandardError => e
-      error reason:    'Unknown Error',
-            exception: e
+      { exception: e }
     end
 
     def command
@@ -89,14 +101,6 @@ module Sym
         '/bin/vi',
         '/sbin/vi'
       ]
-    end
-
-    def error(**hash)
-      Sym::App.error(**hash)
-    end
-
-    def log(level, *args)
-      Sym::LOGGER.send(level, *args) if opts[:debug]
     end
 
     def initialize_input_handler(handler = ::Sym::App::Input::Handler.new)

@@ -9,12 +9,12 @@ module Sym
         class MemcachedProvider
           attr_accessor :dalli
 
-          def initialize
+          def initialize(**opts)
             # disable logging
             Dalli.logger = Sym::NIL_LOGGER
             self.dalli = ::Dalli::Client.new(
               * Sym::Configuration.config.password_cache_arguments[:memcached][:args],
-              ** Sym::Configuration.config.password_cache_arguments[:memcached][:opts]
+              ** Sym::Configuration.config.password_cache_arguments[:memcached][:opts].merge!(opts)
             )
           end
 
@@ -31,6 +31,10 @@ module Sym
 
           def write(key, value, *)
             dalli.set(key, value)
+          end
+
+          def clear
+            dalli.flush
           end
 
         end

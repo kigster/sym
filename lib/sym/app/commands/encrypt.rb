@@ -9,7 +9,7 @@ module Sym
                          [ :encrypt ],
                          [ :file, :string ]
 
-        try_after :generate_key, :encrypt, :show_version, :show_help
+        try_after :generate_key
 
         def execute
           send(application.action, content, application.key)

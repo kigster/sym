@@ -6,7 +6,7 @@ module Sym
       class PrintKey < BaseCommand
         required_options [ :keychain, :keyfile ]
 
-        try_after :encrypt, :decrypt, :password_protect_key, :keychain_add_key, :show_help, :show_examples
+        try_after :generate_key, :encrypt, :decrypt, :password_protect_key, :keychain_add_key
 
         def execute
           self.key
