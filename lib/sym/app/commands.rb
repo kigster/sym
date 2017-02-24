@@ -54,7 +54,8 @@ end
 
 require 'sym/app/commands/base_command'
 require 'sym/app/commands/bash_completion'
-require 'sym/app/commands/encrypt_decrypt'
+require 'sym/app/commands/encrypt'
+require 'sym/app/commands/decrypt'
 require 'sym/app/commands/generate_key'
 require 'sym/app/commands/keychain_add_key'
 require 'sym/app/commands/open_editor'

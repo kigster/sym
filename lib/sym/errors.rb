@@ -8,6 +8,7 @@ module Sym
     class InsufficientOptionsError < Sym::Errors::Error; end
 
     class PasswordError < Sym::Errors::Error; end
+    class NoPasswordProvided < Sym::Errors::PasswordError; end
     class PasswordsDontMatch < Sym::Errors::PasswordError; end
     class PasswordTooShort < Sym::Errors::PasswordError; end
 
@@ -19,8 +20,10 @@ module Sym
 
     class KeyError < Sym::Errors::Error; end
     class InvalidEncodingPrivateKey < Sym::Errors::KeyError; end
-    class InvalidPasswordPrivateKey < Sym::Errors::KeyError; end
+    class InvalidPasswordProvidedForThePrivateKey < Sym::Errors::KeyError; end
     class NoPrivateKeyFound < Sym::Errors::KeyError; end
+
+    class NoDataProvided < Sym::Errors::Error; end
 
     class KeyChainCommandError < Sym::Errors::Error; end
 

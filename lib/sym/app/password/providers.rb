@@ -22,8 +22,8 @@ module Sym
             end
           end
 
-          def provider(p = nil)
-            provider_from_argument(p) || detect
+          def provider(p = nil, **opts, &block)
+            provider_from_argument(p, **opts, &block) || detect
           end
 
           private
@@ -32,12 +32,12 @@ module Sym
             klass.name.gsub(/.*::(\w+)Provider/, '\1').downcase.to_sym
           end
 
-          def provider_from_argument(p)
+          def provider_from_argument(p, **opts, &block)
             case p
               when String, Symbol
                 provider_class_name = "#{p.to_s.capitalize}Provider"
                 Sym::App::Password::Providers.const_defined?(provider_class_name) ?
-                  Sym::App::Password::Providers.const_get(provider_class_name).new :
+                  Sym::App::Password::Providers.const_get(provider_class_name).new(**opts, &block) :
                   nil
             end
           end

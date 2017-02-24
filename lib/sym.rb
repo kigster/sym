@@ -109,6 +109,18 @@ module Kernel
   end
 end
 
+class Object
+  unless self.methods.include?(:present?)
+    def present?
+      return false if self.nil?
+      if self.is_a?(String)
+        return false if self == ''
+      end
+      true
+    end
+  end
+end
+
 require_dir 'sym/extensions'
 
 module Sym
@@ -133,7 +145,8 @@ module Sym
 
   COMPLETION_FILE        = '.sym.completion'.freeze
   COMPLETION_PATH        = "#{ENV['HOME']}/#{COMPLETION_FILE}".freeze
-  LOGGER                 = Logger.new(nil).freeze # empty logger
+  NIL_LOGGER             = Logger.new(nil).freeze # empty logger
+  LOGGER                 = Logger.new(STDOUT).freeze
   ENV_ARGS_VARIABLE_NAME = 'SYM_ARGS'.freeze
 
   BASH_COMPLETION        = {

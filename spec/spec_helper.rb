@@ -10,18 +10,18 @@ require 'aruba'
 require 'rspec/its'
 
 require_relative 'support/contexts'
-require_relative 'support/matchers'
+require_relative 'support/shared_examples'
 
 RSpec.configure do |spec|
   spec.include Aruba::Api
   spec.before do
-    Sym::App.exit_code = 0
+    Sym::App.exit_code                         = 0
     Sym::App::Password::Cache.instance.enabled = false
   end
 
   spec.after :all do
-    # TODO: replace Coin with DRb-cache and gracefully shut it down
-    `kill $(ps -ef | grep ruby | grep [c]oin | awk '{print $2}') 2>/dev/null`
+    `/usr/bin/env bash -c "kill $(ps -ef | egrep ruby | egrep [c]oin | awk '{print $2}' ) 2>/dev/null"`
+    `echo flush_all | nc localhost 11211 2>/dev/null`
   end
 end
 

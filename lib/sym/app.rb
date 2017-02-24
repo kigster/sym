@@ -1,6 +1,6 @@
 require 'sym'
 require 'active_support/inflector'
-
+require 'colored2'
 module Sym
 
   # The {Sym::App} Module is responsible for handing user input and executing commands.
@@ -25,26 +25,45 @@ module Sym
       STDERR
     end
 
-    def self.error(
-      config: {},
+    def self.log(level, *args, **opts)
+      Sym::LOGGER.send(level, *args) if opts[:debug]
+    end
+
+    def self.error(config: {},
       exception: nil,
       type: nil,
       details: nil,
       reason: nil,
-      comments: nil)
+      comments: nil,
+      command: nil)
 
-      self.out.puts([\
-                    "#{(type || exception.class.name).titleize}:".red.bold.underlined +
-                    (sprintf '  %s', details || exception.message).red.italic,
-                    (reason ? "\n#{reason.blue.bold.italic}" : nil),
-                    (comments ? "\n\n#{comments}" : nil)].compact.join("\n"))
-      self.out.puts "\n" + exception.backtrace.join("\n").bold.red if exception && config && config[:trace]
+      lines = []
+
+      error_type    = "#{(type || exception.class.name)}"
+      error_details = (details || exception.message)
+
+      if exception && (config && config[:trace] || reason == 'Unknown Error')
+        lines << "#{error_type.red.underlined}: #{error_details.white.on.red}\n"
+        lines << exception.backtrace.join("\n").red.bold if config[:trace]
+        lines << "\n"
+      end
+
+      operation = command ? "to #{command.class.short_name.to_s.humanize.downcase}" : ''
+      reason    = exception.message if reason.nil? && exception
+
+      lines << " error #{operation} → ".white.on.red+ " #{reason}".bold.red if reason
+      lines << "#{comments}" if comments
+
+      error_report = lines.compact.join("\n") || 'Undefined error'
+
+      self.out.puts(error_report) if error_report.present?
       self.exit_code = 1
     end
 
     def self.is_osx?
       Gem::Platform.local.os.eql?('darwin')
     end
+
     def self.this_os
       Gem::Platform.local.os
     end

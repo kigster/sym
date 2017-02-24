@@ -16,6 +16,9 @@ module Sym
                                    option: :generate,
                                    value: true
           end
+
+          let(:private_key) { program_output }
+          it_behaves_like 'a private key'
         end
       end
     end

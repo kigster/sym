@@ -7,6 +7,8 @@ module Sym
 
         required_options :generate
 
+        try_after :show_help
+
         def execute
           retries ||= 0
 

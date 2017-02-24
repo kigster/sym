@@ -1,6 +1,7 @@
 require 'colored2'
 require 'sym'
 require 'sym/app'
+require 'openssl'
 
 module Sym
   class Application
@@ -35,33 +36,46 @@ module Sym
     end
 
     def execute!
-      if !args.generate_key? &&
-        (args.require_key? || args.specify_key?)
+      if !args.generate_key? && (args.require_key? || args.specify_key?)
+        log :debug, 'operation requires a key...'
         self.key = Sym::App::PrivateKey::Handler.new(opts, input_handler, password_cache).key
-        raise Sym::Errors::NoPrivateKeyFound.new('Private key is required') unless self.key
+        unless self.key
+          log :error, 'Unable to determine the key, which appears to be required'
+          raise Sym::Errors::NoPrivateKeyFound, 'Private key is required'
+        end
       end
+      log :info, "detected command [#{command.class.name}]"
       unless command
-        raise Sym::Errors::InsufficientOptionsError.new(
-          'Can not determine what to do from the options ' + opts_hash.keys.reject { |k| !opts[k] }.to_s)
+        raise Sym::Errors::InsufficientOptionsError, 'Can not determine what to do from the options ' + opts_hash.keys.reject { |k| !opts[k] }.to_s
       end
       self.result = command.execute
+    end
+
+    def log(*args)
+      Sym::App.log(*args, **opts)
     end
 
     def execute
       execute!
 
     rescue ::OpenSSL::Cipher::CipherError => e
-      error type:      'Cipher Error',
-            details:   e.message,
-            reason:    'Perhaps either the secret is invalid, or encrypted data is corrupt.',
-            exception: e
+      { reason:    'Invalid key provided',
+        exception: e }
 
     rescue Sym::Errors::Error => e
-      error type:    e.class.name.split(/::/)[-1],
-            details: e.message
+      { reason:    e.class.name.gsub(/.*::/, '').underscore.humanize.downcase,
+        exception: e }
+
+    rescue TypeError => e
+      if e.message =~ /marshal/
+        { reason: 'Corrupt source data or invalid/corrupt key provided',
+          exception: e }
+      else
+        { exception: e }
+      end
 
     rescue StandardError => e
-      error exception: e
+      { exception: e }
     end
 
     def command
@@ -87,10 +101,6 @@ module Sym
         '/bin/vi',
         '/sbin/vi'
       ]
-    end
-
-    def error(hash)
-      hash
     end
 
     def initialize_input_handler(handler = ::Sym::App::Input::Handler.new)
