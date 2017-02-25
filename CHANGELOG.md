@@ -2,8 +2,17 @@
 
 ## [HEAD](https://github.com/kigster/sym/tree/HEAD)
 
-[Changes since the last tag](https://github.com/kigster/sym/compare/v2.2.1...HEAD)
+[Changes since the last tag](https://github.com/kigster/sym/compare/v2.3.0...HEAD)
 
+## [v2.3.0](https://github.com/kigster/sym/tree/v2.3.0) (2017-02-23)
+[Full Changelog](https://github.com/kigster/sym/compare/v2.2.1...v2.3.0)
+ 
+ * Improving output, especially as it pertains to error reporting
+ * Split encrypt_decrypt command into encrypt and decrypt
+ * Fix permissions before `rake build`
+ * Improve Yard Doc by moving `Kernel` and `Object` monkey-patching
+   into `lib/sym/extensions/stdlib.rb`
+ 
 ## [v2.2.1](https://github.com/kigster/sym/tree/v2.2.1) (2017-02-15)
 [Full Changelog](https://github.com/kigster/sym/compare/v2.2.0...v2.2.1)
 
