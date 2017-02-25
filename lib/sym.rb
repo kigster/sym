@@ -32,7 +32,9 @@ Sym::Configuration.configure do |config|
   }
 end
 
-
+require 'sym/extensions/stdlib'
+require 'sym/extensions/class_methods'
+require 'sym/extensions/instance_methods'
 #
 # == Using Sym Library
 #
@@ -94,34 +96,6 @@ end
 # Each class including the +Sym+ module would get their own +#private_key#
 # class-instance variable accessor, and a possible value.
 #
-# For example:
-#
-#
-
-module Kernel
-  def require_dir(___dir)
-    @___dir ||= File.dirname(__FILE__)
-    # require files using a consistent order based on the dir/file name.
-    # this should be OS-neutral
-    Dir["#{@___dir}/#{___dir}/*.rb"].sort.each do |___file|
-      require(___file)
-    end
-  end
-end
-
-class Object
-  unless self.methods.include?(:present?)
-    def present?
-      return false if self.nil?
-      if self.is_a?(String)
-        return false if self == ''
-      end
-      true
-    end
-  end
-end
-
-require_dir 'sym/extensions'
 
 module Sym
   def self.included(klass)
