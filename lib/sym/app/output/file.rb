@@ -1,11 +1,10 @@
-require 'sym/app/output/base'
+require_relative 'base'
+
 module Sym
   module App
     module Output
-      class File < ::Sym::App::Output::Base
-
+      class File < Sym::App::Output::Base
         required_option :output
-
 
         def output_proc
           ->(data) {
