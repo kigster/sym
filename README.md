@@ -117,7 +117,7 @@ Optionally, after gem installation, you can also install bash-completion of gem'
 
 Should you choose to install it (this part is optional), you will be able to use "tab-tab" after typing `sym`, and you'll be able to choose from all of the supported flags.
 
-<a name="#cli"></a>
+<a name="cli"></a>
 
 ## Using `sym` with the Command Line
 
@@ -391,7 +391,7 @@ To edit an encrypted file in `$EDITOR`, while asking to paste the key (`-i | --i
     # ---
     # # (c) 2016 Konstantin Gredeskoul.  All rights reserved.
 
-<a name="#ruby-api"></a>
+<a name="ruby-api"></a>
 
 ## Ruby API
 
