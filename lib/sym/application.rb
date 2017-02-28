@@ -150,9 +150,11 @@ module Sym
       self.key = self.key_handler.key
       if self.key
         self.key_source = key_handler.key_source
+        if key_source =~ /^default_file/
+          opts[:key] = self.key
+        end
         log :info, "key was detected from source #{key_source.to_s.bold.green}"
       end
     end
-
   end
 end
