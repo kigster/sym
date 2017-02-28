@@ -33,7 +33,7 @@ __Sym__ is a layer built on top of the [`OpenSSL`](https://www.openssl.org/) lib
 
 This gem includes two primary components:
 
- * [Ruby API](#ruby-api) for enabling encryption/decryption of any data within any Ruby class, with extremely easy-to-use methods
+ * [Ruby API](#rubyapi) for enabling encryption/decryption of any data within any Ruby class, with extremely easy-to-use methods
  * [Rich command line interface CLI](#cli) with many additional features to streamline handling of encrypted data.
 
 _Symmetric Encryption_ simply means that we are using the same private key to encrypt and decrypt. In addition to the private key, the encryption uses an IV vector. The library completely hides `iv` generation from the user, and automatically generates a random `iv` per encryption.
@@ -391,7 +391,7 @@ To edit an encrypted file in `$EDITOR`, while asking to paste the key (`-i | --i
     # ---
     # # (c) 2016 Konstantin Gredeskoul.  All rights reserved.
 
-<a name="ruby-api"></a>
+<a name="rubyapi"></a>
 
 ## Ruby API
 
