@@ -8,8 +8,9 @@ def shell(*args)
 end
 
 task :permissions do 
-  shell("find . -type f -exec chmod o+r,g+r {} \\;")
-  shell("find . -type d -exec chmod o+rx,g+rx {} \\;")
+  shell('rm -rf pkg/')
+  shell("chmod -v o+r,g+r * */* */*/* */*/*/* */*/*/*/* */*/*/*/*/*")
+  shell("find . -type d -exec chmod o+x,g+x {} \\;")
 end
 
 task :build => :permissions
