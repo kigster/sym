@@ -13,6 +13,8 @@
  * Removed `OrderedHash`
  * Added `key_source` to logging with `-D`
  * New tests.
+ * Fixed command ordering bug.
+ * Better "default" file handing, only when no options are supplied.
 
 ## [v2.4.0](https://github.com/kigster/sym/tree/v2.4.0) (2017-02-27)
 [Full Changelog](https://github.com/kigster/sym/compare/v2.3.0...v2.4.0)
