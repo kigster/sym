@@ -21,22 +21,22 @@ module Sym
                             result:  'Confirm Password : ' + '••••••••••'.green)
 
           output << example(comment: 'encrypt a plain text string with default key, and save the output to a file',
-                            command: 'sym -e -s ' + '"secret string"'.bold.yellow + ' -o file.enc',
+                            command: 'sym -es ' + '"secret string"'.bold.yellow + ' -o file.enc',
                             echo:    'cat file.enc',
                             result:  'Y09MNDUyczU1S0UvelgrLzV0RTYxZz09CkBDMEw4Q0R0TmpnTm9md1QwNUNy%T013PT0K'.green)
 
           output << example(comment: 'decrypt a previously encrypted string:',
-                            command: 'sym -d -s $(cat file.enc) -k $mykey',
+                            command: 'sym -ds $(cat file.enc) -k $mykey',
                             result:  'secret string'.green)
 
           output << example(comment: 'encrypt sym.yml and save it to sym.enc:',
-                            command: 'sym -e -f sym.yml -o sym.enc -k $mykey')
+                            command: 'sym -ef sym.yml -o sym.enc -k $mykey')
 
           output << example(comment: 'decrypt an encrypted file and print it to STDOUT:',
                             command: 'sym -df sym.enc -k $mykey')
 
           output << example(comment: 'edit an encrypted file in $EDITOR, ask for key, create file backup',
-                            command: 'sym -tibf ecrets.enc',
+                            command: 'sym -tibf secrets.enc',
                             result:  '
 Private Key: ••••••••••••••••••••••••••••••••••••••••••••
 Saved encrypted content to sym.enc.
@@ -50,13 +50,13 @@ Diff:
 
           if Sym::App.is_osx?
           output << example(comment: 'generate a new password-encrypted key, save it to your Keychain:',
-                            command: 'sym -gpx mykey -o ~/.key')
+                            command: 'sym -gpcx mykey -o ~/.key')
 
           output << example(comment: 'use the new key to encrypt a file:',
-                            command: 'sym -x mykey -e -f password.txt -o passwords.enc')
+                            command: 'sym -e -c -k mykey -f password.txt -o passwords.enc')
 
           output << example(comment: 'use the new key to inline-edit the encrypted file:',
-                            command: 'sym -x mykey -t -f sym.yml')
+                            command: 'sym -k mykey -tf sym.yml.enc')
           end
 
           output.flatten.compact.join("\n")
