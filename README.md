@@ -40,12 +40,12 @@ _Symmetric Encryption_ simply means that we are using the same private key to en
 
 ### How It Works
 
-  1. You start with a piece of sensitive __data__ you want to protect. This can be a file or a string.
-  2. You generate a new encryption key, that will be used to both encrypt and decrypt the data. The key is 256 bits, or 32 bytes, or 45 bytes when base64-encoded, and can be generated with `sym -g`.
+  1. You generate a new encryption key, that will be used to both encrypt and decrypt the data. The key is 256 bits, or 32 bytes, or 45 bytes when base64-encoded, and can be generated with `sym -g`.
      * You can optionally password protect the key with `sym -gp`
      * You can save the key into a file `sym -gpo key-file` 
-     * Or you can save it into the OS-X Keychain, with `sym -gpx keychain-name`
+     * Or you can save it into the OS-X Keychain, with `sym -gpcx keychain-name`, while caching its password for a period of time.
      * or you can print it to STDOUT, which is the default.
+  2. You then take a piece of sensitive __data__ that you want to encrypt. This can be a file or a string.
   3. You can then use the key to encrypt sensitive __data__, with `sym -e [key-option] [data-option]`, passing it the key in several accepted ways. Smart flag `-k` automatically interpretes the source of the key, by trying:
      * a file with a pathname.
      * or environment variable
@@ -58,12 +58,14 @@ _Symmetric Encryption_ simply means that we are using the same private key to en
 Sample session that uses Mac OS-X Keychain to store the password-protected key.
 
 ```bash
+# Gen a new key, password-encrypt it, cache the password, save
+# result in the key chain entry 'my-new-key'
 ❯ sym -gpcx my-new-key
 New Password     :  •••••••••
 Confirm Password :  •••••••••
 BAhTOh1TeW06OkRhdGE6OldyYXBwZXJTdH.....
 
-❯ sym -e -c -x my-new-key -s 'My secret data' -o secret.enc
+❯ sym -eck my-new-key -s 'My secret data' -o secret.enc
 Coin::Vault listening at: druby://127.0.0.1:24924
 Password: •••••••••
 
@@ -152,15 +154,18 @@ Or create a password-protected key (`-p`), and save it to a file (`-o`), cache t
     sym -gpcqo ~/.secret
     New Password:     ••••••••••
     Confirm Password: ••••••••••
-
+    
+##### Key Sources
+    
 You can subsequently use the private key by passing either:
 
- 1. the `-k key` flag, where key is either a:
-    * file
-    * environment 
-    * string
-    * keychain 
+ 1. the `-k key` flag, where key is either:
+    * a file
+    * an environment variable name 
+    * an actual base64-encoded key
+    * a keychain name
  2. pasting or typing the key with the `-i` (interactive) flag
+ 3. a default key file, in your home folder, `~/.sym.key`, used only when no other flags passed in.
 
 #### Using KeyChain Access on Mac OS-X
 
