@@ -4,6 +4,16 @@
 
 [Changes since the last tag](https://github.com/kigster/sym/compare/v2.3.0...HEAD)
 
+## [v2.4.1](https://github.com/kigster/sym/tree/v2.4.1) (2017-02-28)
+[Full Changelog](https://github.com/kigster/sym/compare/v2.4.0...v2.4.1)
+
+ * Generalized and consolidated `Detector` class for determining private key from all possible sources.
+ * Split off `KeySourceCheck` into a separate entity
+ * Simplified `Sym::Application`
+ * Removed `OrderedHash`
+ * Added `key_source` to logging with `-D`
+ * New tests.
+
 ## [v2.4.0](https://github.com/kigster/sym/tree/v2.4.0) (2017-02-27)
 [Full Changelog](https://github.com/kigster/sym/compare/v2.3.0...v2.4.0)
 

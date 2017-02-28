@@ -136,6 +136,7 @@ module Sym
         end
 
         it 'should be able to decrypt data back' do
+          expect(encrypted_string).to_not be_nil
           expect(test_instance.decr(encrypted_string, key)).to eql(string)
         end
       end
@@ -191,7 +192,6 @@ module Sym
           before do
             expect(input_handler).to receive(:ask).exactly(attempts).times.and_return(decryption_password)
             application.input_handler = input_handler
-            application.send(:initialize_key_handler)
           end
 
           include_context :decrypting

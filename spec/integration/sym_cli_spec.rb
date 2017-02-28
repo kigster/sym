@@ -1,6 +1,7 @@
 require 'spec_helper'
 require 'sym/app/commands/generate_key'
 require 'sym'
+require 'sym/application'
 
 RSpec.describe 'CLI execution', :type => :aruba do
 
@@ -57,6 +58,14 @@ RSpec.describe 'CLI execution', :type => :aruba do
         let(:args) { "-d -k #{KEY_PLAIN} -s #{HELLO_ENCRYPTED}" }
         it 'should run command' do
           expect(output).to eq('hello')
+        end
+      end
+
+      context 'import a key into keychain' do
+        let(:args) { "-k #{KEY_PLAIN} -x MOO" }
+        it 'should add to keychain' do
+          expect(Sym::App::KeyChain.get('MOO')).to eq(KEY_PLAIN)
+          expect(output).to eq(KEY_PLAIN)
         end
       end
 

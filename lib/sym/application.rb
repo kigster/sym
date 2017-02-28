@@ -8,24 +8,26 @@ module Sym
 
     attr_accessor :opts,
                   :opts_hash,
+                  :provided_options,
                   :args,
                   :action,
                   :key,
+                  :key_source,
                   :input_handler,
                   :key_handler,
                   :result,
                   :password_cache
 
     def initialize(opts)
-      self.opts      = opts
-      self.opts_hash = opts.respond_to?(:to_hash) ? opts.to_hash : opts
-      self.args      = ::Sym::App::Args.new(opts_hash)
+      self.opts             = opts
+      self.opts_hash        = opts.respond_to?(:to_hash) ? opts.to_hash : opts
+      self.provided_options = opts_hash.keys.select { |k| opts_hash[k] }
+      self.args             = ::Sym::App::Args.new(opts_hash)
 
       initialize_action
       initialize_data_source
       initialize_password_cache
       initialize_input_handler
-      initialize_key_handler
     end
 
     def execute!
@@ -36,7 +38,7 @@ module Sym
       end
       log :info, "execute! command is #{command.class.name.blue.bold}"
       self.result = command.execute.tap do |result|
-        log :info, "execute! result is  #{result[0..40].to_s.blue.bold}..."
+        log :info, "execute! result is  #{result.nil? ? 'nil' : result[0..40].to_s.blue.bold }..."
       end
     end
 
@@ -99,7 +101,7 @@ module Sym
     end
 
     def initialize_key_handler
-      self.key_handler = ::Sym::App::PrivateKey::Handler.new(self.opts, input_handler, password_cache)
+      self.key_handler = ::Sym::App::PrivateKey::Handler.new(opts, input_handler, password_cache)
     end
 
     def initialize_password_cache
@@ -133,23 +135,23 @@ module Sym
     # key location (which can be changed via Configuration class).
     # In any case, attempt to initialize the key one way or another.
     def initialize_key_source
-      if args.require_key?
-        if Sym.default_key?
-          opts[:key] = Sym.default_key
-          log :info, "using default key from #{Sym.default_key_file}"
-        end
-      end
-
-      unless args.generate_key?
-        self.key = Sym::App::PrivateKey::Handler.new(opts, input_handler, password_cache).key
-      end
+      detect_key_source
 
       if args.require_key? && !self.key
-        log :error, 'Unable to determine the key, which appears to be required'
-        raise Sym::Errors::NoPrivateKeyFound, 'Private key is required'
+        log :error, 'Unable to determine the key, which appears to be required with current args'
+        raise Sym::Errors::NoPrivateKeyFound, 'Private key is required when ' + (::Sym::App::Args::OPTIONS_REQUIRE_KEY & provided_options).join(', ') << 'ing.'
       end
 
-      log :info, "initialize_key_source: found the key [#{key ? key : 'nil'}]"
+      log :debug, "initialize_key_source: detected key is [#{key ? key : 'nil'}]"
+    end
+
+    def detect_key_source
+      initialize_key_handler
+      self.key = self.key_handler.key
+      if self.key
+        self.key_source = key_handler.key_source
+        log :info, "key was detected from source #{key_source.to_s.bold.green}"
+      end
     end
 
   end

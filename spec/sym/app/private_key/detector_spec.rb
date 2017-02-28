@@ -1,20 +1,21 @@
 require 'spec_helper'
-require 'sym/app/private_key/reader'
+require 'sym/app/private_key/detector'
 
 module Sym
   module App
     module PrivateKey
-      RSpec.describe ::Sym::App::PrivateKey::Reader do
+      RSpec.describe ::Sym::App::PrivateKey::Detector do
         include_context :encryption
 
         let(:input_handler) { Sym::App::Input::Handler.new }
         let(:password_handler) { Sym::App::Password::Cache.instance.configure(enabled: false) }
         let(:data) { key }
-
-        subject { ::Sym::App::PrivateKey::Reader.new(data, input_handler, password_handler).key }
+        let(:opts) { { key: data } }
+        subject(:reader) { ::Sym::App::PrivateKey::Detector.new(opts, input_handler, password_handler) }
 
         context 'from a string' do
-          it { is_expected.to eql(key) }
+          its(:key) { should eq(key) }
+          its(:key_source) { should eq("string://[reducted]") }
         end
 
         context 'from a file' do
@@ -31,7 +32,8 @@ module Sym
             expect(key.length).to eq(44)
           end
 
-          it { is_expected.to eq(key) }
+          its(:key) { should eq(key) }
+          its(:key_source) { should eq("file://#{tempfile.path}") }
         end
 
         context 'from keychain' do
@@ -40,12 +42,14 @@ module Sym
 
           context 'valid key' do
             before { expect(KeyChain).to receive(:get).with(keychain_name).and_return(key) }
-            it { is_expected.to eql(key) }
+            its(:key) { should eq(key) }
+            its(:key_source) { should eq('keychain://keychain-name') }
           end
 
           context 'invalid key' do
             before { expect(KeyChain).to receive(:get).with(keychain_name).and_return('boo!') }
-            it { is_expected.to be_nil }
+            its(:key) { is_expected.to be_nil }
+            its(:key_source) { is_expected.to be_nil }
           end
         end
 
@@ -57,7 +61,8 @@ module Sym
               allow(ENV).to receive(:[]).with(data).and_return(key)
             end
 
-            it { is_expected.to eql(key) }
+            its(:key) { is_expected.to eq(key) }
+            its(:key_source) { is_expected.to eq('env://PRIVATE_KEY') }
           end
 
           context 'invalid key' do
@@ -65,8 +70,29 @@ module Sym
               allow(ENV).to receive(:[]).with('MEMCACHE_USERNAME')
               allow(ENV).to receive(:[]).with(data).and_return(nil)
             end
-            it { is_expected.to be_nil }
+            its(:key) { is_expected.to be_nil }
+            its(:key_source) { is_expected.to be_nil }
           end
+        end
+
+        context 'from a default file' do
+          let(:data) { nil }
+          before do
+            expect(Sym).to receive(:default_key?).at_least(1).times.and_return(true)
+            expect(Sym).to receive(:default_key).at_least(1).times.and_return(key)
+          end
+
+          its(:key) { should eq(key) }
+          its(:key_source) { should start_with('default_file://') }
+        end
+
+        context 'from a an interactive input' do
+          let(:opts) { { interactive: true } }
+          before do
+            expect(input_handler).to receive(:prompt).and_return(key)
+          end
+          its(:key) { should eq(key) }
+          its(:key_source) { should start_with('interactive://[reducted]') }
         end
       end
     end
