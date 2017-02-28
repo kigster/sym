@@ -26,6 +26,10 @@ module Sym
             provider_from_argument(p, **opts, &block) || detect
           end
 
+          def provider_list
+            registry.keys.map(&:to_s).join(', ')
+          end
+
           private
 
           def short_name(klass)

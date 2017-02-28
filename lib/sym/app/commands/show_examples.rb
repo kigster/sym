@@ -15,13 +15,13 @@ module Sym
                             echo:    'echo $mykey',
                             result:  '75ngenJpB6zL47/8Wo7Ne6JN1pnOsqNEcIqblItpfg4='.green)
 
-          output << example(comment: 'generate a new password-protected key & save to a file',
-                            command: 'sym -gp -o ~/.key',
+          output << example(comment: 'generate a new password-protected key & save to the default key file',
+                            command: 'sym -gpco ' + Sym.default_key_file,
                             echo:    'New Password     : ' + '••••••••••'.green,
                             result:  'Confirm Password : ' + '••••••••••'.green)
 
-          output << example(comment: 'encrypt a plain text string with a key, and save the output to a file',
-                            command: 'sym -e -s ' + '"secret string"'.bold.yellow + ' -k $mykey -o file.enc',
+          output << example(comment: 'encrypt a plain text string with default key, and save the output to a file',
+                            command: 'sym -e -s ' + '"secret string"'.bold.yellow + ' -o file.enc',
                             echo:    'cat file.enc',
                             result:  'Y09MNDUyczU1S0UvelgrLzV0RTYxZz09CkBDMEw4Q0R0TmpnTm9md1QwNUNy%T013PT0K'.green)
 

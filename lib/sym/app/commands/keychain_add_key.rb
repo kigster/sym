@@ -5,7 +5,7 @@ module Sym
     module Commands
       class KeychainAddKey < BaseCommand
 
-        required_options [:private_key, :keyfile, :interactive],
+        required_options [:key, :interactive],
                          :keychain
 
         try_after :generate_key, :encrypt, :decrypt, :password_protect_key

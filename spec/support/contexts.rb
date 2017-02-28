@@ -35,7 +35,7 @@ RSpec.shared_context :test_instance do
   let(:instance) { TestClass.new }
   let(:test_class) { TestClass }
   let(:test_instance) { instance }
-  let(:private_key) { TestClass.create_private_key }
+  let(:key) { TestClass.create_private_key }
 end
 
 
@@ -68,8 +68,8 @@ end
 RSpec.shared_context :run_command do
   include_context :encryption
 
-  let(:private_key) { TEST_KEY }
-  let(:cli) { Sym::App::CLI.new(argv.reject { |a| a.to_s =~ /verbose|-v/ }) }
+  let(:key) { TEST_KEY }
+  let(:cli) { Sym::App::CLI.new(argv) }
   let(:opts) { cli.opts }
   let(:run_cli) { true }
   let(:application) { cli.application }

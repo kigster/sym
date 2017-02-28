@@ -13,6 +13,10 @@ module Sym
       class << self
         attr_accessor :user, :kind, :sub_section
 
+        def get(value)
+          self.new(value).find
+        end
+
         def configure
           yield self
         end
@@ -35,6 +39,7 @@ module Sym
         self.key_name = key_name
         self.opts     = opts
         self.class.validate!
+        stderr_off
       end
 
       def add(password)

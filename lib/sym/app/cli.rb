@@ -58,12 +58,14 @@ module Sym
 
       attr_accessor :opts, :application, :outputs, :output_proc
 
-      def initialize(argv_original)
-        env_args = ENV[ENV_ARGS_VARIABLE_NAME]
+      def initialize(argv)
         begin
-          argv = argv_original.dup
-          argv << env_args.split(' ') if env_args && !(argv.include?('-M') or argv.include?('--no-environment'))
+          argv << args_from_environment(argv)
           argv.flatten!
+          argv.compact!
+          argv_original = argv.dup
+          # Re-map any leg  acy options to the new options
+          argv = CLI.replace_argv(argv)
           dict      = argv.delete('--dictionary')
           self.opts = parse(argv)
           command_dictionary if dict
@@ -72,11 +74,23 @@ module Sym
           return
         end
 
-        command_no_color(argv_original) if opts[:no_color]
+        # Disable coloring if requested, or if piping STDOUT
+        if opts[:no_color] || !STDOUT.tty?
+          command_no_color(argv_original)
+        end
+
         self.application = ::Sym::Application.new(opts)
         select_output_stream
       end
 
+      def args_from_environment(argv)
+        env_args = ENV[Sym::Constants::ENV_ARGS_VARIABLE_NAME]
+        if env_args && !(argv.include?('-M') or argv.include?('--no-environment'))
+          env_args.split(' ')
+        else
+          []
+        end
+      end
 
       def execute
         return Sym::App.exit_code if Sym::App.exit_code != 0
@@ -93,6 +107,40 @@ module Sym
 
       def command
         @command ||= self.application&.command
+      end
+
+      def opts_present
+        o = opts.to_hash
+        o.keys.map { |k| opts[k] ? nil : k }.compact.each { |k| o.delete(k) }
+        o
+      end
+
+      class << self
+        # Re-map any legacy options to the new options
+        ARGV_FLAG_REPLACE_MAP = {
+          'C' => 'c'
+        }
+
+        def replace_regex(from)
+          %r{^-([\w]*)#{from}([\w]*)$}
+        end
+
+        def replace_argv(argv)
+          argv = argv.dup
+          replacements = []
+          ARGV_FLAG_REPLACE_MAP.each_pair do |from, to|
+            argv.map! do |a|
+              match = replace_regex(from).match(a)
+              if match
+                replacements << from
+                "-#{match[1]}#{to}#{match[2]}"
+              else
+                a
+              end
+            end
+          end
+          argv
+        end
       end
 
       private

@@ -1,5 +1,6 @@
 require 'sym/app/private_key/decryptor'
 require 'sym/app/password/cache'
+require 'sym/errors'
 module Sym
   module App
     module PrivateKey

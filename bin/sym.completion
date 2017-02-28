@@ -46,11 +46,11 @@ _sym()
     _expand || return 0
 
     case "$prev" in
-    --@(key-file|file|output|))
+    --@(key|file|output|))
         _filedir
         return 0
         ;;
-    -@(f|K|o))
+    -@(f|k|o))
         _filedir
         return 0
         ;;

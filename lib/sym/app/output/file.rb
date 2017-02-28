@@ -6,7 +6,6 @@ module Sym
 
         required_option :output
 
-
         def output_proc
           ->(data) {
             ::File.open(opts[:output], 'w') { |f| f.write(data) }

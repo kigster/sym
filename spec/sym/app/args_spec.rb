@@ -5,7 +5,7 @@ require 'singleton'
 module Sym
   module App
     RSpec.describe Sym::App::Args do
-      let(:opts) { { keyfile: true, edit: true } }
+      let(:opts) { { key: true, edit: true } }
       let(:args) { Args.new(opts) }
 
       %i(specify_key?

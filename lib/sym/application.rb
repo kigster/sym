@@ -21,43 +21,27 @@ module Sym
       self.opts_hash = opts.respond_to?(:to_hash) ? opts.to_hash : opts
       self.args      = ::Sym::App::Args.new(opts_hash)
 
+      initialize_action
+      initialize_data_source
       initialize_password_cache
       initialize_input_handler
       initialize_key_handler
-      initialize_action
-    end
-
-    def initialize_action
-      self.action = if opts[:encrypt] then
-                      :encr
-                    elsif opts[:decrypt]
-                      :decr
-                    end
     end
 
     def execute!
-      if !args.generate_key? && (args.require_key? || args.specify_key?)
-        log :debug, 'operation requires a key...'
-        self.key = Sym::App::PrivateKey::Handler.new(opts, input_handler, password_cache).key
-        unless self.key
-          log :error, 'Unable to determine the key, which appears to be required'
-          raise Sym::Errors::NoPrivateKeyFound, 'Private key is required'
-        end
-      end
-      log :info, "detected command [#{command.class.name}]"
+      initialize_key_source
       unless command
-        raise Sym::Errors::InsufficientOptionsError, 'Can not determine what to do from the options ' + opts_hash.keys.reject { |k| !opts[k] }.to_s
+        raise Sym::Errors::InsufficientOptionsError,
+              'Can not determine what to do from the options:\\n' + args.provided_options.inspect.green.bold
       end
-      self.result = command.execute
-    end
-
-    def log(*args)
-      Sym::App.log(*args, **opts)
+      log :info, "execute! command is #{command.class.name.blue.bold}"
+      self.result = command.execute.tap do |result|
+        log :info, "execute! result is  #{result[0..40].to_s.blue.bold}..."
+      end
     end
 
     def execute
       execute!
-
     rescue ::OpenSSL::Cipher::CipherError => e
       { reason:    'Invalid key provided',
         exception: e }
@@ -67,8 +51,8 @@ module Sym
         exception: e }
 
     rescue TypeError => e
-      if e.message =~ /marshal/
-        { reason: 'Corrupt source data or invalid/corrupt key provided',
+      if e.message =~ /marshal/m
+        { reason:    'Corrupt source data or invalid/corrupt key provided',
           exception: e }
       else
         { exception: e }
@@ -84,9 +68,16 @@ module Sym
       @command
     end
 
+    def log(*args)
+      Sym::App.log(*args, **opts)
+    end
+
     def editor
       editors_to_try.find { |editor| File.exist?(editor) }
     end
+
+
+    private
 
     def editors_to_try
       [
@@ -113,12 +104,53 @@ module Sym
 
     def initialize_password_cache
       args            = {}
-      args[:timeout]  = opts[:cache_for].to_i if opts[:cache_for]
-      args[:enabled]  = opts[:cache_password]
+      args[:timeout]  = (opts[:cache_timeout] || ENV['SYM_CACHE_TTL'] || Sym::Configuration.config.password_cache_timeout).to_i
+      args[:enabled]  = opts[:cache_passwords]
       args[:verbose]  = opts[:verbose]
       args[:provider] = opts[:cache_provider] if opts[:cache_provider]
 
       self.password_cache = Sym::App::Password::Cache.instance.configure(args)
     end
+
+
+    def initialize_action
+      self.action = if opts[:encrypt] then
+                      :encr
+                    elsif opts[:decrypt]
+                      :decr
+                    end
+    end
+
+    # If we are encrypting or decrypting, and no data has been provided, check if we
+    # should read from STDIN
+    def initialize_data_source
+      if self.action && opts[:string].nil? && opts[:file].nil? && !(STDIN.tty?)
+        opts[:file] = '-'
+      end
+    end
+
+    # If no key is provided with command line options, check the default
+    # key location (which can be changed via Configuration class).
+    # In any case, attempt to initialize the key one way or another.
+    def initialize_key_source
+      if args.require_key?
+        if Sym.default_key?
+          opts[:key] = Sym.default_key
+          log :info, "using default key from #{Sym.default_key_file}"
+        end
+      end
+
+      unless args.generate_key?
+        self.key = Sym::App::PrivateKey::Handler.new(opts, input_handler, password_cache).key
+      end
+
+      if args.require_key? && !self.key
+        log :error, 'Unable to determine the key, which appears to be required'
+        raise Sym::Errors::NoPrivateKeyFound, 'Private key is required'
+      end
+
+      log :info, "initialize_key_source: found the key [#{key ? key : 'nil'}]"
+    end
+
   end
 end

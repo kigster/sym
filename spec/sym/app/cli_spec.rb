@@ -5,6 +5,13 @@ module Sym
   module App
     RSpec.describe 'Sym::App::CLI' do
 
+      context '#replace_argv' do
+        let(:argv) { %w(-asdfCkjf --trace --debug) }
+        let(:replaced_argv) { %w(-asdfckjf --trace --debug) }
+        subject { Sym::App::CLI.replace_argv(argv) }
+        it { is_expected.to eq(replaced_argv) }
+      end
+
       context 'basic initialization' do
         let(:argv) { %w(-g) }
         let(:cli) { Sym::App::CLI.new(argv) }
@@ -22,44 +29,54 @@ module Sym
         let(:key) { 'YJOkFraX1JDuQWEbV1JpeYvwUpt0h9tbuSO4XAZ8Asc=' }
         let(:cli) { Sym::App::CLI.new(argv) }
 
-        before do
-          expect(ENV).to receive(:[]).with(Sym::ENV_ARGS_VARIABLE_NAME).and_return("-k #{key} -v -D")
-          allow(ENV).to receive(:[])
-        end
+        context 'with a function stub' do
+          before do
+            allow_any_instance_of(Sym::App::CLI).to receive(:args_from_environment).and_return("-k #{key} -v -D".split(' '))
+          end
 
-        it 'should properly initialize' do
-          expect(cli.command).to be_a_kind_of(Sym::App::Commands::Encrypt)
+          it 'should properly initialize' do
+            expect(cli.opts_present.keys.sort).to eq %i(encrypt string key verbose debug).sort
+            expect(cli.command).to be_a_kind_of(Sym::App::Commands::Encrypt)
+          end
         end
 
         context 'opts' do
-          let(:opts) { cli.opts }
+          before do
+            allow(ENV).to receive(:[]).with('SYM_CACHE_TTL')
+            allow(ENV).to receive(:[]).with('MEMCACHE_USERNAME')
+            allow(ENV).to receive(:[]).with(Sym::Constants::ENV_ARGS_VARIABLE_NAME).and_return("-k #{key} -v -D")
+          end
+
+          let!(:opts) { cli.opts }
+
           it 'should contain flags specified in ENV variable' do
             expect(opts[:encrypt]).to be true
             expect(opts[:string]).to eq('hello')
-            expect(opts[:encrypt]).to be true
             expect(opts[:debug]).to be true
             expect(opts[:verbose]).to be true
+            expect(opts[:key]).to eq(key)
           end
           context 'with -M' do
             let(:argv) { %w(-e -s hello -M) }
             it 'should contain flags specified in ENV variable' do
               expect(opts[:encrypt]).to be true
-              expect(opts[:private_key]).to be_nil
+              expect(opts[:debug]).to be false
+              expect(opts[:key]).to be_nil
             end
           end
         end
       end
 
-
       context 'generate private key' do
-        let(:argv) { %w(-g -v) }
+        let(:argv) { %w(-g) }
         before do
           expect(cli).not_to be_nil
           expect(cli.command).not_to be_nil
-          expect(cli.command.class).to receive(:create_private_key).and_return(TEST_KEY)
+          expect(cli.command.class).to eq(Commands::GenerateKey)
+          expect(cli.command).to receive(:create_key).and_return(TEST_KEY)
         end
         include_context :run_command
-        it 'should output the generated private_key' do
+        it 'should output the generated key' do
           expect_command_to_have klass:  Commands::GenerateKey,
                                  output: [/[a-zA-Z0-9\-_=]{44}/],
                                  option: :generate,
@@ -69,8 +86,11 @@ module Sym
       end
 
       context 'show version' do
-        let(:argv) { %w(-V --trace) }
+        let(:argv) { %w(--version --trace) }
         include_context :run_command
+        it 'should correctly define opts' do
+          expect(cli.opts_present.keys.sort).to eq %i(version trace).sort
+        end
         it 'should output the version number' do
           expect_command_to_have klass:  Commands::ShowVersion,
                                  output: ["sym (version #{Sym::VERSION})"],
@@ -92,8 +112,9 @@ module Sym
       end
 
       context 'insufficient arguments' do
-        let(:argv) { ['-k', private_key, '-v'] }
+        let(:argv) { %w(-e -v) }
         before do
+          expect(Sym).to receive(:default_key?).and_return(false)
           expect(Sym::App).to receive(:error)
         end
         include_context :run_command
@@ -104,7 +125,7 @@ module Sym
 
       context 'perform encryption' do
         let(:string) { 'HelloWorld' }
-        let(:argv) { "-e -s #{string} -k #{private_key} -v --trace".split(' ') }
+        let(:argv) { "-e -s #{string} -k #{key} -v --trace".split(' ') }
         let(:encrypted_string) { program_output }
 
         include_context :run_command
@@ -115,7 +136,7 @@ module Sym
         end
 
         it 'should be able to decrypt data back' do
-          expect(test_instance.decr(encrypted_string, private_key)).to eql(string)
+          expect(test_instance.decr(encrypted_string, key)).to eql(string)
         end
       end
 
@@ -130,7 +151,7 @@ module Sym
 
         RSpec.shared_context :decrypting do
           let(:string) { 'I am being encrypted' }
-          let(:encrypted_string) { test_instance.encr(string, private_key) }
+          let(:encrypted_string) { test_instance.encr(string, key) }
           let(:decrypted_string) { program_output }
 
           include_context :run_command
@@ -141,18 +162,18 @@ module Sym
           context 'and is supplied via -k string' do
             include_context :decrypting
 
-            let(:argv) { "-d -s #{encrypted_string} -k #{private_key} -v".split(' ') }
+            let(:argv) { "-d -s #{encrypted_string} -k #{key} -v".split(' ') }
 
             it 'should decrypt' do
               expect(decrypted_string).to eql(string)
             end
           end
 
-          context 'and is supplied via -K file' do
+          context 'and is supplied via -k frile' do
             include_context :decrypting
 
-            let(:argv) { "-d -s #{encrypted_string} -K #{tempfile.path} -v --trace".split(' ') }
-            let!(:tempfile) { SAVE_TO_TEMPFILE.call(private_key) }
+            let(:argv) { "-d -s #{encrypted_string} -k #{tempfile.path} -v --trace".split(' ') }
+            let!(:tempfile) { SAVE_TO_TEMPFILE.call(key) }
 
             it 'should decrypt' do
               expect(decrypted_string).to eql(string)
@@ -162,8 +183,8 @@ module Sym
 
         context 'when the key is password-protected' do
           let!(:password) { 'pIA44z!w04DS' }
-          let!(:encrypted_key) { test_instance.encr_password(private_key, password) }
-          let!(:argv) { "-d -s #{encrypted_string} -K #{tempfile.path} -v --trace".split(' ') }
+          let!(:encrypted_key) { test_instance.encr_password(key, password) }
+          let!(:argv) { "-d -s #{encrypted_string} -k #{tempfile.path} -v --trace".split(' ') }
           let!(:tempfile) { SAVE_TO_TEMPFILE.call(encrypted_key) }
           let!(:input_handler) { Sym::App::Input::Handler.new }
 
@@ -181,7 +202,7 @@ module Sym
             it 'should decrypt' do
               expect(decrypted_string).to eql(string)
               expect(File.read(tempfile.path)).to eql(encrypted_key)
-              expect(File.read(tempfile.path)).not_to eql(private_key)
+              expect(File.read(tempfile.path)).not_to eql(key)
               expect(decrypted_string).to eql(string)
             end
           end
@@ -193,7 +214,7 @@ module Sym
 
             it 'should decrypt' do
               expect(File.read(tempfile.path)).to eql(encrypted_key)
-              expect(File.read(tempfile.path)).not_to eql(private_key)
+              expect(File.read(tempfile.path)).not_to eql(key)
               expect(input_handler).to receive(:puts).and_return(nil).exactly(attempts).times
               expect(cli).to receive(:error).
                 with(reason:    'invalid password provided for the private key',

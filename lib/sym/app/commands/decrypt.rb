@@ -5,7 +5,7 @@ module Sym
       class Decrypt < BaseCommand
         include Sym
 
-        required_options [ :private_key, :keyfile, :keychain, :interactive ],
+        required_options [ :key, :interactive ],
                          [ :decrypt ],
                          [ :file, :string ]
 

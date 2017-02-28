@@ -5,7 +5,7 @@ module Sym
     RSpec.describe 'Sym::Application' do
 
       context 'basic initialization' do
-        let(:opts) { { generate: true, copy: true }}
+        let(:opts) { { generate: true }}
         let(:application) { Sym::Application.new(opts) }
 
         it 'should properly initialize' do

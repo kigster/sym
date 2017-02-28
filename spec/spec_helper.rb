@@ -1,4 +1,4 @@
-require "simplecov"
+require 'simplecov'
 SimpleCov.start
 
 $LOAD_PATH.unshift File.expand_path('../../lib', __FILE__)
@@ -17,6 +17,7 @@ RSpec.configure do |spec|
   spec.before do
     Sym::App.exit_code                         = 0
     Sym::App::Password::Cache.instance.enabled = false
+    allow(Sym).to receive(:default_key?).and_return(false)
   end
 
   spec.after :all do

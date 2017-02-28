@@ -4,6 +4,30 @@
 
 [Changes since the last tag](https://github.com/kigster/sym/compare/v2.3.0...HEAD)
 
+## [v2.4.0](https://github.com/kigster/sym/tree/v2.4.0) (2017-02-27)
+[Full Changelog](https://github.com/kigster/sym/compare/v2.3.0...v2.4.0)
+
+ * CLI API changes:
+   * Version 2.4.0
+   * New behavior: `-k <value>` now attempts to read a file, environment, keychain or a string.
+   * Removed `--keyfile / -K` (-k now accepts file)
+   * Removed all `require_relative` occurances, replaced with `require`
+   * Adding support for the default key file, stored in `~/.sym.key` by default.
+   * Moved all constants to `Sym::Constants`
+   * Added ability to map legacy (deprecated) flags
+   * Auto-disabling color when STDOUT is not a tty
+   * Changed Password Cache flags:
+     * Replaced `-C` with `-c` (to enable cache)
+     * Replaced `-T` with `-u` for timeout
+     * Replaced `-P` with `-r` for provider
+   * Changed `-A` (trace) to `-T`
+   * Now adding password to the cache upon generation
+   * Adding `KeyChain.get` method
+   * Replacing private key `Detector` with `Reader`
+   * Adding logger
+   * Fixing handling of STDIN and STDOUT with pipes
+   * Deleting unused files
+
 ## [v2.3.0](https://github.com/kigster/sym/tree/v2.3.0) (2017-02-23)
 [Full Changelog](https://github.com/kigster/sym/compare/v2.2.1...v2.3.0)
  

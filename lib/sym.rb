@@ -2,7 +2,10 @@ require 'colored2'
 require 'zlib'
 require 'logger'
 
-require_relative 'sym/configuration'
+require 'sym/configuration'
+require 'sym/constants'
+require 'sym/version'
+require 'sym/errors'
 
 Sym::Configuration.configure do |config|
   config.password_cipher     = 'AES-128-CBC'
@@ -10,6 +13,8 @@ Sym::Configuration.configure do |config|
   config.private_key_cipher  = config.data_cipher
   config.compression_enabled = true
   config.compression_level   = Zlib::BEST_COMPRESSION
+
+  config.default_key_file    = Sym::Constants::SYM_KEY_FILE
 
   config.password_cache_timeout          = 300
 
@@ -117,15 +122,23 @@ module Sym
     end
   end
 
-  COMPLETION_FILE        = '.sym.completion'.freeze
-  COMPLETION_PATH        = "#{ENV['HOME']}/#{COMPLETION_FILE}".freeze
-  NIL_LOGGER             = Logger.new(nil).freeze # empty logger
-  LOGGER                 = Logger.new(STDOUT).freeze
-  ENV_ARGS_VARIABLE_NAME = 'SYM_ARGS'.freeze
+  class << self
+    def config
+      Sym::Configuration.config
+    end
 
-  BASH_COMPLETION        = {
-    file:   File.expand_path('../../bin/sym.completion', __FILE__),
-    script: "[[ -f '#{COMPLETION_PATH}' ]] && source '#{COMPLETION_PATH}'",
-  }.freeze
+    def default_key_file
+      config.default_key_file
+    end
+
+    def default_key
+      File.read(default_key_file) rescue nil
+    end
+
+    def default_key?
+      File.exist?(default_key_file)
+    end
+
+  end
 end
 

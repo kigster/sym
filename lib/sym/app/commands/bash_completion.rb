@@ -11,7 +11,7 @@ module Sym
           install_completion_file
           file = opts[:bash_completion]
           if File.exist?(file)
-            if File.read(file).include?(Sym::BASH_COMPLETION[:script])
+            if File.read(file).include?(script)
               "#{'Hmmm'.bold.yellow}: #{file.bold.yellow} had completion for #{'sym'.bold.red} already installed\n"
             else
               append_completion_script(file)
@@ -23,15 +23,31 @@ module Sym
           end
         end
 
+        private
+
         def install_completion_file
-          FileUtils.cp(Sym::BASH_COMPLETION[:file], Sym::COMPLETION_PATH)
+          FileUtils.cp(source_file, path)
         end
 
         def append_completion_script(file)
           File.open(file, 'a') do |fd|
-            fd.write(Sym::BASH_COMPLETION[:script])
+            fd.write(script)
           end
         end
+
+
+        def script
+          Sym::Constants::Completion::Config[:script]
+        end
+
+        def source_file
+          Sym::Constants::Completion::Config[:file]
+        end
+
+        def path
+          Sym::Constants::Completion::PATH
+        end
+
       end
     end
   end

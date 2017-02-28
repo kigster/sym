@@ -10,7 +10,7 @@ module Sym
       class OpenEditor < BaseCommand
         include Sym
 
-        required_options [ :private_key, :keyfile, :keychain, :interactive ],
+        required_options [ :key, :interactive ],
                            :edit,
                            :file
 

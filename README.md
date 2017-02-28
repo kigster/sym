@@ -48,7 +48,7 @@ _Symmetric Encryption_ simply means that we are using the same private key to en
      * or you can print it to STDOUT, which is the default.
   3. You can then use the key to encrypt sensitive __data__, with `sym -e [key-option] [data-option]`, passing it the key in several accepted ways:
      * You can pass the key as a string (not recommended) via `-k key`
-     * Or read the key from a file `-K key-file`
+     * Or read the key from a file `-k key-file`
      * Or read the key from the OS-X Keychain with `-x keychain-name`
      * Or you can paste the key interactively with `-i` 
   4. Input data can be read from a file with `-f file`, or read from STDIN, or a passed on the command line with `-s string`    
@@ -87,7 +87,7 @@ Instead of decrypting data anytime you need to change it, you can use the shortc
 
 Example:
 
-    sym -t -f config/application/secrets.yml.enc -K ~/.key
+    sym -t -f config/application/secrets.yml.enc -k ~/.key
     
 > This is one of those time-saving features that can make a difference in making encryption feel easy and transparent.
 
@@ -157,7 +157,7 @@ Or create a password-protected key (`-p`), and save it to a file (`-o`), and ski
 You can subsequently use the private key by passing either:
 
  1. the `-k key-string` flag
- 2. the `-K key-file` flag
+ 2. the `-k key-file` flag
  3. the `-x key-keychain-name` flag to read the key from Mac OS-X KeyChain
  4. pasting or typing the key with the `-i` (interactive) flag
 
@@ -170,7 +170,7 @@ Apple had released a `security` command line tool, which this library uses to se
  * The private key won't be lying around your file system unencrypted, so if your Mac is ever stolen, you don't need to worry about the keys running wild.
  * If you sync your keychain with the iCloud you will have access to it on other machines
 
-To activate the KeyChain mode on the Mac, use `-x <key-name>` field instead of `-k` or `-K`, and add it to `-g` when generating a key. The `key name` is what you call this particular key, based on how you plan to use it. For example, you may call it `staging`, etc.
+To activate the KeyChain mode on the Mac, use `-x <key-name>` field instead of `-k` or `-k`, and add it to `-g` when generating a key. The `key name` is what you call this particular key, based on how you plan to use it. For example, you may call it `staging`, etc.
 
 The following command generates the private key and immediately stores it in the KeyChain access under the name provided:
 
@@ -194,13 +194,13 @@ It's help message is self-explanatory:
 
 #### Moving a Key to the Keychain
 
-You can easily move an existing key from a file or a string to a keychain by combining -k or -K to read the key, with -x to write it.
+You can easily move an existing key from a file or a string to a keychain by combining -k or -k to read the key, with -x to write it.
 
     sym -k $mykey -x mykey
 
 #### Adding Password to Existing Key
 
-You can add a password to a key by combining one of the key description flags (-k, -K, -i) and then also -p. 
+You can add a password to a key by combining one of the key description flags (-k, -k, -i) and then also -p. 
 
     sym -k $mykey -p -x moo
     
@@ -251,7 +251,7 @@ Usage:
    sym -g [ -p ] [ -x keychain | -o keyfile | -q | ]  
 
    # To specify a key for an operation use one of...
-   <key-spec> = -k key | -K file | -x keychain | -i 
+   <key-spec> = -k key | -k file | -x keychain | -i 
 
    # Encrypt/Decrypt to STDOUT or an output file 
    sym -e <key-spec> [-f <file> | -s <string>] [-o <file>] 
@@ -279,7 +279,7 @@ Create a new private key:
  
 Read existing private key from:
   -k, --private-key      [key]      private key (or key file)
-  -K, --keyfile          [key-file] private key from a file
+  -k, --keyfile          [key-file] private key from a file
   -x, --keychain         [key-name] add to (or read from) the OS-X Keychain
   -i, --interactive                 Paste or type the key interactively
  
@@ -360,7 +360,7 @@ In this mode several flags are of importance:
     -b (--backup)   – will create a backup of the original file
     -v (--verbose) - will show additional info about file sizes
 
-Here is a full command that opens a file specified by `-f | --file`, using the key specified in `-K | --keyfile`, in the editor defined by the `$EDITOR` environment variable (or if not set – defaults to `/bin/vi`)".
+Here is a full command that opens a file specified by `-f | --file`, using the key specified in `-k | --keyfile`, in the editor defined by the `$EDITOR` environment variable (or if not set – defaults to `/bin/vi`)".
 
 To edit an encrypted file in `$EDITOR`, while asking to paste the key (`-i | --interactive`), while creating a backup file (`-b | --backup`):
 

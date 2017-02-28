@@ -26,7 +26,7 @@ module Sym
     end
 
     def self.log(level, *args, **opts)
-      Sym::LOGGER.send(level, *args) if opts[:debug]
+      Sym::Constants::Log::LOG.send(level, *args) if opts[:debug]
     end
 
     def self.error(config: {},
@@ -70,9 +70,7 @@ module Sym
   end
 end
 
-require 'sym/version'
 require 'sym/app/short_name'
-
 require 'sym/app/args'
 require 'sym/app/cli'
 require 'sym/app/commands'

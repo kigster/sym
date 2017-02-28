@@ -5,7 +5,7 @@ module Sym
     module Commands
       class PasswordProtectKey < BaseCommand
 
-        required_options [:private_key, :keyfile, :keychain, :interactive],
+        required_options [:key, :interactive],
                          :password
 
         try_after :generate_key, :encrypt, :decrypt
@@ -14,7 +14,13 @@ module Sym
           retries ||= 0
 
           the_key = self.key
-          the_key = encrypt_password_if_needed(the_key)
+
+          if opts[:password]
+             encrypted_key, password = encrypt_with_password(the_key)
+             add_password_to_the_cache(encrypted_key, password)
+             the_key = encrypted_key
+           end
+
           add_to_keychain_if_needed(the_key)
 
           the_key

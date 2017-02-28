@@ -1,6 +1,7 @@
-require_relative '../errors'
+require 'sym/errors'
 require 'base64'
 require 'zlib'
+
 module Sym
   module Data
     class Decoder

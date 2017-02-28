@@ -1,4 +1,4 @@
-require_relative '../errors'
+require 'sym/errors'
 module Sym
   module Data
     class WrapperStruct < Struct.new(

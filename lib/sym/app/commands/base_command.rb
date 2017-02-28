@@ -70,7 +70,7 @@ module Sym
         end
 
         def content
-          @content ||= (opts[:string] || (opts[:file].eql?('-') ? STDIN.read : File.read(opts[:file])))
+          @content ||= (opts[:string] || (opts[:file].eql?('-') ? STDIN.read : File.read(opts[:file]).chomp))
         end
 
         def to_s
@@ -89,12 +89,14 @@ module Sym
           end
         end
 
-        def encrypt_password_if_needed(key)
-          if opts[:password]
-            encr_password(key, application.input_handler.new_password)
-          else
-            key
-          end
+        def encrypt_with_password(key)
+          password = application.input_handler.new_password
+          return encr_password(key, password), password
+        end
+
+
+        def add_password_to_the_cache(encrypted_key, password)
+          self.application.password_cache[encrypted_key] = password
         end
       end
     end

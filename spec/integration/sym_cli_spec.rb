@@ -19,12 +19,11 @@ RSpec.describe 'CLI execution', :type => :aruba do
       after &RESET_TEMP_FILE
 
       let(:args) { "--bash-completion #{TEMP_FILE}" }
-      let(:contents) { File.read(TEMP_FILE) }
 
       it 'should run command' do
         run_simple command
         expect(File.exist?(TEMP_FILE))
-        expect(contents).to include(Sym::BASH_COMPLETION[:script])
+        expect(File.read(TEMP_FILE)).to include(Sym::Constants::Completion::Config[:script])
       end
     end
 
