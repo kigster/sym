@@ -43,14 +43,14 @@ _Symmetric Encryption_ simply means that we are using the same private key to en
   1. You start with a piece of sensitive __data__ you want to protect. This can be a file or a string.
   2. You generate a new encryption key, that will be used to both encrypt and decrypt the data. The key is 256 bits, or 32 bytes, or 45 bytes when base64-encoded, and can be generated with `sym -g`.
      * You can optionally password protect the key with `sym -gp`
-     * You can save the key into a file `sym -gp -o key-file` 
-     * Or you can save it into the OS-X Keychain, with `sym -gp -x keychain-name`
+     * You can save the key into a file `sym -gpo key-file` 
+     * Or you can save it into the OS-X Keychain, with `sym -gpx keychain-name`
      * or you can print it to STDOUT, which is the default.
-  3. You can then use the key to encrypt sensitive __data__, with `sym -e [key-option] [data-option]`, passing it the key in several accepted ways:
-     * You can pass the key as a string (not recommended) via `-k key`
-     * Or read the key from a file `-k key-file`
-     * Or read the key from the OS-X Keychain with `-x keychain-name`
-     * Or you can paste the key interactively with `-i` 
+  3. You can then use the key to encrypt sensitive __data__, with `sym -e [key-option] [data-option]`, passing it the key in several accepted ways. Smart flag `-k` automatically interpretes the source of the key, by trying:
+     * a file with a pathname.
+     * or environment variable
+     * or OS-X Keychain password entry
+     * or you can paste the key interactively with `-i` 
   4. Input data can be read from a file with `-f file`, or read from STDIN, or a passed on the command line with `-s string`    
   4. Output is the encrypted data, which is printed to STDOUT by the default, or it can be saved to a file with `-o <file>`
   5. Encrypted file can be later decrypted with `sym -d [key-option] [data-option]`
@@ -58,28 +58,28 @@ _Symmetric Encryption_ simply means that we are using the same private key to en
 Sample session that uses Mac OS-X Keychain to store the password-protected key.
 
 ```bash
-❯ sym -gpx my-new-key
+❯ sym -gpcx my-new-key
 New Password     :  •••••••••
 Confirm Password :  •••••••••
 BAhTOh1TeW06OkRhdGE6OldyYXBwZXJTdH.....
 
-❯ sym -ex my-new-key -s 'My secret data' -o secret.enc -C
+❯ sym -e -c -x my-new-key -s 'My secret data' -o secret.enc
 Coin::Vault listening at: druby://127.0.0.1:24924
 Password: •••••••••
 
 ❯ cat secret.enc
 BAhTOh1TeW06OkRhdGE6OldyYXBFefDFFD.....
 
-❯ sym -dx my-new-key -f secret.enc -C
+❯ sym -dx my-new-key -f secret.enc -c
 My secret data
 
 # Lets now save common flags in the SYM_ARGS bash variable:
-❯ export SYM_ARGS="-x my-new-key -C"
-❯ sym -d -f secret.enc 
+❯ export SYM_ARGS="-x my-new-key -c"
+❯ sym -df secret.enc 
 My secret data
 ```
 
-The line that says `Coin::Vault listening at: druby://127.0.0.1:24924` is the indication that the local dRB server used for caching passwords has been started. Password caching is off by default, but is enabled with `-C` flag. In the example above, the decryption step fetched the password from the cache, and so the user was not required to re-enter the password.
+The line that says `Coin::Vault listening at: druby://127.0.0.1:24924` is the indication that the local dRB server used for caching passwords has been started. Password caching is off by default, but is enabled with `-c` flag. In the example above, the decryption step fetched the password from the cache, and so the user was not required to re-enter the password.
 
 __Direct Editing Encrypted Files__
 
@@ -126,7 +126,7 @@ The private key is the cornerstone of the symmetric encryption. Using `sym`, the
  * generated and printed to STDOUT, or saved to Mac OS-X KeyChain or a file
  * fetched from the Keychain in subsequent operations
  * password-protected during generation (or import) with the `-p` flag.
- * password can be cached using either `memcached` or `dRB` server, if the `-C` flag is provided.
+ * password can be cached using either `memcached` or `dRB` server, if the `-c` flag is provided.
  * must be kept very well protected and secure from attackers.
 
 The __unencrypted private__ key will be in the form of a base64-encoded string, 45 characters long.
@@ -145,21 +145,22 @@ Or save a new key into a bash variable
 
 Or save it to a file:
 
-    sym -g -o ~/.key
     sym -go ~/.key
 
-Or create a password-protected key (`-p`), and save it to a file (`-o`), and skip printing the new key to STDOUT (`-q` for quiet):
+Or create a password-protected key (`-p`), and save it to a file (`-o`), cache the password (`-c`), and don't print the new key to STDOUT (`-q` for quiet):
 
-    sym -gpqo ~/.secret
+    sym -gpcqo ~/.secret
     New Password:     ••••••••••
     Confirm Password: ••••••••••
 
 You can subsequently use the private key by passing either:
 
- 1. the `-k key-string` flag
- 2. the `-k key-file` flag
- 3. the `-x key-keychain-name` flag to read the key from Mac OS-X KeyChain
- 4. pasting or typing the key with the `-i` (interactive) flag
+ 1. the `-k key` flag, where key is either a:
+    * file
+    * environment 
+    * string
+    * keychain 
+ 2. pasting or typing the key with the `-i` (interactive) flag
 
 #### Using KeyChain Access on Mac OS-X
 
@@ -170,11 +171,11 @@ Apple had released a `security` command line tool, which this library uses to se
  * The private key won't be lying around your file system unencrypted, so if your Mac is ever stolen, you don't need to worry about the keys running wild.
  * If you sync your keychain with the iCloud you will have access to it on other machines
 
-To activate the KeyChain mode on the Mac, use `-x <key-name>` field instead of `-k` or `-k`, and add it to `-g` when generating a key. The `key name` is what you call this particular key, based on how you plan to use it. For example, you may call it `staging`, etc.
+To activate the KeyChain mode on the Mac, use `-x <key-name>` flag with `-g` flag when generating a key. The `key name` is what you call this particular key, based on how you plan to use it. For example, you may call it `staging`, etc.
 
 The following command generates the private key and immediately stores it in the KeyChain access under the name provided:
 
-    sym -g -x staging
+    sym -gx staging
 
 Now, whenever you need to encrypt something you can specify the key with `-x staging`. 
 
@@ -196,13 +197,13 @@ It's help message is self-explanatory:
 
 You can easily move an existing key from a file or a string to a keychain by combining -k or -k to read the key, with -x to write it.
 
-    sym -k $mykey -x mykey
+    sym -k $keysource -x mykey
 
 #### Adding Password to Existing Key
 
-You can add a password to a key by combining one of the key description flags (-k, -k, -i) and then also -p. 
+You can add a password to a key by combining one of the key description flags (-k, -i) and then also -p.  Use `-q` to hide new key from the STDOUT, and `c` to cache the password.
 
-    sym -k $mykey -p -x moo
+    sym -k $mykey -pqcx moo
     
 The above example will take an unencrypted key passed in `$mykey`, ask for a password and save password protected key into the keychain with name "moo."
 
@@ -214,22 +215,22 @@ Specifics of configuring both Cache Providers is left to the `Configuration` cla
 
 In order to control password caching, the following flags are available:
 
- * `-C` turns on caching
- * `-T seconds` sets the expiration for cached passwords
- * `-P memcached | drb` controls which of the providers is used. Without this flag, *sym* auto-detects caching provider by first checking for `memcached`, and then starting the `dRB` server.
+ * `-c` turns on caching
+ * `-u seconds` sets the expiration for cached passwords
+ * `-r memcached | drb` controls which of the providers is used. Without this flag, *sym* auto-detects caching provider by first checking for `memcached`, and then starting the `dRB` server.
 
 #### Saving Common Flags in an Environment Variable
 
 You can optionally store frequently used flags for `sym` in the `SYM_ARGS` environment variable. For example, to always cache passwords, and to always use the same encryption key from the keychain named "production", set the following in your `~/.bashrc`:
 
 ```
-export SYM_ARGS="-x production -C"
+export SYM_ARGS="-cx production"
 ```
 
 This will always be appended to the command line, and so to encrypt/decrypt anything with password caching enabled and using that particular key, you would simply type:
 
 ```bash
-# -x production -C are added from SYM_ARGS
+# -cx production are added from SYM_ARGS
 sym -ef file -o file.enc
 
 # And to decrypt:
@@ -244,28 +245,41 @@ sym -tf file.enc
 This may be a good time to take a look at the full help message for the `sym` tool, shown naturally with a `-h` or `--help` option.
 
 ```
-Sym (2.2.1) – encrypt/decrypt data with a private key
+Sym (2.4.0) – encrypt/decrypt data with a private key
 
 Usage:
-   # Generate a new key...
-   sym -g [ -p ] [ -x keychain | -o keyfile | -q | ]  
+   # Generate a new key, optionally password protected, and save it
+   # in one of: keychain, file, or STDOUT (-q turns off STDOUT) 
 
-   # To specify a key for an operation use one of...
-   <key-spec> = -k key | -k file | -x keychain | -i 
+   sym -g [ -p/--password ] [ -x keychain | -o file | ]  [ -q ]  
 
-   # Encrypt/Decrypt to STDOUT or an output file 
-   sym -e <key-spec> [-f <file> | -s <string>] [-o <file>] 
-   sym -d <key-spec> [-f <file> | -s <string>] [-o <file>] 
+   # To specify encryption key, provide the key as a string, file path, 
+   # OS-X Keychain, or a name of an environment variable:
+   # or use -i to type or paste private key interactively
+
+   <key-spec> = -k/--key [ key | file | keychain | env ]
+                -i/--interactive
+
+   # Encrypt/Decrypt from STDIN/file/args, to STDOUT/file:
+
+   sym -e/--encrypt <key-spec> [-f [file | - ] | -s string ] [-o file] 
+   sym -d/--decrypt <key-spec> [-f [file | - ] | -s string ] [-o file] 
  
    # Edit an encrypted file in $EDITOR 
-   sym -t <key-spec>  -f <file> [ -b ]
+   
+   sym -t/--edit    <key-spec> -f file [ -b/--backup ]
  
-   # Specify any common flags in the BASH variable:
-   export SYM_ARGS="-x staging -C"
+   # Specify any  common flags in the BASH variable. Here we
+   # specify KeyChain name "staging" and turn on password caching
+
+   export SYM_ARGS="-ck staging"
  
-   # And now encrypt without having to specify key location:
-   sym -e -f <file>
+   # And now encrypt using default key location /Users/kig/.sym.key
+   
+   sym -e -f file
+
    # May need to disable SYM_ARGS with -M, eg for help:
+   
    sym -h -M 
  
 Modes:
@@ -276,17 +290,16 @@ Modes:
 Create a new private key:
   -g, --generate                    generate a new private key
   -p, --password                    encrypt the key with a password
+  -x, --keychain         [key-name] add to the OS-X Keychain
  
 Read existing private key from:
-  -k, --private-key      [key]      private key (or key file)
-  -k, --keyfile          [key-file] private key from a file
-  -x, --keychain         [key-name] add to (or read from) the OS-X Keychain
+  -k, --key              [key-spec] private key, key file, or keychain
   -i, --interactive                 Paste or type the key interactively
  
 Password Cache:
-  -C, --cache-password              enable the cache (off by default)
-  -T, --cache-for        [seconds]  to cache the password for
-  -P, --cache-provider   [provider] type of cache, one of memcached, drb
+  -c, --cache-passwords             enable password cache
+  -u, --cache-timeout    [seconds]  expire passwords after
+  -r, --cache-provider   [provider] cache provider, one of memcached, drb
  
 Data to Encrypt/Decrypt:
   -s, --string           [string]   specify a string to encrypt/decrypt
@@ -296,9 +309,9 @@ Data to Encrypt/Decrypt:
 Flags:
   -b, --backup                      create a backup file in the edit mode
   -v, --verbose                     show additional information
-  -A, --trace                       print a backtrace of any errors
-  -D, --debug                       print debugging information
   -q, --quiet                       do not print to STDOUT
+  -T, --trace                       print a backtrace of any errors
+  -D, --debug                       print debugging information
   -V, --version                     print library version
   -N, --no-color                    disable color output
   -M, --no-environment              disable reading flags from SYM_ARGS
@@ -450,11 +463,15 @@ require 'zlib'
 require 'sym'
 Sym::Configuration.configure do |config|
   config.password_cipher     = 'AES-128-CBC'
+  config.data_cipher         = 'AES-256-CBC'
   config.private_key_cipher  = config.data_cipher
   config.compression_enabled = true
   config.compression_level   = Zlib::BEST_COMPRESSION
-
-  config.password_cache_timeout = 300
+  config.default_key_file    = '~/.sym.key'
+  
+  config.password_cache_timeout          = 300
+  # When nil is selected, providers are auto-detected.
+  config.password_cache_default_provider = nil
   config.password_cache_arguments        = {
     drb:       {
       opts: {
@@ -480,7 +497,7 @@ As you can see, it's possible to change the default cipher type, although not al
 The `sym` executable as well as the Ruby API provide:
 
  * Symmetric data encryption with:
-   * the Cipher `AES-256-CBC` used by the US Government
+   * the Cipher `AES-256-cBC` used by the US Government
    * 256-bit private key, that
      *  can be generated and is a *base64-encoded* string about 45 characters long. The *decoded* key is always 32 characters (or 256 bytes) long.
      * can be optionally password-encrypted using the 128-bit key, and then be automatically detected (and password requested) when the key is used
