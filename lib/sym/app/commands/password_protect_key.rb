@@ -5,9 +5,8 @@ module Sym
     module Commands
       class PasswordProtectKey < BaseCommand
 
-        required_options [:key, :interactive],
-                         :password
-
+        required_options %i(key interactive), :password
+        incompatible_options %i(examples help version bash_completion)
         try_after :generate_key, :encrypt, :decrypt
 
         def execute

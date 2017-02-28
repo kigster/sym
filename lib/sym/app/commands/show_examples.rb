@@ -5,7 +5,7 @@ module Sym
     module Commands
       class ShowExamples < BaseCommand
         required_options :examples
-        try_after :show_help
+        try_after :show_version
 
         def execute
           output = []
