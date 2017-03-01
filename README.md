@@ -38,6 +38,22 @@ This gem includes two primary components:
 
 _Symmetric Encryption_ simply means that we are using the same private key to encrypt and decrypt. In addition to the private key, the encryption uses an IV vector. The library completely hides `iv` generation from the user, and automatically generates a random `iv` per encryption.
 
+
+### Massive Time Savers
+
+So how does `sym` substantiate its claim that it *streamlines* the encryption process? I thought about it, and turns out there are quite a few reasons:
+ 
+  * By using Mac OS-X Keychain, `sym` offers a simple yet secure way of storing the key on a local machine, much more secure then storing it on a file system.
+  * By using a password cache (`-c`) via an in-memory provider such as `memcached` or `drb`, `sym` invocations take advantage of password cache, and only ask for a password once per a configurable time period.
+  * By using `SYM_ARGS` environment variable, where common flags can be saved.
+  * By reading a key from the default key source file `~/.sym.key` which requires no flags at all.
+  * By utilizing the `--negate` option to quickly encrypt a regular file, or decrypt an encrypted file with extension `.enc`.
+  * By using the `-t` (edit) mode, that opens an encrypted file in your `$EDITOR`, and replaces the encrypted version upon save & exit.
+
+As you can see, we really tried to build a tool that provides good security for application secrets, including password-based encryption, but does not annoyingly ask for password every time. With `--edit` option, and `--negate` options you can treat encrypted files like regular files. 
+
+> Encrypting application secrets had never been easier! –– Socrates. 
+
 ### How It Works
 
   1. You generate a new encryption key, that will be used to both encrypt and decrypt the data. The key is 256 bits, or 32 bytes, or 45 bytes when base64-encoded, and can be generated with `sym -g`.
