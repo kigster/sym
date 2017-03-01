@@ -87,6 +87,7 @@ module Sym
 
       context 'show version' do
         let(:argv) { %w(--version --trace) }
+        before { allow_any_instance_of(Sym::App::CLI).to receive(:args_from_environment).and_return(nil) }
         include_context :run_command
         it 'should correctly define opts' do
           expect(cli.opts_present.keys.sort).to eq %i(version trace).sort
