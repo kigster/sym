@@ -12,7 +12,7 @@ RSpec.describe 'CLI execution', :type => :aruba do
   RESET_TEMP_FILE = ->(*) { File.unlink(TEMP_FILE) if File.exist?(TEMP_FILE) }
 
   context 'using Aruba framework' do
-    let(:command) { "bash -c 'sym #{args}'" }
+    let(:command) { "/usr/bin/env bash -c 'unset SYM_ARGS; sym #{args}'" }
     let(:output) { last_command_started.stdout.chomp }
 
     context 'install bash completion' do
@@ -68,11 +68,21 @@ RSpec.describe 'CLI execution', :type => :aruba do
         end
       end
 
-      context 'import a key into keychain' do
-        let(:args) { "-k #{KEY_PLAIN} -x MOO" }
+      if Sym::App.is_osx?
+        context 'import a key into keychain' do
+          let(:args) { "-k #{KEY_PLAIN} -x MOO" }
+          it 'should add to keychain' do
+            expect(Sym::App::KeyChain.get('MOO')).to eq(KEY_PLAIN)
+            expect(output).to eq(KEY_PLAIN)
+          end
+        end
+      end
+
+      context 'import a key into a file' do
+        let(:tempfile) { Tempfile.new }
+        let(:args) { "-M -k #{KEY_PLAIN} -o #{tempfile.path}" }
         it 'should add to keychain' do
-          expect(Sym::App::KeyChain.get('MOO')).to eq(KEY_PLAIN)
-          expect(output).to eq(KEY_PLAIN)
+          expect(File.read(tempfile.path)).to eq(KEY_PLAIN)
         end
       end
 
