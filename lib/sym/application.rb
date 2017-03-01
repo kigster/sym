@@ -184,7 +184,7 @@ module Sym
 
       if args.require_key? && !self.key
         log :error, 'Unable to determine the key, which appears to be required with current args'
-        raise Sym::Errors::NoPrivateKeyFound, 'Private key is required when ' + (::Sym::App::Args::OPTIONS_REQUIRE_KEY & provided_options).join(', ') << 'ing.'
+        raise Sym::Errors::NoPrivateKeyFound, 'Private key is required when ' + provided_flags.join(', ') << 'ing.'
       end
       log :debug, "initialize_key_source: detected key ends with [...#{(key ? key[-5..-1] : 'nil').bold.magenta}]"
       log :debug, "opts: #{self.provided_value_options.to_s.green.bold}"

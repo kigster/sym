@@ -1,5 +1,5 @@
 module Sym
-  VERSION = '2.4.2'
+  VERSION = '2.4.3'
   DESCRIPTION = <<-eof
     Sym is a command line utility and a Ruby API that makes it trivial to encrypt and decrypt 
     sensitive data. Unlike many other existing encryption tools, sym focuses on usability and 

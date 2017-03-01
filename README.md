@@ -75,11 +75,10 @@ Sample session that uses Mac OS-X Keychain to store the password-protected key.
 
 ```bash
 # Gen a new key, password-encrypt it, cache the password, save
-# result in the key chain entry 'my-new-key'
-❯ sym -gpcx my-new-key
+# result in the key chain entry 'my-new-key' (but don't print it '-q')
+❯ sym -gpqcx my-new-key
 New Password     :  •••••••••
 Confirm Password :  •••••••••
-BAhTOh1TeW06OkRhdGE6OldyYXBwZXJTdH.....
 
 ❯ sym -eck my-new-key -s 'My secret data' -o secret.enc
 Coin::Vault listening at: druby://127.0.0.1:24924
@@ -88,11 +87,17 @@ Password: •••••••••
 ❯ cat secret.enc
 BAhTOh1TeW06OkRhdGE6OldyYXBFefDFFD.....
 
-❯ sym -dx my-new-key -f secret.enc -c
+❯ sym -dck my-new-key -f secret.enc
 My secret data
 
+# Now, let's save our keychain key in the default key file:
+❯ sym -ck my-new-key -o ~/.sym.key
+# Now we can decrypt/encrypt with this key at will
+❯ sym -n secret.enc
+# created a decrypted file `secret` 
+
 # Lets now save common flags in the SYM_ARGS bash variable:
-❯ export SYM_ARGS="-x my-new-key -c"
+❯ export SYM_ARGS="-ck my-new-key"
 ❯ sym -df secret.enc 
 My secret data
 ```
