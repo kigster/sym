@@ -4,6 +4,12 @@
 
 [Changes since the last tag](https://github.com/kigster/sym/compare/v2.3.0...HEAD)
 
+## [v2.4.2](https://github.com/kigster/sym/tree/v2.4.2) (2017-02-28)
+[Full Changelog](https://github.com/kigster/sym/compare/v2.4.1...v2.4.2)
+
+ * Fixing BASH completion for sym to look for files after `--negate` and
+   to auto-complete long options as well.
+
 ## [v2.4.1](https://github.com/kigster/sym/tree/v2.4.1) (2017-02-28)
 [Full Changelog](https://github.com/kigster/sym/compare/v2.4.0...v2.4.1)
 

@@ -46,17 +46,21 @@ _sym()
     _expand || return 0
 
     case "$prev" in
-    --@(key|file|output|))
+    --@(key|file|output|negate))
         _filedir
         return 0
         ;;
-    -@(f|k|o))
+    -@(f|k|o|n))
         _filedir
         return 0
         ;;
     esac
 
     case "$cur" in
+    --*)
+        export DICT_SYM_COMP_LONG_OPTIONS=${DICT_SYM_COMP_LONG_OPTIONS:-$(sym -hM | grep -- '--' | egrep '^  -' | awk '{print $2}')}
+        COMPREPLY=( $( compgen -W "$DICT_SYM_COMP_LONG_OPTIONS" -- "$cur" ))
+        ;;
     -*)
         export DICT_SYM_COMP_OPTIONS=${DICT_SYM_COMP_OPTIONS:-$(sym --dictionary | sed -E 's/ /\n/g')}
         COMPREPLY=( $( compgen -W "$DICT_SYM_COMP_OPTIONS" -- "$cur" ))
