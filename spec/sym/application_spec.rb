@@ -16,6 +16,34 @@ module Sym
         end
       end
 
+      context 'negated option' do
+        RSpec.shared_examples :negated do
+          let(:cli_opts) { { negate: source_file } }
+          let(:application) { Sym::Application.new(cli_opts) }
+          subject(:opts) { application.opts }
+          it 'should properly initialize' do
+            expect(opts.key?(:negate)).to eq(false)
+            expect(opts[:file]).to eq(source_file)
+            expect(opts[:output]).to eq(dest_file)
+            expect(opts[action]).to eq(true)
+          end
+        end
+        context 'negated encrypted file' do
+          it_behaves_like :negated do
+            let(:action) { :decrypt }
+            let(:source_file) { 'file.yml.enc' }
+            let(:dest_file) { 'file.yml' }
+          end
+        end
+        context 'negated unencrypted file' do
+          it_behaves_like :negated do
+            let(:action) { :encrypt }
+            let(:source_file) { 'file.yml' }
+            let(:dest_file) { 'file.yml.enc' }
+          end
+        end
+      end
+
       context 'editor' do
         let(:opts) { { help: true } }
         let(:application) { Sym::Application.new(opts) }
@@ -47,7 +75,7 @@ module Sym
           end
 
           context 'key supplied as a file path' do
-            let(:tempfile)  { Tempfile.new }
+            let(:tempfile) { Tempfile.new }
             let(:key_data) { tempfile.path }
 
             before do
@@ -62,7 +90,7 @@ module Sym
               expect(File.read(tempfile.path)).to eq(private_key)
             end
           end
-          
+
           context 'key supplied as environment variable' do
             let(:key_data) { 'PRIVATE_KEY' }
             before do

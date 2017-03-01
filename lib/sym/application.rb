@@ -2,12 +2,14 @@ require 'colored2'
 require 'sym'
 require 'sym/app'
 require 'openssl'
+require 'json'
 
 module Sym
   class Application
 
     attr_accessor :opts,
-                  :opts_hash,
+                  :opts_original,
+                  :opts,
                   :provided_options,
                   :args,
                   :action,
@@ -19,10 +21,11 @@ module Sym
                   :password_cache
 
     def initialize(opts)
-      self.opts             = opts
-      self.opts_hash        = opts.respond_to?(:to_hash) ? opts.to_hash : opts
-      self.provided_options = opts_hash.keys.select { |k| opts_hash[k] }
-      self.args             = ::Sym::App::Args.new(opts_hash)
+      self.opts_original = opts
+      self.opts          = opts.is_a?(Hash) ? opts : opts.to_hash
+
+      process_negated_option(opts[:negate]) if opts[:negate]
+      self.args = ::Sym::App::Args.new(self.provided_options)
 
       initialize_action
       initialize_data_source
@@ -30,15 +33,44 @@ module Sym
       initialize_input_handler
     end
 
+    def provided_options
+      provided_opts = self.opts.clone
+      provided_opts.delete_if { |k, v| !v }
+      provided_opts
+    end
+
+    def provided_safe_options
+      provided_options.map do |k, v|
+        k == :key && [44, 45].include?(v.size) ?
+          [k, '[reducted]'] :
+          [k, v]
+      end.to_h
+    end
+
+    def provided_flags
+      provided_flags = provided_options
+      provided_flags.delete_if { |k, v| ![false, true].include?(v) }
+      provided_flags.keys
+    end
+
+    def provided_value_options
+      provided = provided_safe_options
+      provided.delete_if { |k, v| [false, true].include?(v) }
+      provided
+    end
+
     def execute!
       initialize_key_source
       unless command
         raise Sym::Errors::InsufficientOptionsError,
-              'Can not determine what to do from the options:\\n' + args.provided_options.inspect.green.bold
+              " Can not determine what to do
+        from the options: \ n " +
+                " #{self.provided_options.inspect.green.bold}\n" +
+                "and flags #{self.provided_flags.to_s.green.bold}"
       end
-      log :info, "execute! command is #{command.class.name.blue.bold}"
+      log :info, "command located is #{command.class.name.blue.bold}"
       self.result = command.execute.tap do |result|
-        log :info, "execute! result is  #{result.nil? ? 'nil' : result[0..40].to_s.blue.bold }..."
+        log :info, "result is  #{result.nil? ? 'nil' : result[0..10].to_s.blue.bold }..." if opts[:trace]
       end
     end
 
@@ -114,6 +146,19 @@ module Sym
       self.password_cache = Sym::App::Password::Cache.instance.configure(args)
     end
 
+    def process_negated_option(file)
+      opts.delete(:negate)
+      opts[:file] = file
+      extension   = Sym.config.encrypted_file_extension
+      if file.end_with?('.enc')
+        opts[:decrypt] = true
+        opts[:output]  = file.gsub(/\.#{extension}/, '')
+        opts.delete(:output) if opts[:output] == ''
+      else
+        opts[:encrypt] = true
+        opts[:output]  = "#{file}.#{extension}"
+      end
+    end
 
     def initialize_action
       self.action = if opts[:encrypt] then
@@ -141,8 +186,9 @@ module Sym
         log :error, 'Unable to determine the key, which appears to be required with current args'
         raise Sym::Errors::NoPrivateKeyFound, 'Private key is required when ' + (::Sym::App::Args::OPTIONS_REQUIRE_KEY & provided_options).join(', ') << 'ing.'
       end
-
-      log :debug, "initialize_key_source: detected key is [#{key ? key : 'nil'}]"
+      log :debug, "initialize_key_source: detected key ends with [...#{(key ? key[-5..-1] : 'nil').bold.magenta}]"
+      log :debug, "opts: #{self.provided_value_options.to_s.green.bold}"
+      log :debug, "flags: #{self.provided_flags.to_s.green.bold}"
     end
 
     def detect_key_source

@@ -11,11 +11,11 @@ module Sym
           o.separator 'Usage:'.yellow
           o.separator '   # Generate a new key, optionally password protected, and save it'.dark
           o.separator '   # in one of: keychain, file, or STDOUT (-q turns off STDOUT) '.dark
-          o.separator '   sym -g '.green.bold + '[ -p/--password ] [ -x keychain | -o file | ]  [ -q ]  '.green
+          o.separator '   sym -g '.green.bold + '[ -p/--password ] [ -x keychain | -o file | ] [ -q ]  '.green
           o.separator ''
-          o.separator '   # To specify encryption key, provide the key as a string, file path, '.dark
-          o.separator '   # OS-X Keychain, or a name of an environment variable:'.dark
-          o.separator '   # or use -i to type or paste private key interactively'.dark
+          o.separator '   # To specify encryption key, provide the key as '.dark
+          o.separator '   #   1) a string, 2) a file path, 3) an OS-X Keychain, 4) env variable, '.dark
+          o.separator '   #   5) use -i to paste/type the key, 6) default key file, if present.'.dark
           o.separator '   ' + key_spec + ' = -k/--key [ key | file | keychain | env ]'.green.bold
           o.separator '                -i/--interactive'.green.bold
 
@@ -23,13 +23,16 @@ module Sym
           o.separator '   # Encrypt/Decrypt from STDIN/file/args, to STDOUT/file:'.dark
           o.separator '   sym -e/--encrypt '.green.bold + key_spec + ' [-f [file | - ] | -s string ] [-o file] '.green
           o.separator '   sym -d/--decrypt '.green.bold + key_spec + ' [-f [file | - ] | -s string ] [-o file] '.green
+          o.separator ''
+          o.separator '   # Auto-detect mode based on a special file extension '.dark + '".enc"'.dark.bold
+          o.separator '   sym -n/--negate  '.green.bold + key_spec + ' file[.enc] '.green
           o.separator ' '
           o.separator '   # Edit an encrypted file in $EDITOR '.dark
           o.separator '   sym -t/--edit    '.green.bold + key_spec + ' -f file [ -b/--backup ]'.green.bold
 
           o.separator ' '
-          o.separator '   # Specify any  common flags in the BASH variable. Here we'.dark
-          o.separator '   # specify KeyChain name "staging" and turn on password caching'.dark
+          o.separator '   # Save commonly used flags in a BASH variable. Below we save KeyChain '.dark
+          o.separator '   # "staging" as the default key source, and enable password caching.'.dark
           o.separator '   export SYM_ARGS="'.green + '-ck staging'.bold.green + '"'.green
           o.separator ' '
           o.separator '   # And now encrypt using default key location '.dark + Sym.default_key_file.magenta.bold
@@ -67,6 +70,8 @@ module Sym
           o.string    '-s', '--string',             '[string]'.blue + '   specify a string to encrypt/decrypt'
           o.string    '-f', '--file',               '[file]  '.blue + '   filename to read from'
           o.string    '-o', '--output',             '[file]  '.blue + '   filename to write to'
+          o.string    '-n', '--negate',             '[file]  '.blue + "   encrypts any regular #{'file'.green} into #{'file.enc'.green}" + "\n" +
+                                     "                                    conversely decrypts #{'file.enc'.green} into #{'file'.green}."
 
           o.separator ' '
           o.separator 'Flags:'.yellow

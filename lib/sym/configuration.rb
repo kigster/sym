@@ -39,6 +39,6 @@ module Sym
     attr_accessor :compression_enabled, :compression_level
     attr_accessor :password_cache_default_provider, :password_cache_timeout
     attr_accessor :password_cache_arguments
-    attr_accessor :default_key_file
+    attr_accessor :default_key_file, :encrypted_file_extension
   end
 end

@@ -162,7 +162,7 @@ module Sym
         unless output_klass && output_klass.is_a?(Class)
           raise "Can not determine output class from arguments #{opts.to_hash}"
         end
-        self.output_proc = output_klass.new(self).output_proc
+        self.output_proc = output_klass.new(application.opts).output_proc
       end
 
       def command_no_color(argv)

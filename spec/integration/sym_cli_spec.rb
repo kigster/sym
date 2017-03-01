@@ -38,6 +38,13 @@ RSpec.describe 'CLI execution', :type => :aruba do
         end
       end
 
+      context 'help' do
+        let(:args) { '-h' }
+        it 'should show help' do
+          expect(output).to match(/encrypt\/decrypt data with a private key/)
+        end
+      end
+
       context 'generate' do
         let(:args) { '-g' }
         it 'should run command' do

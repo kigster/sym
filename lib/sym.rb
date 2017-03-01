@@ -8,13 +8,13 @@ require 'sym/version'
 require 'sym/errors'
 
 Sym::Configuration.configure do |config|
-  config.password_cipher     = 'AES-128-CBC'
-  config.data_cipher         = 'AES-256-CBC'
-  config.private_key_cipher  = config.data_cipher
-  config.compression_enabled = true
-  config.compression_level   = Zlib::BEST_COMPRESSION
-
-  config.default_key_file    = Sym::Constants::SYM_KEY_FILE
+  config.password_cipher          = 'AES-128-CBC'
+  config.data_cipher              = 'AES-256-CBC'
+  config.private_key_cipher       = config.data_cipher
+  config.compression_enabled      = true
+  config.compression_level        = Zlib::BEST_COMPRESSION
+  config.encrypted_file_extension = 'enc'
+  config.default_key_file         = Sym::Constants::SYM_KEY_FILE
 
   config.password_cache_timeout          = 300
 

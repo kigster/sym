@@ -75,11 +75,11 @@ module Sym
 
           KeySourceCheck.new(
             name:   :default_file,
-            input:  ->(*) { Sym.default_key if Sym.default_key? },
-            output: ->(detector, value) {
+            input:  ->(*) { Sym.default_key_file if Sym.default_key? },
+            output: ->(detector, *) {
               key_provided_by = %i(key interactive) &
                                 detector.opts.to_hash.keys.select { |k| detector.opts[k] }
-              value if key_provided_by.empty?
+              Sym.default_key if key_provided_by.empty?
             }
           )
         ]

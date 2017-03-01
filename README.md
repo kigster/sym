@@ -250,41 +250,28 @@ sym -tf file.enc
 This may be a good time to take a look at the full help message for the `sym` tool, shown naturally with a `-h` or `--help` option.
 
 ```
-Sym (2.4.0) – encrypt/decrypt data with a private key
+Sym (2.4.1) – encrypt/decrypt data with a private key
 
 Usage:
    # Generate a new key, optionally password protected, and save it
    # in one of: keychain, file, or STDOUT (-q turns off STDOUT) 
+   sym -g [ -p/--password ] [ -x keychain | -o file | ] [ -q ]  
 
-   sym -g [ -p/--password ] [ -x keychain | -o file | ]  [ -q ]  
-
-   # To specify encryption key, provide the key as a string, file path, 
-   # OS-X Keychain, or a name of an environment variable:
-   # or use -i to type or paste private key interactively
-
-   <key-spec> = -k/--key [ key | file | keychain | env ]
-                -i/--interactive
 
    # Encrypt/Decrypt from STDIN/file/args, to STDOUT/file:
-
    sym -e/--encrypt <key-spec> [-f [file | - ] | -s string ] [-o file] 
    sym -d/--decrypt <key-spec> [-f [file | - ] | -s string ] [-o file] 
  
    # Edit an encrypted file in $EDITOR 
-   
    sym -t/--edit    <key-spec> -f file [ -b/--backup ]
  
    # Specify any  common flags in the BASH variable. Here we
    # specify KeyChain name "staging" and turn on password caching
-
    export SYM_ARGS="-ck staging"
  
    # And now encrypt using default key location /Users/kig/.sym.key
-   
    sym -e -f file
-
    # May need to disable SYM_ARGS with -M, eg for help:
-   
    sym -h -M 
  
 Modes:
@@ -295,7 +282,7 @@ Modes:
 Create a new private key:
   -g, --generate                    generate a new private key
   -p, --password                    encrypt the key with a password
-  -x, --keychain         [key-name] add to the OS-X Keychain
+  -x, --keychain         [key-name] write the key to OS-X Keychain
  
 Read existing private key from:
   -k, --key              [key-spec] private key, key file, or keychain
@@ -310,6 +297,8 @@ Data to Encrypt/Decrypt:
   -s, --string           [string]   specify a string to encrypt/decrypt
   -f, --file             [file]     filename to read from
   -o, --output           [file]     filename to write to
+  -n, --negate           [file]     encrypts any regular file into file.enc
+                                    conversely decrypts file.enc into file.
  
 Flags:
   -b, --backup                      create a backup file in the edit mode
@@ -327,6 +316,7 @@ Utility:
 Help & Examples:
   -E, --examples                    show several examples
   -h, --help                        show help
+
 ```
 
 ### CLI Usage Examples
@@ -467,14 +457,16 @@ The library offers a typical `Sym::Configuration` class which can be used to twe
 require 'zlib'
 require 'sym'
 Sym::Configuration.configure do |config|
-  config.password_cipher     = 'AES-128-CBC'
-  config.data_cipher         = 'AES-256-CBC'
-  config.private_key_cipher  = config.data_cipher
-  config.compression_enabled = true
-  config.compression_level   = Zlib::BEST_COMPRESSION
-  config.default_key_file    = '~/.sym.key'
-  
+  config.password_cipher          = 'AES-128-CBC'
+  config.data_cipher              = 'AES-256-CBC'
+  config.private_key_cipher       = config.data_cipher
+  config.compression_enabled      = true
+  config.compression_level        = Zlib::BEST_COMPRESSION
+  config.encrypted_file_extension = 'enc'
+  config.default_key_file         = "#{ENV['HOME']}/.sym.key"
+
   config.password_cache_timeout          = 300
+
   # When nil is selected, providers are auto-detected.
   config.password_cache_default_provider = nil
   config.password_cache_arguments        = {
@@ -493,6 +485,7 @@ Sym::Configuration.configure do |config|
     }
   }
 end
+
 ```
 
 As you can see, it's possible to change the default cipher type, although not all ciphers will be code-compatible with the current algorithm, and may require additional code changes.

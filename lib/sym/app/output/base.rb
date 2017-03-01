@@ -4,14 +4,10 @@ module Sym
     module Output
       class Base
 
-        attr_accessor :cli
+        attr_accessor :opts
 
-        def initialize(cli)
-          self.cli = cli
-        end
-
-        def opts
-          cli.opts
+        def initialize(opts)
+          self.opts = opts
         end
 
         @outputs = []

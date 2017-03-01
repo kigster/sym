@@ -1,6 +1,6 @@
 require 'sym'
 require 'sym/app'
-
+require 'forwardable'
 require 'active_support/inflector'
 
 module Sym
@@ -47,22 +47,13 @@ module Sym
         end
 
         include Sym
+        extend Forwardable
 
         attr_accessor :application
+        def_delegators :@application, :opts, :opts_original, :key
 
         def initialize(application)
           self.application = application
-        end
-
-        def opts
-          application.opts
-        end
-        def opts_hash
-          application.opts_hash
-        end
-
-        def key
-          @key ||= application.key
         end
 
         def execute

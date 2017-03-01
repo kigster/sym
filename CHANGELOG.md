@@ -7,7 +7,9 @@
 ## [v2.4.1](https://github.com/kigster/sym/tree/v2.4.1) (2017-02-28)
 [Full Changelog](https://github.com/kigster/sym/compare/v2.4.0...v2.4.1)
 
- * Generalized and consolidated `Detector` class for determining private key from all possible sources.
+ * Added new feature:   `-n/--negate` to quickly encrypt/decrypt a file to/from *.enc extension; extension is configurable.
+ * Refactored `application.opts` to be a hash.
+ * Refactored and consolidate key sources via the `Detector` class.
  * Split off `KeySourceCheck` into a separate entity
  * Simplified `Sym::Application`
  * Removed `OrderedHash`
