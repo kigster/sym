@@ -14,11 +14,11 @@ module Sym
           o.separator '   sym -g '.green.bold + '[ -p/--password ] [ -x keychain | -o file | ] [ -q ]  '.green
           o.separator ''
           o.separator '   # To specify encryption key, provide the key as '.dark
-          o.separator '   #   1) a string, 2) a file path, 3) an OS-X Keychain, 4) env variable, '.dark
-          o.separator '   #   5) use -i to paste/type the key, 6) default key file, if present.'.dark
-          o.separator '   ' + key_spec + ' = -k/--key [ key | file | keychain | env ]'.green.bold
-          o.separator '                -i/--interactive'.green.bold
-
+          o.separator '   #   1) a string, 2) a file path, 3) an OS-X Keychain, 4) env variable name '.dark
+          o.separator '   #   5) use -i to paste/type the key interactively'.dark
+          o.separator '   #   6) default key file (if present) at '.dark + Sym.default_key_file.magenta.bold
+          o.separator '   ' + key_spec + ' = -k/--key [ key | file | keychain | environment_variable ]'.green.bold
+          o.separator         '              -i/--interactive'.green.bold
           o.separator ''
           o.separator '   # Encrypt/Decrypt from STDIN/file/args, to STDOUT/file:'.dark
           o.separator '   sym -e/--encrypt '.green.bold + key_spec + ' [-f [file | - ] | -s string ] [-o file] '.green
@@ -29,23 +29,20 @@ module Sym
           o.separator ' '
           o.separator '   # Edit an encrypted file in $EDITOR '.dark
           o.separator '   sym -t/--edit    '.green.bold + key_spec + ' -f file [ -b/--backup ]'.green.bold
-
           o.separator ' '
-          o.separator '   # Save commonly used flags in a BASH variable. Below we save KeyChain '.dark
-          o.separator '   # "staging" as the default key source, and enable password caching.'.dark
+          o.separator '   # Save commonly used flags in a BASH variable. Below we save the KeyChain '.dark
+          o.separator '   # "staging" as the default key name, and enable password caching.'.dark
           o.separator '   export SYM_ARGS="'.green + '-ck staging'.bold.green + '"'.green
-          o.separator ' '
-          o.separator '   # And now encrypt using default key location '.dark + Sym.default_key_file.magenta.bold
-          o.separator '   sym -e '.green.bold '-f file'.green.bold
-          o.separator '   # May need to disable SYM_ARGS with -M, eg for help:'.dark
-          o.separator '   sym -h -M '.green.bold
+          o.separator '   # Then activate $SYM_ARGS by using -A/--sym-args flag:'.dark
+          o.separator '   sym -Aef '.green.bold 'file'.green.bold
 
           o.separator ' '
           o.separator 'Modes:'.yellow
           o.bool      '-e', '--encrypt',            '           encrypt mode'
           o.bool      '-d', '--decrypt',            '           decrypt mode'
           o.bool      '-t', '--edit',               '           edit encrypted file in an $EDITOR'
-
+          o.string    '-n', '--negate',             '[file]  '.blue + "   encrypts any regular #{'file'.green} into #{'file.enc'.green}" + "\n" +
+                                     "                                    conversely decrypts #{'file.enc'.green} into #{'file'.green}."
           o.separator ' '
           o.separator 'Create a new private key:'.yellow
           o.bool      '-g', '--generate',           '           generate a new private key'
@@ -70,8 +67,6 @@ module Sym
           o.string    '-s', '--string',             '[string]'.blue + '   specify a string to encrypt/decrypt'
           o.string    '-f', '--file',               '[file]  '.blue + '   filename to read from'
           o.string    '-o', '--output',             '[file]  '.blue + '   filename to write to'
-          o.string    '-n', '--negate',             '[file]  '.blue + "   encrypts any regular #{'file'.green} into #{'file.enc'.green}" + "\n" +
-                                     "                                    conversely decrypts #{'file.enc'.green} into #{'file'.green}."
 
           o.separator ' '
           o.separator 'Flags:'.yellow
@@ -82,17 +77,21 @@ module Sym
           o.bool      '-D', '--debug',              '           print debugging information'
           o.bool      '-V', '--version',            '           print library version'
           o.bool      '-N', '--no-color',           '           disable color output'
-          o.bool      '-M', '--no-environment',     '           disable reading flags from SYM_ARGS'
+          o.bool      '-A', '--sym-args',           '           read more CLI arguments from $SYM_ARGS'
 
           o.separator ' '
           o.separator 'Utility:'.yellow
-          o.string    '-a', '--bash-completion',    '[file]'.blue + '     append shell completion to a file'
+          o.string    '-B', '--bash-completion',    '[file]'.blue + '     append shell completion to a file'
 
           o.separator ' '
           o.separator 'Help & Examples:'.yellow
           o.bool      '-E', '--examples',           '           show several examples'
           o.bool      '-h', '--help',               '           show help'
         end
+      end
+
+      def key_spec
+        'KEY-SPEC'.bold.magenta
       end
     end
   end

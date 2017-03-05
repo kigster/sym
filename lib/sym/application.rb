@@ -17,6 +17,7 @@ module Sym
                   :key_source,
                   :input_handler,
                   :key_handler,
+                  :output,
                   :result,
                   :password_cache
 
@@ -25,38 +26,14 @@ module Sym
       self.opts          = opts.is_a?(Hash) ? opts : opts.to_hash
 
       process_negated_option(opts[:negate]) if opts[:negate]
+
       self.args = ::Sym::App::Args.new(self.provided_options)
 
+      initialize_output_stream
       initialize_action
       initialize_data_source
       initialize_password_cache
       initialize_input_handler
-    end
-
-    def provided_options
-      provided_opts = self.opts.clone
-      provided_opts.delete_if { |k, v| !v }
-      provided_opts
-    end
-
-    def provided_safe_options
-      provided_options.map do |k, v|
-        k == :key && [44, 45].include?(v.size) ?
-          [k, '[reducted]'] :
-          [k, v]
-      end.to_h
-    end
-
-    def provided_flags
-      provided_flags = provided_options
-      provided_flags.delete_if { |k, v| ![false, true].include?(v) }
-      provided_flags.keys
-    end
-
-    def provided_value_options
-      provided = provided_safe_options
-      provided.delete_if { |k, v| [false, true].include?(v) }
-      provided
     end
 
     def execute!
@@ -110,6 +87,32 @@ module Sym
       editors_to_try.find { |editor| File.exist?(editor) }
     end
 
+    def provided_options
+      provided_opts = self.opts.clone
+      provided_opts.delete_if { |k, v| !v }
+      provided_opts
+    end
+
+    def provided_safe_options
+      provided_options.map do |k, v|
+        k == :key && [44, 45].include?(v.size) ?
+          [k, '[reducted]'] :
+          [k, v]
+      end.to_h
+    end
+
+    def provided_flags
+      provided_flags = provided_options
+      provided_flags.delete_if { |k, v| ![false, true].include?(v) }
+      provided_flags.keys
+    end
+
+    def provided_value_options
+      provided = provided_safe_options
+      provided.delete_if { |k, v| [false, true].include?(v) }
+      provided
+    end
+
 
     private
 
@@ -126,6 +129,14 @@ module Sym
         '/bin/vi',
         '/sbin/vi'
       ]
+    end
+
+    def initialize_output_stream
+      output_klass = args.output_class
+      unless output_klass && output_klass.is_a?(Class)
+        raise "Can not determine output type from arguments #{provided_options}"
+      end
+      self.output = output_klass.new(opts).output_proc
     end
 
     def initialize_input_handler(handler = ::Sym::App::Input::Handler.new)

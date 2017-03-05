@@ -2,7 +2,18 @@
 
 ## [HEAD](https://github.com/kigster/sym/tree/HEAD)
 
-[Changes since the last tag](https://github.com/kigster/sym/compare/v2.3.0...HEAD)
+[Changes since the last tag](https://github.com/kigster/sym/compare/v2.5.0...HEAD)
+
+## [v2.5.0](https://github.com/kigster/sym/tree/v2.5.0) (2017-02-28)
+[Full Changelog](https://github.com/kigster/sym/compare/v2.4.3...v2.5.0)
+
+ * Updated README
+ * Remove `-M` flag; make `SYM_ARGS` environment be only used when `-A` flag is supplied
+ * Change `--bash-completion` to use `-B`
+ * Major fix up for sym.completion
+ * New file `exe/symit` for transparently editing secrets
+ * Reworked `Sym::Application`, removed `--dictionary`, and simplified argument parsing.
+ * Refactored `output_proc` to live in `application`.
 
 ## [v2.4.2](https://github.com/kigster/sym/tree/v2.4.2) (2017-02-28)
 [Full Changelog](https://github.com/kigster/sym/compare/v2.4.1...v2.4.2)

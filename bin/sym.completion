@@ -5,35 +5,26 @@
 # © 2015-2016, Konstantin Gredeskoul,  https://github.com/kigster/sym
 # MIT LICENSE
 #
- [[ -z "$(type _filedir 2>/dev/null)" ]] && {
-  _filedir ()
-  {
-      local i IFS='
-  ' xspec;
-      _tilde "$cur" || return 0;
-      local -a toks;
-      local quoted tmp;
-      _quote_readline_by_ref "$cur" quoted;
-      toks=(${toks[@]-} $(
-          compgen -d -- "$cur" | {
-              while read -r tmp; do
-                  # TODO: I have removed a "[ -n $tmp ] &&" before 'printf ..',
-                  #       and everything works again. If this bug suddenly
-                  #       appears again (i.e. "cd /b<TAB>" becomes "cd /"),
-                  #       remember to check for other similar conditionals (here
-                  #       and _filedir_xspec()). --David
-                  printf '%s\n' $tmp
-              done
-          }
-      ));
-      if [[ "$1" != -d ]]; then
-          [[ ${BASH_VERSINFO[0]} -ge 4 ]] && xspec=${1:+"!*.@($1|${1^^})"} || xspec=${1:+"!*.@($1|$(printf %s $1 | tr '[:lower:]' '[:upper:]'))"};
-          toks=(${toks[@]-} $( compgen -f -X "$xspec" -- $quoted));
-      fi;
-      [ ${#toks[@]} -ne 0 ] && _compopt_o_filenames;
-      COMPREPLY=("${COMPREPLY[@]}" "${toks[@]}")
-  }
+
+declare -a bash_completion_locations=(/usr/local/etc/bash_completion /usr/etc/bash_completion /etc/bash_completion)
+loaded=false
+for file in ${bash_completion_locations[@]}; do
+    [[ -s $file ]] && {
+      source $file
+      break
+    }
+done
+
+_sym_long_opts() {
+    sym -h | grep -- '--' | egrep '^  -' | awk '{print $2}' | sort 
 }
+
+_sym_short_opts() {
+    sym -h | grep -- '--' | egrep '^  -' | awk '{print $1}' | sed 's/,//g' | sort
+}
+
+unset _SYM_COMP_LONG_OPTIONS
+unset _SYM_COMP_SHORT_OPTIONS
 
 _sym()
 {
@@ -46,33 +37,33 @@ _sym()
     _expand || return 0
 
     case "$prev" in
-    --@(key|file|output|negate))
-        _filedir
-        return 0
-        ;;
-    -@(f|k|o|n))
-        _filedir
-        return 0
-        ;;
+        --@(key|file|output|negate))
+            _filedir
+            return 0
+            ;;
+        -@(f|k|o|n))
+            _filedir
+            return 0
+            ;;
     esac
 
     case "$cur" in
-    --*)
-        export DICT_SYM_COMP_LONG_OPTIONS=${DICT_SYM_COMP_LONG_OPTIONS:-$(sym -hM | grep -- '--' | egrep '^  -' | awk '{print $2}')}
-        COMPREPLY=( $( compgen -W "$DICT_SYM_COMP_LONG_OPTIONS" -- "$cur" ))
-        ;;
-    -*)
-        export DICT_SYM_COMP_OPTIONS=${DICT_SYM_COMP_OPTIONS:-$(sym --dictionary | sed -E 's/ /\n/g')}
-        COMPREPLY=( $( compgen -W "$DICT_SYM_COMP_OPTIONS" -- "$cur" ))
-        ;;
-    *)
-        _filedir
-        ;;
+        --*)
+            export _SYM_COMP_LONG_OPTIONS=${_SYM_COMP_LONG_OPTIONS:-$(_sym_long_opts)}
+            COMPREPLY=($( compgen -W "$_SYM_COMP_LONG_OPTIONS" -- "$cur" ))
+            ;;
+        -*)
+            export _SYM_COMP_SHORT_OPTIONS=${_SYM_COMP_SHORT_OPTIONS:-$(_sym_short_opts)}
+            COMPREPLY=($( compgen -W "$_SYM_COMP_SHORT_OPTIONS" -- "$cur" ))
+            ;;
+        *)
+            _filedir
+            ;;
     esac
 
     return 0
 } &&
-complete -F _sym $nospace $filenames sym
+    complete -F _sym $nospace $filenames sym
 
 # Local variables:
 # mode: shell-script

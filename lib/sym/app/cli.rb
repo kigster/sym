@@ -56,40 +56,43 @@ module Sym
       # brings in #parse(Array[String] args)
       include CLISlop
 
-      attr_accessor :opts, :application, :outputs, :output_proc
+      attr_accessor :opts, :application, :outputs
 
       def initialize(argv)
         begin
-          argv << args_from_environment(argv)
-          argv.flatten!
-          argv.compact!
-          argv_original = argv.dup
-          # Re-map any leg  acy options to the new options
-          argv = CLI.replace_argv(argv)
-          dict      = argv.delete('--dictionary')
+
+          # Re-map any legacy options to the new options
           self.opts = parse(argv)
-          command_dictionary if dict
+          if opts[:sym_args]
+            append_sym_args(argv)
+            self.opts = parse(argv)
+          end
+
+          # Disable coloring if requested, or if piping STDOUT
+          if opts[:no_color] || !STDOUT.tty?
+            Colored2.disable! # reparse options without the colors to create new help msg
+            self.opts = parse(argv)
+          end
+
         rescue StandardError => e
+          log :error, "#{e.message}" if opts
           error exception: e
           return
         end
 
-        # Disable coloring if requested, or if piping STDOUT
-        if opts[:no_color] || !STDOUT.tty?
-          command_no_color(argv_original)
-        end
-
         self.application = ::Sym::Application.new(opts)
-        select_output_stream
       end
 
-      def args_from_environment(argv)
-        env_args = ENV[Sym::Constants::ENV_ARGS_VARIABLE_NAME]
-        if env_args && !(argv.include?('-M') or argv.include?('--no-environment'))
-          env_args.split(' ')
-        else
-          []
+      def append_sym_args(argv)
+        if env_args = sym_args
+          argv << env_args.split(' ')
+          argv.flatten!
+          argv.compact!
         end
+      end
+
+      def sym_args
+        ENV[Sym::Constants::ENV_ARGS_VARIABLE_NAME]
       end
 
       def execute
@@ -97,7 +100,7 @@ module Sym
         result = application.execute
         case result
           when Hash
-            self.output_proc = ::Sym::App::Args.new({}).output_class
+            self.output_proc ::Sym::App::Args.new({}).output_class
             error(result)
           else
             self.output_proc.call(result)
@@ -109,46 +112,21 @@ module Sym
         @command ||= self.application&.command
       end
 
+      def output_proc(proc = nil)
+        self.application&.output = proc if proc
+        self.application&.output
+      end
+
       def opts_present
         o = opts.to_hash
         o.keys.map { |k| opts[k] ? nil : k }.compact.each { |k| o.delete(k) }
         o
       end
 
-      class << self
-        # Re-map any legacy options to the new options
-        ARGV_FLAG_REPLACE_MAP = {
-          'C' => 'c'
-        }
-
-        def replace_regex(from)
-          %r{^-([\w]*)#{from}([\w]*)$}
-        end
-
-        def replace_argv(argv)
-          argv = argv.dup
-          replacements = []
-          ARGV_FLAG_REPLACE_MAP.each_pair do |from, to|
-            argv.map! do |a|
-              match = replace_regex(from).match(a)
-              if match
-                replacements << from
-                "-#{match[1]}#{to}#{match[2]}"
-              else
-                a
-              end
-            end
-          end
-          argv
-        end
-      end
-
       private
 
-      def command_dictionary
-        options = opts.parser.unused_options + opts.parser.used_options
-        puts options.map(&:to_s).sort.map { |o| "-#{o[1]}" }.join(' ')
-        exit 0
+      def log(*args)
+        Sym::App.log(*args, **(opts.to_hash))
       end
 
       def error(hash)
@@ -157,22 +135,6 @@ module Sym
         Sym::App.error(**hash)
       end
 
-      def select_output_stream
-        output_klass = application.args.output_class
-        unless output_klass && output_klass.is_a?(Class)
-          raise "Can not determine output class from arguments #{opts.to_hash}"
-        end
-        self.output_proc = output_klass.new(application.opts).output_proc
-      end
-
-      def command_no_color(argv)
-        Colored2.disable! # reparse options without the colors to create new help msg
-        self.opts = parse(argv.dup)
-      end
-
-      def key_spec
-        '<key-spec>'.bold.magenta
-      end
     end
   end
 end

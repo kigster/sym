@@ -82,7 +82,7 @@ RSpec.shared_context :run_command do
     console.clear!
     self.before_cli_run if self.respond_to?(:before_cli_run)
     # overwrite output proc on CLI so that we can collect and test the output
-    cli.output_proc = console.output_proc unless opts[:quiet]
+    cli.output_proc console.output_proc unless opts[:quiet]
     cli.execute if run_cli
   end
 

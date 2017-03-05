@@ -1,6 +1,7 @@
 require 'spec_helper'
 require 'sym/app/commands/generate_key'
 require 'sym'
+require 'sym/constants'
 require 'sym/application'
 
 RSpec.describe 'CLI execution', :type => :aruba do
@@ -12,13 +13,12 @@ RSpec.describe 'CLI execution', :type => :aruba do
   RESET_TEMP_FILE = ->(*) { File.unlink(TEMP_FILE) if File.exist?(TEMP_FILE) }
 
   context 'using Aruba framework' do
-    let(:command) { "/usr/bin/env bash -c 'unset SYM_ARGS; sym #{args}'" }
+    let(:command) { "exe/sym #{args}" }
     let(:output) { last_command_started.stdout.chomp }
 
     context 'install bash completion' do
       before &RESET_TEMP_FILE
       after &RESET_TEMP_FILE
-
       let(:args) { "--bash-completion #{TEMP_FILE}" }
 
       it 'should run command' do
@@ -80,18 +80,21 @@ RSpec.describe 'CLI execution', :type => :aruba do
 
       context 'import a key into a file' do
         let(:tempfile) { Tempfile.new }
-        let(:args) { "-M -k #{KEY_PLAIN} -o #{tempfile.path}" }
+        let(:args) { "-k #{KEY_PLAIN} -o #{tempfile.path}" }
         it 'should add to keychain' do
           expect(File.read(tempfile.path)).to eq(KEY_PLAIN)
         end
       end
 
-      context 'with a temporary file' do
-        let(:result) { output; File.read(TEMP_FILE) }
+      context 'using a temporary file' do
 
         context 'encrypt with redirect' do
-          let(:args) { %Q[-e -k #{KEY_PLAIN} -s "hello" > #{TEMP_FILE} ] }
+          let(:args) { %Q[-e -k #{KEY_PLAIN} -s "hello" -o #{TEMP_FILE} ] }
+
           it 'should run command' do
+            RESET_TEMP_FILE.call
+            run_simple command
+            result = File.read(TEMP_FILE)
             expect(result).to end_with('==')
             expect(result).to match(BASE62_REGEX)
           end

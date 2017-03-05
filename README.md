@@ -52,24 +52,26 @@ So how does `sym` substantiate its claim that it *streamlines* the encryption pr
 
 As you can see, we really tried to build a tool that provides good security for application secrets, including password-based encryption, but does not annoyingly ask for password every time. With `--edit` option, and `--negate` options you can treat encrypted files like regular files. 
 
-> Encrypting application secrets had never been easier! –– Socrates. 
+> Encrypting application secrets had never been easier! –– Socrates [LOL, -ed.]
 
 ### How It Works
 
   1. You generate a new encryption key, that will be used to both encrypt and decrypt the data. The key is 256 bits, or 32 bytes, or 45 bytes when base64-encoded, and can be generated with `sym -g`.
      * You can optionally password protect the key with `sym -gp`
-     * You can save the key into a file `sym -gpo key-file` 
-     * Or you can save it into the OS-X Keychain, with `sym -gpcx keychain-name`, while caching its password for a period of time.
-     * or you can print it to STDOUT, which is the default.
+     * You can save the key into a file with `sym -gpo key-file` 
+     * Or you can save it into the OS-X Keychain, with `sym -gpx keychain-name`
+     * You can also cache the password, with `sym -gpcx keychain-name`
+     * Normally, `sym` will also print the resulting key to STDOUT.
+     * You can prevent the key from being printed to STDOUT with `-q/--quiet`. 
   2. You then take a piece of sensitive __data__ that you want to encrypt. This can be a file or a string.
-  3. You can then use the key to encrypt sensitive __data__, with `sym -e [key-option] [data-option]`, passing it the key in several accepted ways. Smart flag `-k` automatically interpretes the source of the key, by trying:
+  3. You can then use the key to encrypt sensitive __data__, with `sym -e [key-spec] [data-spec]`, passing it the key in several accepted ways. Smart flag `-k` automatically interpretes the source of the key, by trying:
      * a file with a pathname.
      * or environment variable
      * or OS-X Keychain password entry
      * or you can paste the key interactively with `-i` 
   4. Input data can be read from a file with `-f file`, or read from STDIN, or a passed on the command line with `-s string`    
   4. Output is the encrypted data, which is printed to STDOUT by the default, or it can be saved to a file with `-o <file>`
-  5. Encrypted file can be later decrypted with `sym -d [key-option] [data-option]`
+  5. Encrypted file can be later decrypted with `sym -d [key-spec] [data-spec]`
 
 Sample session that uses Mac OS-X Keychain to store the password-protected key.
 
@@ -178,15 +180,15 @@ Or create a password-protected key (`-p`), and save it to a file (`-o`), cache t
     
 ##### Key Sources
     
-You can subsequently use the private key by passing either:
+You can subsequently use the private key by passing either of these options to the `-k` flag (*sym attempts to resolve the key automatically, by trying each option and moving to the next until the key is found*):
 
- 1. the `-k key` flag, where key is either:
-    * a file
+ 1. the `-k value` flag, where the *value* is one of:
+    * a file path
     * an environment variable name 
-    * an actual base64-encoded key
+    * an actual base64-encoded key (not recommended for security reasons)
     * a keychain name
  2. pasting or typing the key with the `-i` (interactive) flag
- 3. a default key file, in your home folder, `~/.sym.key`, used only when no other flags passed in.
+ 3. a default key file, in your home folder, `~/.sym.key`, used only when no other flags were passed in.
 
 #### Using KeyChain Access on Mac OS-X
 
@@ -197,13 +199,14 @@ Apple had released a `security` command line tool, which this library uses to se
  * The private key won't be lying around your file system unencrypted, so if your Mac is ever stolen, you don't need to worry about the keys running wild.
  * If you sync your keychain with the iCloud you will have access to it on other machines
 
-To activate the KeyChain mode on the Mac, use `-x <key-name>` flag with `-g` flag when generating a key. The `key name` is what you call this particular key, based on how you plan to use it. For example, you may call it `staging`, etc.
+As mentioned previously, to add the key to the KeyChain on the Mac, use `-x <key-name>` flag with `-g` flag when generating a key. The `key name` is what you call this particular key, based on how you plan to use it. For example, you may call it `staging`, etc.
 
 The following command generates the private key and immediately stores it in the KeyChain access under the name provided:
 
-    sym -gx staging
+    sym -gx staging   # the key is passwordless
+    sym -gpcx staging # this key is password protected, with the password cached
 
-Now, whenever you need to encrypt something you can specify the key with `-x staging`. 
+Next, whenever you need to *use* this key, you can specify the key with `-k staging`. 
 
 Finally, you can delete a key from KeyChain access by running:
 
@@ -253,17 +256,17 @@ You can optionally store frequently used flags for `sym` in the `SYM_ARGS` envir
 export SYM_ARGS="-cx production"
 ```
 
-This will always be appended to the command line, and so to encrypt/decrypt anything with password caching enabled and using that particular key, you would simply type:
+This will be automatically appended to the command line if the `-A/--sym-args` flag is provided, and so to encrypt/decrypt anything with password caching enabled and using that particular key, you would simply type:
 
 ```bash
 # -cx production are added from SYM_ARGS
-sym -ef file -o file.enc
+sym -Aef file -o file.enc
 
 # And to decrypt:
-sym -df file.enc -o file.original
+sym -Adf file.enc -o file.original
 
 # Or edit the encrypted file:
-sym -tf file.enc
+sym -Atf file.enc
 ```
 
 #### Complete CLI Usage
@@ -271,34 +274,42 @@ sym -tf file.enc
 This may be a good time to take a look at the full help message for the `sym` tool, shown naturally with a `-h` or `--help` option.
 
 ```
-Sym (2.4.1) – encrypt/decrypt data with a private key
+Sym (2.5.0) – encrypt/decrypt data with a private key
 
 Usage:
    # Generate a new key, optionally password protected, and save it
    # in one of: keychain, file, or STDOUT (-q turns off STDOUT) 
    sym -g [ -p/--password ] [ -x keychain | -o file | ] [ -q ]  
 
+   # To specify encryption key, provide the key as 
+   #   1) a string, 2) a file path, 3) an OS-X Keychain, 4) env variable name 
+   #   5) use -i to paste/type the key interactively
+   #   6) default key file (if present) at /Users/kig/.sym.key
+   KEY-SPEC = -k/--key [ key | file | keychain | environment_variable ]
+              -i/--interactive
 
    # Encrypt/Decrypt from STDIN/file/args, to STDOUT/file:
-   sym -e/--encrypt <key-spec> [-f [file | - ] | -s string ] [-o file] 
-   sym -d/--decrypt <key-spec> [-f [file | - ] | -s string ] [-o file] 
+   sym -e/--encrypt KEY-SPEC [-f [file | - ] | -s string ] [-o file] 
+   sym -d/--decrypt KEY-SPEC [-f [file | - ] | -s string ] [-o file] 
+
+   # Auto-detect mode based on a special file extension ".enc"
+   sym -n/--negate  KEY-SPEC file[.enc] 
  
    # Edit an encrypted file in $EDITOR 
-   sym -t/--edit    <key-spec> -f file [ -b/--backup ]
+   sym -t/--edit    KEY-SPEC -f file [ -b/--backup ]
  
-   # Specify any  common flags in the BASH variable. Here we
-   # specify KeyChain name "staging" and turn on password caching
+   # Save commonly used flags in a BASH variable. Below we save the KeyChain 
+   # "staging" as the default key name, and enable password caching.
    export SYM_ARGS="-ck staging"
- 
-   # And now encrypt using default key location /Users/kig/.sym.key
-   sym -e -f file
-   # May need to disable SYM_ARGS with -M, eg for help:
-   sym -h -M 
+   # Then activate $SYM_ARGS by using -A/--sym-args flag:
+   sym -Aef file
  
 Modes:
   -e, --encrypt                     encrypt mode
   -d, --decrypt                     decrypt mode
   -t, --edit                        edit encrypted file in an $EDITOR
+  -n, --negate           [file]     encrypts any regular file into file.enc
+                                    conversely decrypts file.enc into file.
  
 Create a new private key:
   -g, --generate                    generate a new private key
@@ -318,8 +329,6 @@ Data to Encrypt/Decrypt:
   -s, --string           [string]   specify a string to encrypt/decrypt
   -f, --file             [file]     filename to read from
   -o, --output           [file]     filename to write to
-  -n, --negate           [file]     encrypts any regular file into file.enc
-                                    conversely decrypts file.enc into file.
  
 Flags:
   -b, --backup                      create a backup file in the edit mode
@@ -329,15 +338,14 @@ Flags:
   -D, --debug                       print debugging information
   -V, --version                     print library version
   -N, --no-color                    disable color output
-  -M, --no-environment              disable reading flags from SYM_ARGS
+  -A, --sym-args                    read more CLI arguments from $SYM_ARGS
  
 Utility:
-  -a, --bash-completion  [file]     append shell completion to a file
+  -B, --bash-completion  [file]     append shell completion to a file
  
 Help & Examples:
   -E, --examples                    show several examples
   -h, --help                        show help
-
 ```
 
 ### CLI Usage Examples
