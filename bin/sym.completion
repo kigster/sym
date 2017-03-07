@@ -16,7 +16,7 @@ for file in ${bash_completion_locations[@]}; do
 done
 
 _sym_long_opts() {
-    sym -h | grep -- '--' | egrep '^  -' | awk '{print $2}' | sort 
+    sym -h | grep -- '--' | egrep '^  -' | awk '{print $2}' | sort
 }
 
 _sym_short_opts() {
@@ -49,12 +49,12 @@ _sym()
 
     case "$cur" in
         --*)
-            export _SYM_COMP_LONG_OPTIONS=${_SYM_COMP_LONG_OPTIONS:-$(_sym_long_opts)}
-            COMPREPLY=($( compgen -W "$_SYM_COMP_LONG_OPTIONS" -- "$cur" ))
+            export _sym_comp_long_options=${_sym_comp_long_options:-$(_sym_long_opts)}
+            COMPREPLY=($( compgen -W "$_sym_comp_long_options" -- "$cur" ))
             ;;
         -*)
-            export _SYM_COMP_SHORT_OPTIONS=${_SYM_COMP_SHORT_OPTIONS:-$(_sym_short_opts)}
-            COMPREPLY=($( compgen -W "$_SYM_COMP_SHORT_OPTIONS" -- "$cur" ))
+            export _sym_comp_short_options=${_sym_comp_short_options:-$(_sym_short_opts)}
+            COMPREPLY=($( compgen -W "$_sym_comp_short_options" -- "$cur" ))
             ;;
         *)
             _filedir
@@ -62,8 +62,7 @@ _sym()
     esac
 
     return 0
-} &&
-    complete -F _sym $nospace $filenames sym
+} && complete -F _sym $nospace $filenames sym
 
 # Local variables:
 # mode: shell-script

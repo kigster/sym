@@ -4,48 +4,37 @@ module Sym
     module Commands
       class BashCompletion < BaseCommand
 
-        required_options [:bash_completion]
+        required_options [:bash_support]
         try_after :generate_key, :open_editor, :encrypt, :decrypt
 
         def execute
-          install_completion_file
-          file = opts[:bash_completion]
-          if File.exist?(file)
-            if File.read(file).include?(script)
-              "#{'Hmmm'.bold.yellow}: #{file.bold.yellow} had completion for #{'sym'.bold.red} already installed\n"
-            else
-              append_completion_script(file)
-              "#{'OK'.bold.green}: appended completion for #{'sym'.bold.red} to #{file.bold.yellow}\n"
-            end
-          else
-            append_completion_script(file)
-            "#{'OK'.bold.green}: created new file #{file.bold.yellow} and installed BASH completion for #{'sym'.bold.red}\n"
+          file = opts[:bash_support]
+
+          out = ''
+          Sym::Constants::Bash::Config.each_pair do |key, config|
+            script_name = key.to_s
+            FileUtils.cp(config[:source], config[:dest])
+            out << if File.exist?(file)
+                     if File.read(file).include?(config[:script])
+                       "#{'OK'.bold.green}, #{file.bold.yellow} already has #{script_name.bold.blue} installed\n"
+                     else
+                       append_completion_script(file, config[:script])
+                       "#{'OK'.bold.green}, appended initialization for #{script_name.bold.blue} to #{file.bold.yellow}\n"
+                     end
+                   else
+                     append_completion_script(file, config[:script])
+                     "#{'OK'.bold.green}, created new file #{file.bold.yellow}, added #{script_name.bold.blue} initialization.\n"
+                   end
           end
+          out + "Please reload your terminal session to activate bash completion and other installed utilities.\n"
         end
 
         private
 
-        def install_completion_file
-          FileUtils.cp(source_file, path)
-        end
-
-        def append_completion_script(file)
+        def append_completion_script(file, script)
           File.open(file, 'a') do |fd|
-            fd.write(script)
+            fd.write(script + "\n")
           end
-        end
-
-
-        def script
-          Sym::Constants::Completion::Config[:script]
-        end
-
-        def source_file
-          Sym::Constants::Completion::Config[:file]
-        end
-
-        def path
-          Sym::Constants::Completion::PATH
         end
 
       end

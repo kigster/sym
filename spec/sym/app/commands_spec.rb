@@ -66,7 +66,7 @@ module Sym
                                                            version: true,
                                                            no_color: false,
                                                            no_environment: false,
-                                                           bash_completion: nil,
+                                                           bash_support: nil,
                                                            examples: false,
                                                            help: false })).to eq(ShowVersion)
           end

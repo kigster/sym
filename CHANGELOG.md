@@ -2,9 +2,16 @@
 
 ## [HEAD](https://github.com/kigster/sym/tree/HEAD)
 
-[Changes since the last tag](https://github.com/kigster/sym/compare/v2.5.0...HEAD)
+[Changes since the last tag](https://github.com/kigster/sym/compare/v2.5.1...HEAD)
 
-## [v2.5.0](https://github.com/kigster/sym/tree/v2.5.0) (2017-02-28)
+## [v2.5.1](https://github.com/kigster/sym/tree/v2.5.0) (2017-03-06)
+[Full Changelog](https://github.com/kigster/sym/compare/v2.5.0...v2.5.1)
+
+ * Moved `symit` into `bin/` folder, and now installing it into `~/.sym.symit` with `-B/--bash-support` flag.
+ * `symit` now works as a bash function installed together with the completion.
+ * Updated `Sym::Constants` module.
+ 
+## [v2.5.0](https://github.com/kigster/sym/tree/v2.5.0) (2017-03-04)
 [Full Changelog](https://github.com/kigster/sym/compare/v2.4.3...v2.5.0)
 
  * Updated README
@@ -15,7 +22,7 @@
  * Reworked `Sym::Application`, removed `--dictionary`, and simplified argument parsing.
  * Refactored `output_proc` to live in `application`.
 
-## [v2.4.2](https://github.com/kigster/sym/tree/v2.4.2) (2017-02-28)
+## [v2.4.2](https://github.com/kigster/sym/tree/v2.4.2) (2017-03-01)
 [Full Changelog](https://github.com/kigster/sym/compare/v2.4.1...v2.4.2)
 
  * Fixing BASH completion for sym to look for files after `--negate` and

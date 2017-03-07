@@ -8,7 +8,7 @@ module Sym
 
         required_options [:key, :interactive],
                          :keychain
-        incompatible_options %i(examples help version bash_completion)
+        incompatible_options %i(examples help version bash_support)
         try_after :generate_key, :encrypt, :decrypt, :password_protect_key
 
         def execute

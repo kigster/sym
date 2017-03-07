@@ -136,7 +136,7 @@ __BASH Completion__
 
 Optionally, after gem installation, you can also install bash-completion of gem's command line options, but running the following command (and feel free to use any of the "dot" files you prefer):
 
-    sym --bash-completion ~/.bashrc
+    sym -B/--bash-support ~/.bashrc
 
 Should you choose to install it (this part is optional), you will be able to use "tab-tab" after typing `sym`, and you'll be able to choose from all of the supported flags.
 
@@ -274,35 +274,43 @@ sym -Atf file.enc
 This may be a good time to take a look at the full help message for the `sym` tool, shown naturally with a `-h` or `--help` option.
 
 ```
-Sym (2.5.0) – encrypt/decrypt data with a private key
+Sym (2.5.1) – encrypt/decrypt data with a private key
 
 Usage:
    # Generate a new key, optionally password protected, and save it
    # in one of: keychain, file, or STDOUT (-q turns off STDOUT) 
-   sym -g [ -p/--password ] [ -x keychain | -o file | ] [ -q ]  
+   
+        sym -g [ -p/--password ] [ -x keychain | -o file | ] [ -q ]  
 
    # To specify encryption key, provide the key as 
    #   1) a string, 2) a file path, 3) an OS-X Keychain, 4) env variable name 
    #   5) use -i to paste/type the key interactively
    #   6) default key file (if present) at /Users/kig/.sym.key
+   
    KEY-SPEC = -k/--key [ key | file | keychain | environment_variable ]
               -i/--interactive
 
    # Encrypt/Decrypt from STDIN/file/args, to STDOUT/file:
-   sym -e/--encrypt KEY-SPEC [-f [file | - ] | -s string ] [-o file] 
-   sym -d/--decrypt KEY-SPEC [-f [file | - ] | -s string ] [-o file] 
+   
+        sym -e/--encrypt KEY-SPEC [-f [file | - ] | -s string ] [-o file] 
+        sym -d/--decrypt KEY-SPEC [-f [file | - ] | -s string ] [-o file] 
 
    # Auto-detect mode based on a special file extension ".enc"
-   sym -n/--negate  KEY-SPEC file[.enc] 
+   
+        sym -n/--negate  KEY-SPEC file[.enc] 
  
    # Edit an encrypted file in $EDITOR 
-   sym -t/--edit    KEY-SPEC -f file [ -b/--backup ]
+   
+        sym -t/--edit    KEY-SPEC -f file [ -b/--backup ]
  
    # Save commonly used flags in a BASH variable. Below we save the KeyChain 
    # "staging" as the default key name, and enable password caching.
-   export SYM_ARGS="-ck staging"
+   
+        export SYM_ARGS="-ck staging"
+   
    # Then activate $SYM_ARGS by using -A/--sym-args flag:
-   sym -Aef file
+   
+        sym -Aef file
  
 Modes:
   -e, --encrypt                     encrypt mode
@@ -341,11 +349,13 @@ Flags:
   -A, --sym-args                    read more CLI arguments from $SYM_ARGS
  
 Utility:
-  -B, --bash-completion  [file]     append shell completion to a file
+  -B, --bash-support     [file]     append bash completion & utils to a file
+                                    such as ~/.bash_profile or ~/.bashrc
  
 Help & Examples:
   -E, --examples                    show several examples
   -h, --help                        show help
+
 ```
 
 ### CLI Usage Examples
