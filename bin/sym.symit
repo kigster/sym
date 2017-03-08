@@ -110,12 +110,24 @@ symit::locs() {
   echo -n ${locations[*]}
 }
 
+symit::locs::print() {
+  printf "Search locations:\n"
+  for loc in ${locations[@]}; do
+    if [[ -n "${loc}" ]] ; then
+      printf "\t - ${bldblu}${loc}${txtrst}\n"
+    fi
+  done
+}
+
 symit::exit() {
   code=${1:-0}
+  echo -n ${code}
+}
+
+symit::cleanup() {
   unset encrypted_file
   unset cli__opts
   unset locations
-  echo -n ${code}
 }
 
 symit() {
@@ -140,6 +152,7 @@ symit() {
       -h|-\?|--help)
           shift
           symit::usage
+          symit::cleanup
           return $(symit::exit 0)
           ;;
 
@@ -171,6 +184,7 @@ symit() {
       -i|--install)
           shift
           symit::install
+          symit::cleanup
           return $(symit::exit 0)
           ;;
 
@@ -186,6 +200,7 @@ symit() {
 
       -?*)
           printf 'WARN: Unknown option (ignored): %s\n' "$1" >&2
+          symit::cleanup
           return $(symit::exit 127)
           shift
           ;;
@@ -201,24 +216,24 @@ symit() {
   if [[ ${cli__opts[locations]} == ${true} ]]; then
     if [[ -z ${encrypted_file} ]]; then
       symit::error "-l/--locations requires file-spec to be provided as the 1st argument"
+      symit::cleanup
       return $(symit::exit 2)
+    else
+      symit::locs::print
+      symit::cleanup
+      return $(symit::exit 0)
     fi
-    printf "search locations:\n"
-    for loc in ${locations[@]}; do
-      if [[ -n "${loc}" ]] ; then
-        printf "\t - ${loc}\n"
-      fi
-    done
-    return $(symit::exit 0)
   fi
 
   if [[ -z "${encrypted_file}" ]]; then
     symit::error "Missing 1st argument — file name to be loaded, eg 'production', etc."
+    symit::cleanup
     return $(symit::exit 3)
   fi
 
   if [[ -z "${cli__opts[key]}" ]]; then
     symit::error "Key was not defined, pass it with ${bldblu}-k key-spec${bldred} or set it via ${bldgrn}\$sym__key${bldred} variable."
+    symit::cleanup
     return $(symit::exit 4)
   fi
 
@@ -231,7 +246,9 @@ symit() {
   done
 
   [[ -z "${file}" ]] && {
-    symit::error "${encrypted_file} could not be found."
+    symit::error "${bldylw}${encrypted_file}${bldred} could not be found."
+    symit::locs::print
+    symit::cleanup
     return $(symit::exit 5)
   }
 
