@@ -15,11 +15,17 @@
 
 ## Description
 
-> __sym__ is a command line utility and a Ruby API that makes it _trivial to encrypt and decrypt sensitive data_. Unlike many other existing encryption tools, __sym__ focuses on usability and streamlined interface (CLI), with the goal of making encryption easy and transparent. The result? There is no excuse for keeping your application secrets unencrypted :) 
+<div style="padding 20px; font-size: 13pt;">
+
+<strong>sym</strong> is a command line utility and a Ruby API that makes it <em>trivial to encrypt and decrypt sensitive data</em>. Unlike many other existing encryption tools, <strong>sym</strong> focuses on usability and streamlined interface (CLI), with the goal of making encryption easy and transparent. The result? There is no longer any excuse for keeping your application secrets unencrypted or outside of your repo.<br /><br />
+
+<strong>sym</strong> uses <em>symmetric Encryption</em> which simply means that you will be using the same 256-bit key to encrypt and decrypt data. In addition to the private key, the encryption uses an IV vector. The library completely hides `iv` generation from the user, and automatically generates a random `iv` per encryption. Finally, each key can be uniquely password-protected (encrypted) and stored in OS-X Keychain, environment variable or a file.
+
+</div>
 
 ### Motivation
 
-The primary goal of this tool is to streamline and simplify handling of relatively sensitive data in the most trasparent and easy to use way as possible, without sacrificing security.
+The main goal when writing this tool was to streamline and simplify handling of sensitive data in a  trasparent and easy to use way without sacrificing security.
 
 Most common use-cases include:
 
@@ -33,15 +39,16 @@ __Sym__ is a layer built on top of the [`OpenSSL`](https://www.openssl.org/) lib
 
 This gem includes two primary components:
 
- * [Ruby API](#rubyapi) for enabling encryption/decryption of any data within any Ruby class, with extremely easy-to-use methods
- * [Rich command line interface CLI](#cli) with many additional features to streamline handling of encrypted data.
-
-_Symmetric Encryption_ simply means that we are using the same private key to encrypt and decrypt. In addition to the private key, the encryption uses an IV vector. The library completely hides `iv` generation from the user, and automatically generates a random `iv` per encryption.
+ * [Rich command line interface CLI](#cli) with many features to streamline encryption/decryption.
+ * Ruby API:
+     * [Basic Encryption/Decryption API](#rubyapi) is activated by including `Sym` module in a class, it adds easy to use `encr`/`decr` methods.
+     * [Application API](#rubyapi-app) is activated by instantiating `Sym::Application`, and using the instance to drive sym's complete set of functionality, as if it was invoked from the CLI.
+     * [Sym::Configuration](#rubyapi-config) class for overriding default cipher, and many other parameters such as compression, cache location, zlib compression, and more.
 
 
 ### Massive Time Savers
 
-So how does `sym` substantiate its claim that it *streamlines* the encryption process? I thought about it, and turns out there are quite a few reasons:
+What are the time savers that we mentioned earlier?
  
   * By using Mac OS-X Keychain, `sym` offers a simple yet secure way of storing the key on a local machine, much more secure then storing it on a file system.
   * By using a password cache (`-c`) via an in-memory provider such as `memcached` or `drb`, `sym` invocations take advantage of password cache, and only ask for a password once per a configurable time period.
@@ -54,26 +61,51 @@ As you can see, we really tried to build a tool that provides good security for 
 
 > Encrypting application secrets had never been easier! –– Socrates [LOL, -ed.]
 
-### How It Works
+## Using Sym
 
-  1. You generate a new encryption key, that will be used to both encrypt and decrypt the data. The key is 256 bits, or 32 bytes, or 45 bytes when base64-encoded, and can be generated with `sym -g`.
-     * You can optionally password protect the key with `sym -gp`
-     * You can save the key into a file with `sym -gpo key-file` 
-     * Or you can save it into the OS-X Keychain, with `sym -gpx keychain-name`
-     * You can also cache the password, with `sym -gpcx keychain-name`
-     * Normally, `sym` will also print the resulting key to STDOUT.
+#### Installation
+
+If you plan on using the library in your Ruby project with Bundler managing its dependencies, just include the following line in your `Gemfile`:
+
+    gem 'sym'
+
+And then run `bundle`.
+
+Or install it into the global namespace with `gem install` command:
+
+    $ gem install sym
+    $ sym -h
+    $ sym -E # see examples
+
+__BASH Completion__
+
+Optionally, after gem installation, you can also install bash-completion of gem's command line options, but running the following command (and feel free to use any of the "dot" files you prefer):
+
+    sym -B ~/.bashrc
+
+Should you choose to install it (this part is optional), you will be able to use "tab-tab" after typing `sym`, and you'll be able to choose from all of the supported flags.
+
+#### Typical Use-Case Scenario
+
+  1. You generate a new encryption key, that will be used to both encrypt and decrypt the data. The key is 256 bits, or 32 bytes, or 45 bytes when base64-encoded, and can be generated with `sym -g`. The key must be saved somewhere for later retrieval. The key should not be easily accessible to an attacker. Note, that while generating the key, you can:
+     * optionally password protect the key with `sym -gp`
+     * save the key into a file with `sym -gpo key-file` 
+     * save it into the OS-X Keychain, with `sym -gpx keychain-name`
+     * cache the password, with `sym -gpcx keychain-name`
+     * Normally, `sym` will print the resulting key to STDOUT
      * You can prevent the key from being printed to STDOUT with `-q/--quiet`. 
-  2. You then take a piece of sensitive __data__ that you want to encrypt. This can be a file or a string.
-  3. You can then use the key to encrypt sensitive __data__, with `sym -e [key-spec] [data-spec]`, passing it the key in several accepted ways. Smart flag `-k` automatically interpretes the source of the key, by trying:
-     * a file with a pathname.
-     * or environment variable
-     * or OS-X Keychain password entry
-     * or you can paste the key interactively with `-i` 
-  4. Input data can be read from a file with `-f file`, or read from STDIN, or a passed on the command line with `-s string`    
-  4. Output is the encrypted data, which is printed to STDOUT by the default, or it can be saved to a file with `-o <file>`
-  5. Encrypted file can be later decrypted with `sym -d [key-spec] [data-spec]`
+  2. Next, let's assume you have a file or a string that you want to encrypt. We call this *data*.
+  3. In order to encrypt the __data__, we must supply an encryption key. Flag `-k` automatically retrieves the key, by trying to read it in several distinct ways, such as:
+     * a file with a pathname specified by the argument (eg, `-k ~/.key`)
+     * or environment variable (eg `-k ENC_KEY`)
+     * or OS-X Keychain entry
+     * verbatum string argument (not recommended)
+     * alternatively, you can paste the key interactively with `-i` or save the default key in `~/.sym.key` file.
+  4. Finally, we are ready to encrypt. The data to be encrypted can be read from a file with `-f filename`, or it can be read from STDIN, or a passed on the command line with `-s string`. For example, `sym -e -k ~/.key -f /etc/passwd` will encrypt the file and print the encrypted contents to STDOUT.
+  4. Instead of printing to STDOUT, the output can be saved to a file with `-o <file>`
+  5. Encrypted file can later be decrypted with `sym -d ...` assuming the same key it was encrypted with.
 
-Sample session that uses Mac OS-X Keychain to store the password-protected key.
+A sample session that uses Mac OS-X Keychain to store the password-protected key.
 
 ```bash
 # Gen a new key, password-encrypt it, cache the password, save
@@ -83,7 +115,6 @@ New Password     :  •••••••••
 Confirm Password :  •••••••••
 
 ❯ sym -eck my-new-key -s 'My secret data' -o secret.enc
-Coin::Vault listening at: druby://127.0.0.1:24924
 Password: •••••••••
 
 ❯ cat secret.enc
@@ -104,7 +135,7 @@ My secret data
 My secret data
 ```
 
-The line that says `Coin::Vault listening at: druby://127.0.0.1:24924` is the indication that the local dRB server used for caching passwords has been started. Password caching is off by default, but is enabled with `-c` flag. In the example above, the decryption step fetched the password from the cache, and so the user was not required to re-enter the password.
+Note that password caching is off by default, but is enabled with `-c` flag. In the example above, the decryption step fetched the password from the cache, and so the user was not required to re-enter the password.
 
 __Direct Editing Encrypted Files__
 
@@ -118,30 +149,81 @@ Example:
 
 For more information see the section on [inline editing](#inline).
 
-## Installation
 
-If you plan on using the library in your Ruby project with Bundler managing its dependencies, just include the following line in your `Gemfile`:
 
-    gem 'sym'
+<a name="rubyapi"></a>
+## Ruby API
 
-And then run `bundle`.
+To use this library, you must include the main `Sym` module into your library.
 
-Or install it into the global namespace with `gem install` command:
+Any class including `Sym` will be decorated with new class methods `#private_key` and `#create_private_key`, as well as instance methods `#encr`, and `#decr`.
 
-    $ gem install sym
-    $ sym -h
-    $ sym -E # see examples
+`#create_private_key` will generate a new key each time it's called, while `#private_key` will either assign an existing key (if a value is passed) or generate and save a new key in the class instance variable. Therefore each class including `Sym` will use its key (unless the key is assigned).
 
-__BASH Completion__
+The following example illustrates this point:
 
-Optionally, after gem installation, you can also install bash-completion of gem's command line options, but running the following command (and feel free to use any of the "dot" files you prefer):
+```ruby
+require 'sym'
 
-    sym -B/--bash-support ~/.bashrc
+class TestClass
+  include Sym
+end
+@key = TestClass.create_private_key
+@key.eql?(TestClass.private_key)  # => false
+# A new key was created and saved in #private_key accessor.
 
-Should you choose to install it (this part is optional), you will be able to use "tab-tab" after typing `sym`, and you'll be able to choose from all of the supported flags.
+class SomeClass
+  include Sym
+  private_key TestClass.private_key
+end
+
+@key.eql?(SomeClass.private_key)  # => true (it was assigned)
+```
+
+### Encrypting and Decrypting Data
+
+So how would we use this library from another Ruby project to encrypt and decrypt values?
+
+After including the `Sym` module in a ruby class, the class will now have the `#encr` and `#decr` instance methods, as well as `#secret` and `#create_private_key class methods.
+
+Therefore you could write something like this below, protecting a sensitive string using a class-level secret.
+
+```ruby
+require 'sym'
+class TestClass
+  include Sym
+  private_key ENV['SECRET']
+
+  def sensitive_value=(value)
+    @sensitive_value = encr(value, self.class.private_key)
+  end
+  def sensitive_value
+    decr(@sensitive_value, self.class.private_key)
+  end
+end
+```
+
+<a name="rubyapi-app"></a>
+
+### Application Ruby API
+
+Since the command line interface offers much more than just encryption/decryption of data with a key, majority of these features are available through `Sym::Application` instance.
+
+The class is instantiated with a hash that would be otherwise generated by parsing CLI arguments, typical `options`. For example, to generate the key, pass `generate: true` — essentially any flag in it's long form can be converted into a hash member.
+
+Here is an example:
+
+```ruby
+require 'sym/application'
+
+key  = Sym::Application.new(generate: true).execute
+# => '75ngenJpB6zL47/8Wo7Ne6JN1pnOsqNEcIqblItpfg4='
+```
+
+<a name="rubyapi-config"></a>
+
 
 <a name="cli"></a>
-
 ## Using `sym` with the Command Line
 
 ### Private Keys
@@ -273,90 +355,7 @@ sym -Atf file.enc
 
 This may be a good time to take a look at the full help message for the `sym` tool, shown naturally with a `-h` or `--help` option.
 
-```
-Sym (2.5.1) – encrypt/decrypt data with a private key
-
-Usage:
-   # Generate a new key, optionally password protected, and save it
-   # in one of: keychain, file, or STDOUT (-q turns off STDOUT) 
-   
-        sym -g [ -p/--password ] [ -x keychain | -o file | ] [ -q ]  
-
-   # To specify encryption key, provide the key as 
-   #   1) a string, 2) a file path, 3) an OS-X Keychain, 4) env variable name 
-   #   5) use -i to paste/type the key interactively
-   #   6) default key file (if present) at /Users/kig/.sym.key
-   
-   KEY-SPEC = -k/--key [ key | file | keychain | environment_variable ]
-              -i/--interactive
-
-   # Encrypt/Decrypt from STDIN/file/args, to STDOUT/file:
-   
-        sym -e/--encrypt KEY-SPEC [-f [file | - ] | -s string ] [-o file] 
-        sym -d/--decrypt KEY-SPEC [-f [file | - ] | -s string ] [-o file] 
-
-   # Auto-detect mode based on a special file extension ".enc"
-   
-        sym -n/--negate  KEY-SPEC file[.enc] 
- 
-   # Edit an encrypted file in $EDITOR 
-   
-        sym -t/--edit    KEY-SPEC -f file [ -b/--backup ]
- 
-   # Save commonly used flags in a BASH variable. Below we save the KeyChain 
-   # "staging" as the default key name, and enable password caching.
-   
-        export SYM_ARGS="-ck staging"
-   
-   # Then activate $SYM_ARGS by using -A/--sym-args flag:
-   
-        sym -Aef file
- 
-Modes:
-  -e, --encrypt                     encrypt mode
-  -d, --decrypt                     decrypt mode
-  -t, --edit                        edit encrypted file in an $EDITOR
-  -n, --negate           [file]     encrypts any regular file into file.enc
-                                    conversely decrypts file.enc into file.
- 
-Create a new private key:
-  -g, --generate                    generate a new private key
-  -p, --password                    encrypt the key with a password
-  -x, --keychain         [key-name] write the key to OS-X Keychain
- 
-Read existing private key from:
-  -k, --key              [key-spec] private key, key file, or keychain
-  -i, --interactive                 Paste or type the key interactively
- 
-Password Cache:
-  -c, --cache-passwords             enable password cache
-  -u, --cache-timeout    [seconds]  expire passwords after
-  -r, --cache-provider   [provider] cache provider, one of memcached, drb
- 
-Data to Encrypt/Decrypt:
-  -s, --string           [string]   specify a string to encrypt/decrypt
-  -f, --file             [file]     filename to read from
-  -o, --output           [file]     filename to write to
- 
-Flags:
-  -b, --backup                      create a backup file in the edit mode
-  -v, --verbose                     show additional information
-  -q, --quiet                       do not print to STDOUT
-  -T, --trace                       print a backtrace of any errors
-  -D, --debug                       print debugging information
-  -V, --version                     print library version
-  -N, --no-color                    disable color output
-  -A, --sym-args                    read more CLI arguments from $SYM_ARGS
- 
-Utility:
-  -B, --bash-support     [file]     append bash completion & utils to a file
-                                    such as ~/.bash_profile or ~/.bashrc
- 
-Help & Examples:
-  -E, --examples                    show several examples
-  -h, --help                        show help
-
-```
+Please take a look at the [SYM-CLI](SYM-CLI.md) for a complete help screen and the examples.
 
 ### CLI Usage Examples
 
@@ -420,77 +419,11 @@ To edit an encrypted file in `$EDITOR`, while asking to paste the key (`-i | --i
     # ---
     # # (c) 2016 Konstantin Gredeskoul.  All rights reserved.
 
-<a name="rubyapi"></a>
-
-## Ruby API
-
-To use this library, you must include the main `Sym` module into your library.
-
-Any class including `Sym` will be decorated with new class methods `#private_key` and `#create_private_key`, as well as instance methods `#encr`, and `#decr`.
-
-`#create_private_key` will generate a new key each time it's called, while `#private_key` will either assign an existing key (if a value is passed) or generate and save a new key in the class instance variable. Therefore each class including `Sym` will use its key (unless the key is assigned).
-
-The following example illustrates this point:
-
-```ruby
-require 'sym'
-
-class TestClass
-  include Sym
-end
-@key = TestClass.create_private_key
-@key.eql?(TestClass.private_key)  # => false
-# A new key was created and saved in #private_key accessor.
-
-class SomeClass
-  include Sym
-  private_key TestClass.private_key
-end
-
-@key.eql?(SomeClass.private_key)  # => true (it was assigned)
-```
-
-### Encryption and Decryption Operations
-
-So how would we use this library from another Ruby project to encrypt and decrypt values?
-
-After including the `Sym` module in a ruby class, the class will now have the `#encr` and `#decr` instance methods, as well as `#secret` and `#create_private_key class methods.
-
-Therefore you could write something like this below, protecting a sensitive string using a class-level secret.
-
-```ruby
-require 'sym'
-class TestClass
-  include Sym
-  private_key ENV['SECRET']
-
-  def sensitive_value=(value)
-    @sensitive_value = encr(value, self.class.private_key)
-  end
-  def sensitive_value
-    decr(@sensitive_value, self.class.private_key)
-  end
-end
-```
-
-### Full Application API
-
-Since the command line interface offers more than just encryption/decryption, it is available via `Sym::Application` class.
-
-The class is instantiated with a hash that would be otherwise generated by `Slop.parse(argv)` – ie, typical `options`.
-
-Here is an example:
-
-```ruby
-require 'sym/application'
-
-key  = Sym::Application.new(generate: true).execute
-# => returns a new private key
-```
+## Additional Details 
 
 ### Configuration
 
-The library offers a typical `Sym::Configuration` class which can be used to tweak some of the internals of the gem. Its meant for an advanced user who knows what he or she is doing. The code snippet shown below is an actual part of the Configuration class, but you can override it by including it in your code that uses and initializes this library, right after the `require.` The `Configuration` class is a Singleton, so changes to it will propagate to any subsequent calls to the gem.
+The library contains a `Sym::Configuration` singleton class, which can be used to tweak some of the internals of the gem. Its meant for advanced users who know what they are doing. The code snippet shown below is an actual default configuration. You can override the defaults by including a similar snipped in your application initialization, right after the `require 'sym'`. The `Configuration` class is a Singleton, so changes to it will propagate to any subsequent calls to the gem.
 
 ```ruby
 require 'zlib'
@@ -509,18 +442,19 @@ Sym::Configuration.configure do |config|
   # When nil is selected, providers are auto-detected.
   config.password_cache_default_provider = nil
   config.password_cache_arguments        = {
+    # Ruby dRB-based in-memory cache.
     drb:       {
       opts: {
         uri: 'druby://127.0.0.1:24924'
       }
     },
+    # Memcached Provider – local is the default, but can be changed.
     memcached: {
       args: %w(127.0.0.1:11211),
       opts: { namespace:  'sym',
               compress:   true,
               expires_in: config.password_cache_timeout
       }
-
     }
   }
 end
@@ -529,7 +463,8 @@ end
 
 As you can see, it's possible to change the default cipher type, although not all ciphers will be code-compatible with the current algorithm, and may require additional code changes.
 
-## Encryption Features & Cipher Used
+
+#### Encryption Features & Cipher Used
 
 The `sym` executable as well as the Ruby API provide:
 
@@ -547,7 +482,7 @@ The `sym` executable as well as the Ruby API provide:
  * Rich Ruby API
  * (OS-X Only): Ability to create, add and delete generic password entries from the Mac OS-X KeyChain, and to leverage the KeyChain to store sensitive private keys.
 
-## Development
+#### Development
 
 After checking out the repo, run `bin/setup` to install dependencies. Then, run `rake spec` to run the tests. You can also run `bin/console` for an interactive prompt that will allow you to experiment.
 
@@ -555,11 +490,11 @@ To install this gem onto your local machine, run `bundle exec rake install`.
 
 To release a new version, update the version number in `version.rb`, and then run `bundle exec rake release`, which will create a git tag for the version, push git commits and tags, and push the `.gem` file to [rubygems.org](https://rubygems.org).
 
-### Contributing
+#### Contributing
 
 Bug reports and pull requests are welcome on GitHub at [https://github.com/kigster/sym](https://github.com/kigster/sym).
 
-## License
+### License
 
 `Sym` library is &copy; 2016-2017 Konstantin Gredeskoul.
 
@@ -567,7 +502,7 @@ The gem is available as open source under the terms of the [MIT License](http://
 
 The library is designed to be a layer on top of [`OpenSSL`](https://www.openssl.org/), distributed under the [Apache Style license](https://www.openssl.org/source/license.txt).
 
-## Acknowledgements
+### Acknowledgements
 
 [Konstantin Gredeskoul](http:/kig.re) is the primary developer of this library. Contributions from others are strongly encouraged and very welcome. Any pull requests will be reviewed promptly.
 
