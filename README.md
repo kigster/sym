@@ -13,9 +13,11 @@
 
 <hr/>
 
+**March 10th, 2017**: Please read the blog post [Dead Simple Encryption with Sym](http://kig.re/2017/03/10/dead-simple-encryption-with-sym.html) launching this tool and a library. Please leave comments or questions in the discussion thread at the bottom of that post. Thanks!
+
 ## Description
 
-<div style="padding 20px; font-size: 13pt;">
+<div style="padding 40px; margin: 40px; font-size: 13pt;">
 
 <strong>sym</strong> is a command line utility and a Ruby API that makes it <em>trivial to encrypt and decrypt sensitive data</em>. Unlike many other existing encryption tools, <strong>sym</strong> focuses on usability and streamlined interface (CLI), with the goal of making encryption easy and transparent. The result? There is no longer any excuse for keeping your application secrets unencrypted or outside of your repo.<br /><br />
 
