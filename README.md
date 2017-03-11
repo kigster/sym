@@ -263,10 +263,9 @@ key  = Sym::Application.new(generate: true).execute
 
 
 <a name="cli"></a>
-
 ## Using `sym` with the Command Line
 
-## Private Keys — Overview
+### Encryption Keys
 
 The private key is the cornerstone of the symmetric encryption. Using `sym`, the key can be:
 
@@ -280,43 +279,45 @@ The __unencrypted private__ key will be in the form of a base64-encoded string, 
 
 __Encrypted (with password) private key__ will be considerably longer, perhaps 200-300 characters long.
 
-#### Generating Private Keys
+#### Generating the Key — Examples
 
-Let's generate a new key, and copy it to the clipboard (using `pbcopy` command on Mac OS-X):
+```bash
+# Let's generate a new key, and copy it to the clipboard (using `pbcopy` command on Mac OS-X):
+$ sym -g | pbcopy
 
-    sym -g | pbcopy
+# Or save a new key into a bash variable
+$ KEY=$(sym -g)
 
-Or save a new key into a bash variable
+# Or save it to a file:
+$ sym -go ~/.key
 
-    KEY=$(sym -g)
+# Or create a password-protected key (`-p`), and save it to a file (`-o`), 
+# cache the password (`-c`), and don't print the new key to STDOUT (`-q` for quiet)
+$ sym -gpcqo ~/.secret
+New Password:     ••••••••••
+Confirm Password: ••••••••••
+$ 
+```
 
-Or save it to a file:
-
-    sym -go ~/.key
-
-Or create a password-protected key (`-p`), and save it to a file (`-o`), cache the password (`-c`), and don't print the new key to STDOUT (`-q` for quiet):
-
-    sym -gpcqo ~/.secret
-    New Password:     ••••••••••
-    Confirm Password: ••••••••••
+#### Resolving the `-k` Argument
     
-##### Key Sources
-    
-You can subsequently use the private key by passing either of these options to the `-k` flag (*sym attempts to resolve the key automatically, by trying each option and moving to the next until the key is found*):
+You can use the generated private key by passing an argument to the `-k` flag. 
+
+**Sym** attempts to automatically resolve the key source by trying each of the following options, and then moving on to the next until the key is found, or error is shown:
 
  1. the `-k value` flag, where the *value* is one of:
-    * a file path
-    * an environment variable name 
+    * a file path, eg (`-k ~/.key`)
+    * an environment variable name (`-k MY_KEY`)
     * an actual base64-encoded key (not recommended for security reasons)
-    * a keychain name
+    * a keychain name (`-k keychain-entry-name`)
  2. pasting or typing the key with the `-i` (interactive) flag
- 3. a default key file, in your home folder, `~/.sym.key`, used only when no other flags were passed in.
+ 3. if exists, a default key file, located in your home folder: `~/.sym.key` is used only when no other key-specifying flags were passed in.
 
-##### Encryption and Decryption
+#### Encryption and Decryption
 
 <a name="inline"></a>
 
-##### Inline Editing
+#### Inline Editing
 
 The `sym` CLI tool supports one particularly interesting mode, that streamlines handling of encrypted files. The mode is called __edit mode__, and is activated with the `-t` flag. 
 
@@ -427,7 +428,7 @@ This may be a good time to take a look at the full help message for the `sym` to
 
 Please take a look at the [SYM-CLI](SYM-CLI.md) for a complete help screen and the examples.
 
-## Additional Details 
+## Fine Tuning
 
 <a name="rubyapi-config"></a>
 
@@ -474,7 +475,7 @@ end
 As you can see, it's possible to change the default cipher type, although not all ciphers will be code-compatible with the current algorithm, and may require additional code changes.
 
 
-#### Encryption Features & Cipher Used
+#### Encryption Features & Cipher
 
 The `sym` executable as well as the Ruby API provide:
 
@@ -492,7 +493,7 @@ The `sym` executable as well as the Ruby API provide:
  * Rich Ruby API
  * (OS-X Only): Ability to create, add and delete generic password entries from the Mac OS-X KeyChain, and to leverage the KeyChain to store sensitive private keys.
 
-#### Development
+## Development
 
 After checking out the repo, run `bin/setup` to install dependencies. Then, run `rake spec` to run the tests. You can also run `bin/console` for an interactive prompt that will allow you to experiment.
 
@@ -502,7 +503,7 @@ To release a new version, update the version number in `version.rb`, and then ru
 
 #### Contributing
 
-Bug reports and pull requests are welcome on GitHub at [https://github.com/kigster/sym](https://github.com/kigster/sym).
+Bug reports and pull requests are welcome on GitHub at [https://github.com/kigster/sym](https://github.com/kigster/sym)
 
 ### License
 
@@ -514,11 +515,11 @@ The library is designed to be a layer on top of [`OpenSSL`](https://www.openssl.
 
 ### Acknowledgements
 
-[Konstantin Gredeskoul](http:/kig.re) is the primary developer of this library. Contributions from others are strongly encouraged and very welcome. Any pull requests will be reviewed promptly.
+While [Konstantin Gredeskoul](http:/kig.re) is the primary developer of this library, contributions  are very much encouraged. Any pull requests will be reviewed promptly. Please submit feature requests, bugs, or a good word :) 
 
-Contributors:
+#### Contributors:
 
- * Wissam Jarjoui (Shippo)
+ * [Wissam Jarjoui](https://github.com/bosswissam)
  * Megan Mathews 
  * Barry Anderson
 
