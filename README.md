@@ -41,10 +41,9 @@ This gem includes two primary components:
 
  * [Rich command line interface CLI](#cli) with many features to streamline encryption/decryption.
  * Ruby API:
-     * [Basic Encryption/Decryption API](#rubyapi) is activated by including `Sym` module in a class, it adds easy to use `encr`/`decr` methods.
+     * [Basic Encryption/Decryption API](#rubyapi) is activated by including `Sym` module in a class, it adds easy to use `encr`/`decr` methods.     
      * [Application API](#rubyapi-app) is activated by instantiating `Sym::Application`, and using the instance to drive sym's complete set of functionality, as if it was invoked from the CLI.
      * [Sym::Configuration](#rubyapi-config) class for overriding default cipher, and many other parameters such as compression, cache location, zlib compression, and more.
-
 
 ### Massive Time Savers
 
@@ -102,8 +101,10 @@ Should you choose to install it (this part is optional), you will be able to use
      * verbatum string argument (not recommended)
      * alternatively, you can paste the key interactively with `-i` or save the default key in `~/.sym.key` file.
   4. Finally, we are ready to encrypt. The data to be encrypted can be read from a file with `-f filename`, or it can be read from STDIN, or a passed on the command line with `-s string`. For example, `sym -e -k ~/.key -f /etc/passwd` will encrypt the file and print the encrypted contents to STDOUT.
-  4. Instead of printing to STDOUT, the output can be saved to a file with `-o <file>`
+  4. Instead of printing to STDOUT, the output can be saved to a file with `-o <file>` or a simple redirect or a pipe.
   5. Encrypted file can later be decrypted with `sym -d ...` assuming the same key it was encrypted with.
+  6. Encrypted file with extension `.enc` can be automatically decrypted with `-n/--negate` option; if the file does not end with `.enc`, it is encrypted and `.enc` extension added to the resulting file.
+  7. With `-t` flag you can open in VIM (or `$EDITOR`) any encrypted file and edit it. Once you save it, the file gets re-encrypted and replaces the previous version. A backup can be created with `-b` option. See the section on [inline editing](#inline)
 
 A sample session that uses Mac OS-X Keychain to store the password-protected key.
 
@@ -137,28 +138,53 @@ My secret data
 
 Note that password caching is off by default, but is enabled with `-c` flag. In the example above, the decryption step fetched the password from the cache, and so the user was not required to re-enter the password.
 
-__Direct Editing Encrypted Files__
+<a name="inline"></a>
 
-Instead of decrypting data anytime you need to change it, you can use the shortcut flag `-t` (for "edi**t**"), which decrypts your data into a temporary file, automatically opening it with an `$EDITOR`. 
+#### Inline Editing of Encrypted Files
 
-Example:
+The `sym` CLI tool supports one particularly interesting mode, that streamlines handling of encrypted files. The mode is called __edit mode__, and is activated with the `-t` flag. 
+
+Instead of decrypting data anytime you need to change it into a new file and then manually re-encrypting the result, you can use the shortcut flag `-t` (for "edi**t**"), which decrypts your data into a temporary file, automatically opening it with an `$EDITOR`. 
 
     sym -t -f config/application/secrets.yml.enc -k ~/.key
     
 > This is one of those time-saving features that can make a difference in making encryption feel easy and transparent.
 
-For more information see the section on [inline editing](#inline).
+> NOTE: this mode does not seem to work with GUI editors such as Atom or TextMate. Since `sym` waits for the editor process to complete, GUI editors "complete" immediately upon starting a windowed application. 
 
+In this mode several flags are of importance:
 
+    -b (--backup)   – will create a backup of the original file
+    -v (--verbose) - will show additional info about file sizes
+
+Here is a full command that opens a file specified by `-f | --file`, using the key specified in `-k | --keyfile`, in the editor defined by the `$EDITOR` environment variable (or if not set – defaults to `/bin/vi`)".
+
+Example: here we edit an encrypted file in `vim`, while using interactive mode to paste the key (`-i | --interactive`), and then creating a backup file (`-b | --backup`) upon save:
+
+    sym -tibf data.enc
+    # => Private Key: ••••••••••••••••••••••••••••••••••••••••••••
+    #
+    # => Diff:
+    # 3c3
+    # # (c) 2015 Konstantin Gredeskoul.  All rights reserved.
+    # ---
+    # # (c) 2016 Konstantin Gredeskoul.  All rights reserved.
+
+Note the `diff` shown after save.
 
 <a name="rubyapi"></a>
+
 ## Ruby API
 
-To use this library, you must include the main `Sym` module into your library.
+You start by including `Sym` module into your class or a module. Such class will be decorated with new class methods `#private_key` and `#create_private_key`, as well as instance methods `#encr`, and `#decr`.
 
-Any class including `Sym` will be decorated with new class methods `#private_key` and `#create_private_key`, as well as instance methods `#encr`, and `#decr`.
+#### Class Method `#create_private_key()` 
 
-`#create_private_key` will generate a new key each time it's called, while `#private_key` will either assign an existing key (if a value is passed) or generate and save a new key in the class instance variable. Therefore each class including `Sym` will use its key (unless the key is assigned).
+This method will generate a new key each time it's called.
+
+#### Class Method `#private_key(value = nil)` 
+
+This method will either assign an existing key (if a value is passed) or generate and save a new key in the class instance variable. Therefore each class including `Sym` will (by default) use a unique key (unless the key is passed in as an argument).
 
 The following example illustrates this point:
 
@@ -168,6 +194,7 @@ require 'sym'
 class TestClass
   include Sym
 end
+
 @key = TestClass.create_private_key
 @key.eql?(TestClass.private_key)  # => false
 # A new key was created and saved in #private_key accessor.
@@ -180,11 +207,14 @@ end
 @key.eql?(SomeClass.private_key)  # => true (it was assigned)
 ```
 
-### Encrypting and Decrypting Data
+#### Encrypting and Decrypting Data
 
 So how would we use this library from another Ruby project to encrypt and decrypt values?
 
-After including the `Sym` module in a ruby class, the class will now have the `#encr` and `#decr` instance methods, as well as `#secret` and `#create_private_key class methods.
+After including the `Sym` module, two instance methods are added: 
+
+* `#encr(value, private_key)` and 
+* `#decr(value, private_key)`.
 
 Therefore you could write something like this below, protecting a sensitive string using a class-level secret.
 
@@ -203,9 +233,20 @@ class TestClass
 end
 ```
 
+#### Encrypting the Key Itself
+
+You can encrypt the private key using a custom password. This is highly recommended, because without the password the key is the only piece that stands between an attacker and decrypting your sensitive data. 
+
+For this purpose, two more instance methods exist:
+
+ * `encr_password(data, password, iv = nil)`
+ * `decr_password(encrypted_data, password, iv = nil)`
+
+They can be used independently of `encr` and `decr` to encrypt/decrypt any data with a password.
+
 <a name="rubyapi-app"></a>
 
-### Application Ruby API
+#### Full Application API
 
 Since the command line interface offers much more than just encryption/decryption of data with a key, majority of these features are available through `Sym::Application` instance.
 
@@ -220,13 +261,12 @@ key  = Sym::Application.new(generate: true).execute
 # => '75ngenJpB6zL47/8Wo7Ne6JN1pnOsqNEcIqblItpfg4='
 ```
 
-<a name="rubyapi-config"></a>
-
 
 <a name="cli"></a>
+
 ## Using `sym` with the Command Line
 
-### Private Keys
+## Private Keys — Overview
 
 The private key is the cornerstone of the symmetric encryption. Using `sym`, the key can be:
 
@@ -271,6 +311,36 @@ You can subsequently use the private key by passing either of these options to t
     * a keychain name
  2. pasting or typing the key with the `-i` (interactive) flag
  3. a default key file, in your home folder, `~/.sym.key`, used only when no other flags were passed in.
+
+##### Encryption and Decryption
+
+<a name="inline"></a>
+
+##### Inline Editing
+
+The `sym` CLI tool supports one particularly interesting mode, that streamlines handling of encrypted files. The mode is called __edit mode__, and is activated with the `-t` flag. 
+
+In this mode `sym` can decrypt the file, and open the result in an `$EDITOR`. Once you make any changes, and save it (exiting the editor), `sym` will automatically diff the new and old content, and if different – will save encrypt it and overwrite the original file.
+
+> NOTE: this mode does not seem to work with GUI editors such as Atom or TextMate. Since `sym` waits for the editor process to complete, GUI editors "complete" immediately upon starting a windowed application. 
+In this mode several flags are of importance:
+
+    -b (--backup)   – will create a backup of the original file
+    -v (--verbose) - will show additional info about file sizes
+
+Here is a full command that opens a file specified by `-f | --file`, using the key specified in `-k | --keyfile`, in the editor defined by the `$EDITOR` environment variable (or if not set – defaults to `/bin/vi`)".
+
+To edit an encrypted file in `$EDITOR`, while asking to paste the key (`-i | --interactive`), while creating a backup file (`-b | --backup`):
+
+    sym -tibf data.enc
+    # => Private Key: ••••••••••••••••••••••••••••••••••••••••••••
+    #
+    # => Diff:
+    # 3c3
+    # # (c) 2015 Konstantin Gredeskoul.  All rights reserved.
+    # ---
+    # # (c) 2016 Konstantin Gredeskoul.  All rights reserved.
+
 
 #### Using KeyChain Access on Mac OS-X
 
@@ -351,75 +421,15 @@ sym -Adf file.enc -o file.original
 sym -Atf file.enc
 ```
 
-#### Complete CLI Usage
+#### CLI Help Screen and Examples
 
-This may be a good time to take a look at the full help message for the `sym` tool, shown naturally with a `-h` or `--help` option.
+This may be a good time to take a look at the full help message for the `sym` tool, shown naturally with a `-h` or `--help` option. Examples can be shown with `-E/--examples` flag.
 
 Please take a look at the [SYM-CLI](SYM-CLI.md) for a complete help screen and the examples.
 
-### CLI Usage Examples
-
-__Generating the Key__:
-
-Generate a new private key into an environment variable:
-
-    export KEY=$(sym -g)
-    echo $KEY
-    # => 75ngenJpB6zL47/8Wo7Ne6JN1pnOsqNEcIqblItpfg4=
-
-Generate a new password-protected key & save to a file:
-
-    sym -gpqo ~/.key
-    New Password     : ••••••••••
-    Confirm Password : ••••••••••
-
-Encrypt a plain text string with a key, and save the output to a file:
-
-    sym -e -s "secret string" -k $KEY -o file.enc
-    cat file.enc
-    # => Y09MNDUyczU1S0UvelgrLzV0RTYxZz09CkBDMEw4Q0R0TmpnTm9md1QwNUNy%T013PT0K
-
-Decrypt a previously encrypted string:
-
-    sym -d -s $(cat file.enc) -k $KEY
-    # => secret string
-
-Encrypt a file and save it to `sym.enc`:
-
-    sym -e -f app-sym.yml -o app-sym.enc -k $KEY
-
-Decrypt an encrypted file and print it to STDOUT:
-
-    sym -df app-sym.enc -k $KEY
-
-<a name="inline"></a>
-
-#### Inline Editing
-
-The `sym` CLI tool supports one particularly interesting mode, that streamlines handling of encrypted files. The mode is called __edit mode__, and is activated with the `-t` flag. 
-
-In this mode `sym` can decrypt the file, and open the result in an `$EDITOR`. Once you make any changes, and save it (exiting the editor), `sym` will automatically diff the new and old content, and if different – will save encrypt it and overwrite the original file.
-
-> NOTE: this mode does not seem to work with GUI editors such as Atom or TextMate. Since `sym` waits for the editor process to complete, GUI editors "complete" immediately upon starting a windowed application. 
-In this mode several flags are of importance:
-
-    -b (--backup)   – will create a backup of the original file
-    -v (--verbose) - will show additional info about file sizes
-
-Here is a full command that opens a file specified by `-f | --file`, using the key specified in `-k | --keyfile`, in the editor defined by the `$EDITOR` environment variable (or if not set – defaults to `/bin/vi`)".
-
-To edit an encrypted file in `$EDITOR`, while asking to paste the key (`-i | --interactive`), while creating a backup file (`-b | --backup`):
-
-    sym -tibf data.enc
-    # => Private Key: ••••••••••••••••••••••••••••••••••••••••••••
-    #
-    # => Diff:
-    # 3c3
-    # # (c) 2015 Konstantin Gredeskoul.  All rights reserved.
-    # ---
-    # # (c) 2016 Konstantin Gredeskoul.  All rights reserved.
-
 ## Additional Details 
+
+<a name="rubyapi-config"></a>
 
 ### Configuration
 
