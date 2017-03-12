@@ -9,7 +9,7 @@ Gem::Specification.new do |spec|
   spec.authors       = ['Konstantin Gredeskoul']
   spec.email         = %w(kigster@gmail.com)
 
-  spec.summary       = %q{Super easy to use encryption library & a CLI with a strong aes-256-cbc cipher that can be used to transparently encrypt/decrypt/edit application secrets.}
+  spec.summary       = %q{Dead-simple and easy to use encryption library on top of OpenSSL, offering rich Ruby API as well as feature-rich CLI able to generate a key, encrypt/decrypt data, password-protect the keys, cache passwords, and more. Strong cipher "aes-256-cbc" used by US Government is behind data encryption.}
 
   spec.description   = Sym::DESCRIPTION
 
@@ -21,16 +21,29 @@ Gem::Specification.new do |spec|
   spec.require_paths = ['lib']
   spec.required_ruby_version = '>= 2.2'
   spec.post_install_message = <<-EOF
-Thank you for installing this gem! We hope you like it :)  
 
-NOTE: To enable bash command line completion, please run the following 
-command, which appends sym's shell completion to the file specified
-in arguments to -B/--bash-support flag.
+Thank you for installing Sym! 
+
+BLOG POST
+=========
+http://kig.re/2017/03/10/dead-simple-encryption-with-sym.html
+
+BASH COMPLETION
+===============
+To enable bash command line completion, please run the following 
+command, which appends sym's shell completion wrapper to the file 
+specified in arguments to -B/--bash-support flag.
 
   sym -B ~/.bash_profile
+  source ~/.bash_profile
  
-Thank you for checking out Sym and happy crypting :)
-              -- KG ( github.com/kigster | twitter.com/kig )
+Thank you for using Sym and happy crypting :)
+
+For bonus points, run 'symit -h' after installing and loading bash
+completion.
+
+@kigster on Github, @kig on Twitter.
+
 EOF
   spec.add_dependency 'colored2', '~> 3'
   spec.add_dependency 'slop', '~> 4.3'

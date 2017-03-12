@@ -1,28 +1,25 @@
 module Sym
-  VERSION = '2.6.0'
+  VERSION     = '2.6.1'
   DESCRIPTION = <<-eof
-    Sym is a command line utility plus a straightforward Ruby API that makes it easy to 
-    transparently handle sensitive data such as application secrets using symmetric
-    encryption with a 256bit key.
- 
-    Unlike many modern encryption tools, sym focuses on the streamlined interface (CLI),
-    and offers many time-saving features that make encryption/decryption of application
-    secrets and other sensitive data as seamless as possible.   
- 
-    You can encrypt the key itself with a password, for an additional layer of security.
-    You can choose to save the key to OS-X Keychain, making it difficult to get the key
-    when only disk is accessible. Using memcached or DRb sym can cache passwords so that
-    you don't have to retype it too often. Finally, the -t flag (edit mode) decrypts
-    the file on the fly, and lets you edit the unencrypted contents in $EDITOR. 
+### Sym — Symmetric Encryption Made Easy
+  
+**Sym** is a ruby library (gem) that offers both the command line interface (CLI) and a set of rich Ruby APIs, which make it rather trivial to add encryption and decryption of sensitive data to your development or deployment flow. As a layer of additional security, you can encrypt the private key itself with a password. 
 
-    Sym can read the key from many sources, including file, environment variable, 
-    keychain, or CLI argument — all of the above become arguments of -k flag: one 
-    flag to define the key no matter where it lives.
+Unlike many other existing encryption tools, Sym focuses on getting out of the way — by offering its streamlined interface, hoping to make encryption of application secrets nearly completely transparent to the developers. 
 
-    Finally, set environment variable SYM_ARGS to common flags you use, and then
-    have sym read these flags, activating this time-saving feature with -A flag.     
-     
-    Sym uses a symmetric aes-256-cbc cipher with a private key and an IV vector, 
-    and is built atop of OpenSSL.
+For the data encryption Sym uses a symmetric 256-bit key with the `AES-256-CBC` cipher, same cipher as used by the US Government. For password-protecting the key Sym uses `AES-128-CBC` cipher. The resulting data is zlib-compressed and base64-encoded. The keys are also base64 encoded for easy copying/pasting/etc.
+  
+### Massive Time Savers
+
+Sym accomplishes encryption transparency by combining convenience features:
+
+ * Sym can read the private key from multiple source types, such as: a pathname to a file, an environment variable name, a keychain entry, or CLI argument. You simply pass either of these to the `-k` flag — one flag that works for all source types
+ * By utilizing OS-X Keychain on a Mac, Sym offers truly secure way of storing the key on a local machine, much more secure then storing it on a file system
+ * By using a local password cache (activated with `-c`) via an in-memory provider such as memcached or `drb`, sym invocations take advantage of password cache, and only ask for a password once per a configurable time period
+ * By using `SYM_ARGS` environment variable, where common flags can be saved. This is activated with `sym -A`
+ * By reading the key from the default key source file `~/.sym.key` which requires no flags at all
+ * By utilizing the `--negate` option to quickly encrypt a regular file, or decrypt an encrypted file with extension `.enc`
+ * By implementing the `-t` (edit) mode, that opens an encrypted file in your `$EDITOR`, and replaces the encrypted version upon save & exit, optionally creating a backup.
+ * By offering the `Sym::MagicFile` ruby API to easily read encrypted files into memory.
   eof
 end
