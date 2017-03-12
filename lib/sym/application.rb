@@ -51,8 +51,17 @@ module Sym
       end
     end
 
+    def process_output(result)
+      unless result.is_a?(Hash)
+        self.output.call(result)
+        result
+      else
+        result
+      end
+    end
+
     def execute
-      execute!
+      process_output(execute!)
     rescue ::OpenSSL::Cipher::CipherError => e
       { reason:    'Invalid key provided',
         exception: e }

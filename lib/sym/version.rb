@@ -1,5 +1,5 @@
 module Sym
-  VERSION = '2.5.3'
+  VERSION = '2.6.0'
   DESCRIPTION = <<-eof
     Sym is a command line utility plus a straightforward Ruby API that makes it easy to 
     transparently handle sensitive data such as application secrets using symmetric

@@ -98,12 +98,9 @@ module Sym
       def execute
         return Sym::App.exit_code if Sym::App.exit_code != 0
         result = application.execute
-        case result
-          when Hash
-            self.output_proc ::Sym::App::Args.new({}).output_class
-            error(result)
-          else
-            self.output_proc.call(result)
+        if result.is_a?(Hash)
+          self.output_proc ::Sym::App::Args.new({}).output_class
+          error(result)
         end
         Sym::App.exit_code
       end

@@ -41,10 +41,11 @@ __Sym__ is a layer built on top of the [`OpenSSL`](https://www.openssl.org/) lib
 
 This gem includes two primary components:
 
- * [Rich command line interface CLI](#cli) with many features to streamline encryption/decryption.
- * Ruby API:
+ 1. [Rich command line interface CLI](#cli) with many features to streamline encryption/decryption.
+ 2.  Ruby API:
      * [Basic Encryption/Decryption API](#rubyapi) is activated by including `Sym` module in a class, it adds easy to use `encr`/`decr` methods.     
      * [Application API](#rubyapi-app) is activated by instantiating `Sym::Application`, and using the instance to drive sym's complete set of functionality, as if it was invoked from the CLI.
+     * [Sym::MagicFile API](#magic-file) is a convenience class allowing you to read encrypted files in your ruby code with a couple of lines of code.
      * [Sym::Configuration](#rubyapi-config) class for overriding default cipher, and many other parameters such as compression, cache location, zlib compression, and more.
 
 ### Massive Time Savers
@@ -178,7 +179,9 @@ Note the `diff` shown after save.
 
 ## Ruby API
 
-You start by including `Sym` module into your class or a module. Such class will be decorated with new class methods `#private_key` and `#create_private_key`, as well as instance methods `#encr`, and `#decr`.
+### Including `Sym` module
+
+Low-level encryption routines can be imported by including `Sym` module into your class or a module. Such class will be decorated with new class methods `#private_key` and `#create_private_key`, as well as instance methods `#encr`, and `#decr`.
 
 #### Class Method `#create_private_key()` 
 
@@ -209,7 +212,7 @@ end
 @key.eql?(SomeClass.private_key)  # => true (it was assigned)
 ```
 
-#### Encrypting and Decrypting Data
+#### Encrypting and Decrypting
 
 So how would we use this library from another Ruby project to encrypt and decrypt values?
 
@@ -248,7 +251,7 @@ They can be used independently of `encr` and `decr` to encrypt/decrypt any data 
 
 <a name="rubyapi-app"></a>
 
-#### Full Application API
+### `Sym::Application`
 
 Since the command line interface offers much more than just encryption/decryption of data with a key, majority of these features are available through `Sym::Application` instance.
 
@@ -263,6 +266,50 @@ key  = Sym::Application.new(generate: true).execute
 # => '75ngenJpB6zL47/8Wo7Ne6JN1pnOsqNEcIqblItpfg4='
 ```
 
+### `Sym::MagicFile` for Reading Encrypted Data
+
+This is probably the easiest way to leverage Sym-encrypted files, by loading them into memory.
+
+`Sym::MagicFile` provides a very simple API for loading and reading encrypted files
+into memory, while supporting all of the convenience features of the rich
+application API.
+
+You initialize this class with just two things: a `pathname` to a file (encrypted
+or not), and the `key` identifier. The identifier can either be a filename, or
+OS-X Keychain entry, or environment variable name, etc — basically it is resolve
+like any other `-k <value>` CLI flag.
+
+#### Example: Using `Sym::MagicFile` with the `RailsConfig` gem
+
+In this example, we assume that the environment variable `$PRIVATE_KEY` contain
+the key to be used in decryption. Note that methods `#decrypt` and `#read` on `Sym::MagicFile` instance are synomymous.
+
+```ruby
+require 'sym/magic_file'
+require 'yaml'
+secrets = Sym::MagicFile.new('/usr/local/etc/secrets.yml.enc', 'PRIVATE_KEY')
+hash = YAML.load(secrets.decrypt)
+```
+
+Let's say that you are using [RailsConfig](https://github.com/railsconfig/config) gem for managing your Rails application setings. Since the gem allows appending settings from a hash, you can simply do the following in your `settings_initializer.rb`, and after all of the unencrypted settings are loaded:
+
+```ruby
+require 'config'
+require 'sym/magic_file'
+require 'yaml'
+Settings.add_source!(
+    YAML.load(
+        Sym::MagicFile.new(
+            '/usr/local/etc/secrets.yml.enc', 
+            'PRIVATE_KEY'
+        ).decrypt)
+    )
+Settings.reload!
+```
+
+### Ruby API Conclusion
+
+Using `Sym`'s rich ruby API you can perform both low-level encryption/decryption, as well as high-level management of encrypted files. By using `Sym::MagicFile` and/or `Sym::Application` classes you can access the entire set of functionality expressed vi the CLI, described in details below.
 
 <a name="cli"></a>
 ## Using `sym` with the Command Line

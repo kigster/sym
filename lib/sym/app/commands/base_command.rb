@@ -61,7 +61,7 @@ module Sym
         end
 
         def content
-          @content ||= (opts[:string] || (opts[:file].eql?('-') ? STDIN.read : File.read(opts[:file]).chomp))
+          @content ||= (opts[:string] || (opts[:file].eql?('-') ? STDIN.read : ::File.read(opts[:file]).chomp))
         end
 
         def to_s
