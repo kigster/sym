@@ -42,7 +42,8 @@ Thank you for using Sym and happy crypting :)
 For bonus points, run 'symit -h' after installing and loading bash
 completion.
 
-@kigster on Github, @kig on Twitter.
+@kigster on Github, 
+    @kig on Twitter.
 
 EOF
   spec.add_dependency 'colored2', '~> 3'
