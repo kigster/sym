@@ -17,12 +17,18 @@ module Sym
   module App
     class << self
       attr_accessor :exit_code
+      attr_accessor :stdin, :stdout, :stderr
+
     end
 
     self.exit_code = 0
 
+    self.stdin     = STDIN
+    self.stdout    = STDOUT
+    self.stderr    = STDERR
+
     def self.out
-      STDERR
+      self.stderr
     end
 
     def self.log(level, *args, **opts)

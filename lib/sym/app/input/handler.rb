@@ -4,22 +4,30 @@ module Sym
   module App
     module Input
       class Handler
+        attr_accessor :stdin, :stdout, :stderr, :kernel
+
+        def initialize(stdin = STDIN, stdout = STDOUT, stderr = STDERR, kernel = nil)
+          self.stdin  = stdin
+          self.stdout = stdout
+          self.stderr = stderr
+          self.kernel = kernel
+        end
 
         def ask
           retries ||= 0
           prompt('Password: ', :green)
         rescue ::OpenSSL::Cipher::CipherError
-          STDERR.puts 'Invalid password. Please try again.'
+          stderr.puts 'Invalid password. Please try again.'
           retry if (retries += 1) < 3
           nil
         end
 
         def puts(*args)
-          STDERR.puts args
+          stderr.puts args
         end
 
         def prompt(message, color)
-          HighLine.new(STDIN, STDERR).ask(message.bold) { |q| q.echo = '•'.send(color) }
+          HighLine.new(stdin, stderr).ask(message.bold) { |q| q.echo = '•'.send(color) }
         end
 
         def new_password

@@ -24,7 +24,7 @@ module Sym
 
           the_key
         rescue Sym::Errors::PasswordsDontMatch, Sym::Errors::PasswordTooShort => e
-          STDERR.puts e.message.bold
+          stderr.puts e.message.bold
           retry if (retries += 1) < 3
         end
 

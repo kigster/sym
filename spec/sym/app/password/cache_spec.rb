@@ -6,10 +6,10 @@ module Sym
     module Password
       RSpec.describe Cache do
         let(:enabled) { true }
-        let(:cache) { Cache.instance.configure(provider: :drb, provider_opts: { uri: 'druby://127.0.0.1:19191' }, timeout: 200, enabled: enabled) }
+        let(:cache) { Cache.instance.configure(provider: :memcached, provider_opts: { uri: 'druby://127.0.0.1:19191' }, timeout: 200, enabled: enabled) }
         context 'cache provider' do
           subject { cache.provider }
-          it { is_expected.to be_kind_of(Providers::DrbProvider) }
+          it { is_expected.to be_kind_of(Providers::MemcachedProvider) }
         end
 
         context 'cache enabled' do

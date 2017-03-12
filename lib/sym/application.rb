@@ -5,12 +5,21 @@ require 'openssl'
 require 'json'
 
 module Sym
+  # Main Application controller class for Sym.
+  #
+  # Accepts a hash with CLI options set (as symbols), for example
+  #
+  # Example
+  # =======
+  #
+  #     app = Sym::Application.new( encrypt: true, file: '/tmp/secrets.yml', output: '/tmp/secrets.yml.enc')
+  #     result = app.execute
+  #
+  #
   class Application
 
     attr_accessor :opts,
-                  :opts_original,
-                  :opts,
-                  :provided_options,
+                  :opts_slop,
                   :args,
                   :action,
                   :key,
@@ -19,11 +28,18 @@ module Sym
                   :key_handler,
                   :output,
                   :result,
-                  :password_cache
+                  :password_cache,
+                  :stdin, :stdout, :stderr, :kernel
 
-    def initialize(opts)
-      self.opts_original = opts
-      self.opts          = opts.is_a?(Hash) ? opts : opts.to_hash
+    def initialize(opts, stdin = STDIN, stdout = STDOUT, stderr = STDERR, kernel = nil)
+
+      self.stdin  = stdin
+      self.stdout = stdout
+      self.stderr = stderr
+      self.kernel = kernel
+
+      self.opts_slop = opts.clone
+      self.opts      = opts.is_a?(Hash) ? opts : opts.to_hash
 
       process_negated_option(opts[:negate]) if opts[:negate]
 
@@ -36,32 +52,11 @@ module Sym
       initialize_input_handler
     end
 
-    def execute!
-      initialize_key_source
-      unless command
-        raise Sym::Errors::InsufficientOptionsError,
-              " Can not determine what to do
-        from the options: \ n " +
-                " #{self.provided_options.inspect.green.bold}\n" +
-                "and flags #{self.provided_flags.to_s.green.bold}"
-      end
-      log :info, "command located is #{command.class.name.blue.bold}"
-      self.result = command.execute.tap do |result|
-        log :info, "result is  #{result.nil? ? 'nil' : result[0..10].to_s.blue.bold }..." if opts[:trace]
-      end
-    end
-
-    def process_output(result)
-      unless result.is_a?(Hash)
-        self.output.call(result)
-        result
-      else
-        result
-      end
-    end
-
+    # Main action method — it looksup the command, and executes it, translating
+    # various exception conditions into meaningful error messages.
     def execute
       process_output(execute!)
+
     rescue ::OpenSSL::Cipher::CipherError => e
       { reason:    'Invalid key provided',
         exception: e }
@@ -88,28 +83,6 @@ module Sym
       @command
     end
 
-    def log(*args)
-      Sym::App.log(*args, **opts)
-    end
-
-    def editor
-      editors_to_try.find { |editor| File.exist?(editor) }
-    end
-
-    def provided_options
-      provided_opts = self.opts.clone
-      provided_opts.delete_if { |k, v| !v }
-      provided_opts
-    end
-
-    def provided_safe_options
-      provided_options.map do |k, v|
-        k == :key && [44, 45].include?(v.size) ?
-          [k, '[reducted]'] :
-          [k, v]
-      end.to_h
-    end
-
     def provided_flags
       provided_flags = provided_options
       provided_flags.delete_if { |k, v| ![false, true].include?(v) }
@@ -117,13 +90,58 @@ module Sym
     end
 
     def provided_value_options
-      provided = provided_safe_options
+      provided = provided_options(safe: true)
       provided.delete_if { |k, v| [false, true].include?(v) }
       provided
     end
 
+    def provided_options(**opts)
+      provided_opts = self.opts.clone
+      provided_opts.delete_if { |k, v| !v }
+      if opts[:safe]
+        provided_options.map do |k, v|
+          k == :key && [44, 45].include?(v.size) ?
+            [k, '[reducted]'] :
+            [k, v]
+        end.to_h
+      else
+        provided_opts
+      end
+    end
+
+    def editor
+      editors_to_try.find { |editor| File.exist?(editor) }
+    end
+
+    def process_output(result)
+      unless result.is_a?(Hash)
+        self.output.call(result)
+        result
+      else
+        result
+      end
+    end
 
     private
+
+    def execute!
+      initialize_key_source
+      unless command
+        raise Sym::Errors::InsufficientOptionsError,
+              " Can not determine what to do
+        from the options: \ n " +
+                " #{self.provided_options.inspect.green.bold}\n" +
+                "and flags #{self.provided_flags.to_s.green.bold}"
+      end
+      log :info, "command located is #{command.class.name.blue.bold}"
+      self.result = command.execute.tap do |result|
+        log :info, "result is  #{result.nil? ? 'nil' : result[0..10].to_s.blue.bold }..." if opts[:trace]
+      end
+    end
+
+    def log(*args)
+      Sym::App.log(*args, **opts)
+    end
 
     def editors_to_try
       [
@@ -145,10 +163,10 @@ module Sym
       unless output_klass && output_klass.is_a?(Class)
         raise "Can not determine output type from arguments #{provided_options}"
       end
-      self.output = output_klass.new(opts).output_proc
+      self.output = output_klass.new(opts, stdin, stdout, stderr, kernel).output_proc
     end
 
-    def initialize_input_handler(handler = ::Sym::App::Input::Handler.new)
+    def initialize_input_handler(handler = ::Sym::App::Input::Handler.new(stdin, stdout, stderr, kernel))
       self.input_handler = handler
     end
 
@@ -191,7 +209,7 @@ module Sym
     # If we are encrypting or decrypting, and no data has been provided, check if we
     # should read from STDIN
     def initialize_data_source
-      if self.action && opts[:string].nil? && opts[:file].nil? && !(STDIN.tty?)
+      if self.action && opts[:string].nil? && opts[:file].nil? && !(self.stdin.tty?)
         opts[:file] = '-'
       end
     end

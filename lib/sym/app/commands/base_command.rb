@@ -50,7 +50,7 @@ module Sym
         extend Forwardable
 
         attr_accessor :application
-        def_delegators :@application, :opts, :opts_original, :key
+        def_delegators :@application, :opts, :opts_slop, :key, :stdin, :stdout, :stderr, :kernel
 
         def initialize(application)
           self.application = application
@@ -61,7 +61,7 @@ module Sym
         end
 
         def content
-          @content ||= (opts[:string] || (opts[:file].eql?('-') ? STDIN.read : ::File.read(opts[:file]).chomp))
+          @content ||= (opts[:string] || (opts[:file].eql?('-') ? stdin.read : ::File.read(opts[:file]).chomp))
         end
 
         def to_s

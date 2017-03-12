@@ -4,10 +4,14 @@ module Sym
     module Output
       class Base
 
-        attr_accessor :opts
+        attr_accessor :opts, :stdin, :stdout, :stderr, :kernel
 
-        def initialize(opts)
-          self.opts = opts
+        def initialize(opts, stdin = STDIN, stdout = STDOUT, stderr = STDERR, kernel = nil)
+          self.opts   = opts
+          self.stdin  = stdin
+          self.stdout = stdout
+          self.stderr = stderr
+          self.kernel = kernel
         end
 
         @outputs = []

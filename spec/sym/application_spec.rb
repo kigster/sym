@@ -94,7 +94,7 @@ module Sym
           context 'key supplied as environment variable' do
             let(:key_data) { 'PRIVATE_KEY' }
             before do
-              allow(ENV).to receive(:[]).with('MEMCACHED_USERNAME')
+              allow(ENV).to receive(:[]).with('MEMCACHE_USERNAME')
               allow(ENV).to receive(:[]).with('SYM_CACHE_TTL')
               expect(ENV).to receive(:[]).with(key_data).and_return(private_key)
               application.send(:initialize_key_source)

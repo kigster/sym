@@ -1,6 +1,5 @@
 require 'forwardable'
 require 'dalli'
-require 'sym/app/password/cache'
 
 module Sym
   module App
