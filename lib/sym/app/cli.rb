@@ -124,8 +124,11 @@ module Sym
       end
 
       def output_proc(proc = nil)
-        self.application&.output = proc if proc
-        self.application&.output
+        if self.application
+          self.application.output = proc if proc
+          return self.application.output
+        end
+        nil
       end
 
       def opts_present
