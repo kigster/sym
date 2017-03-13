@@ -25,6 +25,16 @@
 
 </div>
 
+## Supported Ruby Versions
+
+Sym currently builds and runs on the following ruby versions, which can be verified on Travis CI:
+[![Build Status](https://travis-ci.org/kigster/sym.svg?branch=master)](https://travis-ci.org/kigster/sym)
+
+ * 2.2.5
+ * 2.3.3
+ * 2.4.0
+ * jruby-9.1.7.0 
+
 ### Motivation
 
 The main goal when writing this tool was to streamline and simplify handling of sensitive data in a  trasparent and easy to use way without sacrificing security.

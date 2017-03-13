@@ -4,40 +4,40 @@
 
 [Changes since the last tag](https://github.com/kigster/sym/compare/v2.6.3...HEAD)
 
-## [v2.6.3](https://github.com/kigster/sym/tree/v2.6.3) (2017-03-11)
+## [v2.6.3](https://github.com/kigster/sym/tree/v2.6.3) (2017-03-13)
 [Full Changelog](https://github.com/kigster/sym/compare/v2.6.2...v2.6.3)
 
  * Much faster unit tests thanks to running Aruba tests in-process
  * Better error reporting, and catching the case when STDIN is not a TTY
    and yet password is required to decrypt the key.
 
-## [v2.6.2](https://github.com/kigster/sym/tree/v2.6.2) (2017-03-11)
+## [v2.6.2](https://github.com/kigster/sym/tree/v2.6.2) (2017-03-12)
 [Full Changelog](https://github.com/kigster/sym/compare/v2.6.1...v2.6.2)
 
  * Updating gem description for RubyGems.
 
-## [v2.6.1](https://github.com/kigster/sym/tree/v2.6.1) (2017-03-11)
+## [v2.6.1](https://github.com/kigster/sym/tree/v2.6.1) (2017-03-12)
 [Full Changelog](https://github.com/kigster/sym/compare/v2.6.0...v2.6.1)
 
  * Mostly updating gem descriptions and README
 
-## [v2.6.0](https://github.com/kigster/sym/tree/v2.6.0) (2017-03-11)
+## [v2.6.0](https://github.com/kigster/sym/tree/v2.6.0) (2017-03-12)
 [Full Changelog](https://github.com/kigster/sym/compare/v2.5.3...v2.6.0)
 
  * Added `Sym::MagicFile` API for easy access to encrypted files.
  * Moving output processing into the `Sym::Application` class.
 
-## [v2.5.3](https://github.com/kigster/sym/tree/v2.5.3) (2017-03-09)
+## [v2.5.3](https://github.com/kigster/sym/tree/v2.5.3) (2017-03-11)
 [Full Changelog](https://github.com/kigster/sym/compare/v2.5.2...v2.5.3)
 
  * Added a "\n" to all printouts to STDOUT as long as it's a TTY
 
-## [v2.5.2](https://github.com/kigster/sym/tree/v2.5.2) (2017-03-06)
+## [v2.5.2](https://github.com/kigster/sym/tree/v2.5.2) (2017-03-07)
 [Full Changelog](https://github.com/kigster/sym/compare/v2.5.1...v2.5.2)
 
  * Minor bug fixes around `symit` bash script, and `--bash-support` flag.
 
-## [v2.5.1](https://github.com/kigster/sym/tree/v2.5.0) (2017-03-06)
+## [v2.5.1](https://github.com/kigster/sym/tree/v2.5.0) (2017-03-07)
 [Full Changelog](https://github.com/kigster/sym/compare/v2.5.0...v2.5.1)
 
  * Moved `symit` into `bin/` folder, and now installing it into `~/.sym.symit` with `-B/--bash-support` flag.
