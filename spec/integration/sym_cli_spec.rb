@@ -84,7 +84,7 @@ RSpec.describe 'CLI execution', :type => :aruba do
       end
 
       context 'import a key into a file' do
-        let(:tempfile) { Tempfile.new }
+        let(:tempfile) { Tempfile.new('sym-rspec') }
         let(:args) { "-k #{KEY_PLAIN} -o #{tempfile.path}" }
         it 'should add to keychain' do
           expect(File.read(tempfile.path)).to eq(KEY_PLAIN)

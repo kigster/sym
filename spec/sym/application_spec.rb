@@ -75,7 +75,7 @@ module Sym
           end
 
           context 'key supplied as a file path' do
-            let(:tempfile) { Tempfile.new }
+            let(:tempfile) { Tempfile.new('sym-rspec') }
             let(:key_data) { tempfile.path }
 
             before do
