@@ -219,10 +219,9 @@ module Sym
     # In any case, attempt to initialize the key one way or another.
     def initialize_key_source
       detect_key_source
-
       if args.require_key? && !self.key
         log :error, 'Unable to determine the key, which appears to be required with current args'
-        raise Sym::Errors::NoPrivateKeyFound, 'Private key is required when ' + provided_flags.join(', ') << 'ing.'
+        raise Sym::Errors::NoPrivateKeyFound, 'Private key is required when ' + (self.action ? self.action.to_s + 'ypting' : provided_flags.join(', '))
       end
       log :debug, "initialize_key_source: detected key ends with [...#{(key ? key[-5..-1] : 'nil').bold.magenta}]"
       log :debug, "opts: #{self.provided_value_options.to_s.green.bold}"

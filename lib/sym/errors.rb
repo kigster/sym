@@ -11,6 +11,7 @@ module Sym
     class NoPasswordProvided < Sym::Errors::PasswordError; end
     class PasswordsDontMatch < Sym::Errors::PasswordError; end
     class PasswordTooShort < Sym::Errors::PasswordError; end
+    class CantReadPasswordNoTTY < Sym::Errors::PasswordError; end
 
     class EditorExitedAbnormally < Sym::Errors::Error; end
 

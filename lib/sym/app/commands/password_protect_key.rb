@@ -11,6 +11,7 @@ module Sym
 
         def execute
           retries ||= 0
+          raise Sym::Errors::NoPrivateKeyFound.new("Unable to resolve private key from argument '#{opts[:key]}'") if self.key.nil?
 
           the_key = self.key
 

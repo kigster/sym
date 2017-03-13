@@ -48,17 +48,17 @@ module Sym
       error_type    = "#{(type || exception.class.name)}"
       error_details = (details || exception.message)
 
+      operation = command ? "to #{command.class.short_name.to_s.humanize.downcase}" : ''
+      reason    = exception.message if exception
+
       if exception && (config && config[:trace] || reason == 'Unknown Error')
-        lines << "#{error_type.red.underlined}: #{error_details.white.on.red}\n"
+        lines << "#{error_type.red.on.white.bold}:\n#{error_details.white.on.red}\n" + ''.normal
         lines << exception.backtrace.join("\n").red.bold if config[:trace]
         lines << "\n"
+      else
+        lines << "| SYM Error #{operation} → |".white.on.red + (reason ? " #{reason} ".bold.black.on.white : " #{error_details}")[0..70] + ' '.normal + "\n"
+        lines << "#{comments}" if comments
       end
-
-      operation = command ? "to #{command.class.short_name.to_s.humanize.downcase}" : ''
-      reason    = exception.message if reason.nil? && exception
-
-      lines << " error #{operation} → ".white.on.red+ " #{reason}".bold.red if reason
-      lines << "#{comments}" if comments
 
       error_report = lines.compact.join("\n") || 'Undefined error'
 
