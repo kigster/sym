@@ -120,7 +120,7 @@ module Sym
       end
 
       def command
-        @command ||= self.application&.command
+        @command ||= self.application.command if self.application
       end
 
       def output_proc(proc = nil)
