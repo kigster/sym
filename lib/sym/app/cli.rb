@@ -56,11 +56,21 @@ module Sym
       # brings in #parse(Array[String] args)
       include CLISlop
 
-      attr_accessor :opts, :application, :outputs
+      attr_accessor :opts, :application, :outputs, :stdin, :stdout, :stderr, :kernel
 
-      def initialize(argv)
+
+      def initialize(argv, stdin = STDIN, stdout = STDOUT, stderr = STDERR, kernel = nil)
+
+        self.stdin  = stdin
+        self.stdout = stdout
+        self.stderr = stderr
+        self.kernel = kernel
+
+        Sym::App.stdin  = stdin
+        Sym::App.stdout = stdout
+        Sym::App.stderr = stderr
+
         begin
-
           # Re-map any legacy options to the new options
           self.opts = parse(argv)
           if opts[:sym_args]
@@ -69,7 +79,7 @@ module Sym
           end
 
           # Disable coloring if requested, or if piping STDOUT
-          if opts[:no_color] || !STDOUT.tty?
+          if opts[:no_color] || !self.stdout.tty?
             Colored2.disable! # reparse options without the colors to create new help msg
             self.opts = parse(argv)
           end
@@ -80,7 +90,7 @@ module Sym
           return
         end
 
-        self.application = ::Sym::Application.new(opts)
+        self.application = ::Sym::Application.new(opts, stdin, stdout, stderr, kernel)
       end
 
       def append_sym_args(argv)
@@ -93,6 +103,10 @@ module Sym
 
       def sym_args
         ENV[Sym::Constants::ENV_ARGS_VARIABLE_NAME]
+      end
+
+      def execute!
+        execute
       end
 
       def execute

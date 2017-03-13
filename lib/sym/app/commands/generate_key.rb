@@ -23,7 +23,7 @@ module Sym
           add_to_keychain_if_needed(the_key)
           the_key
         rescue Sym::Errors::PasswordsDontMatch, Sym::Errors::PasswordTooShort => e
-          STDERR.puts e.message.bold
+          stderr.puts e.message.bold
           retry if (retries += 1) < 3
         end
       end

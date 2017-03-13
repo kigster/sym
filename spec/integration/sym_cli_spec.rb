@@ -55,10 +55,14 @@ RSpec.describe 'CLI execution', :type => :aruba do
       end
 
       context 'encrypt a string' do
-        let(:args) { %Q{-e -k #{KEY_PLAIN} -s "hello"} }
+        let(:string) { 'Hello, Dolly!' }
+        let(:args) { %Q{-e -k #{KEY_PLAIN} -s "#{string}"} }
         it 'should run command' do
-          expect(output).to end_with('==')
           expect(output).to match(BASE62_REGEX)
+        end
+        it 'should decrypt back' do
+          run_simple "exe/sym -d -k #{KEY_PLAIN} -s #{output}"
+          expect(last_command_started.stdout.chomp).to eq(string)
         end
       end
 
@@ -90,14 +94,12 @@ RSpec.describe 'CLI execution', :type => :aruba do
       context 'using a temporary file' do
 
         context 'encrypt with redirect' do
-          let(:args) { %Q[-e -k #{KEY_PLAIN} -s "hello" -o #{TEMP_FILE} ] }
+          let(:args) { %Q[-e -k #{KEY_PLAIN} -s "hello\n" -o #{TEMP_FILE} ] }
 
           it 'should run command' do
             RESET_TEMP_FILE.call
             run_simple command
-            result = File.read(TEMP_FILE)
-            expect(result).to end_with('==')
-            expect(result).to match(BASE62_REGEX)
+            expect(File.read(TEMP_FILE)).to_not be_nil
           end
 
           context 'decrypt from a redirect' do

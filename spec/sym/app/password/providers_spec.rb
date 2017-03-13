@@ -20,21 +20,38 @@ module Sym
             let(:argument) { :something }
             it('should be nil') { is_expected.to be_nil }
           end
-          context 'when :drb' do
-            let(:argument) { :drb }
-            it('be DrbProvider') { is_expected.to be_kind_of(Providers::DrbProvider)}
+          if ENV['TEST_DRB']
+            context 'when :drb' do
+              let(:argument) { :drb }
+              it('be DrbProvider') { is_expected.to be_kind_of(Providers::DrbProvider) }
+            end
           end
           context 'when :memcached' do
             let(:argument) { :memcached }
-            it('be Memcached') { is_expected.to be_kind_of(Providers::MemcachedProvider)}
+            it('be Memcached') { is_expected.to be_kind_of(Providers::MemcachedProvider) }
           end
         end
 
-        context '#provider' do
-          before do
-            expect_any_instance_of(Providers::MemcachedProvider).to receive(:alive?).at_least(1).times.and_return(false)
+        context '#detect' do
+          if ENV['TEST_DRB']
+            context 'when memcached is down' do
+              before do
+                allow_any_instance_of(Providers::MemcachedProvider).to receive(:alive?).and_return(false)
+                allow_any_instance_of(Providers::DrbProvider).to receive(:alive?).and_return(true)
+              end
+              its(:provider) { should eq(subject.detect) }
+              its(:provider) { should be_kind_of(Providers::DrbProvider) }
+            end
           end
-          its(:provider) { should eq(subject.detect) }
+
+          context '#when dRB is down' do
+            before do
+              allow_any_instance_of(Providers::MemcachedProvider).to receive(:alive?).and_return(true)
+              allow_any_instance_of(Providers::DrbProvider).to receive(:alive?).and_return(false)
+            end
+            its(:provider) { should eq(subject.detect) }
+            its(:provider) { should be_kind_of(Providers::MemcachedProvider) }
+          end
         end
 
         context '#detect' do
@@ -54,14 +71,8 @@ module Sym
               end
             end
             its(:detect) { should be_kind_of(subject.providers.first) }
+            its(:detect) { should be_kind_of(Providers::MemcachedProvider) }
             its(:detect) { should respond_to(:read, :write, :alive?) }
-          end
-
-          context 'when memcached is not available' do
-            before do
-              expect_any_instance_of(Providers::MemcachedProvider).to receive(:alive?).and_return(false)
-            end
-            its(:detect) { should be_kind_of(Providers::DrbProvider) }
           end
 
           context 'when drb is not available' do

@@ -6,8 +6,8 @@ module Sym
         required_option nil
         def output_proc
           ->(argument) do
-            printf '%s', argument
-            printf "\n" if STDOUT.tty?
+            self.stdout.printf '%s', argument
+            self.stdout.printf "\n" if self.stdout.tty?
           end
         end
       end
