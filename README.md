@@ -1,19 +1,17 @@
 # Sym — Light Weight Symmetric Encryption for Humans
 
 <hr/>
-[![Gitter](https://img.shields.io/gitter/room/gitterHQ/gitter.svg)](https://gitter.im/kigster/sym)
 [![Gem Version](https://badge.fury.io/rb/sym.svg)](https://badge.fury.io/rb/sym)
 [![Downloads](http://ruby-gem-downloads-badge.herokuapp.com/sym?type=total)](https://rubygems.org/gems/sym)
-[![Documentation](http://inch-ci.org/github/kigster/sym.png)](http://inch-ci.org/github/kigster/sym)
-
 [![Build Status](https://travis-ci.org/kigster/sym.svg?branch=master)](https://travis-ci.org/kigster/sym)
 [![Code Climate](https://codeclimate.com/github/kigster/sym/badges/gpa.svg)](https://codeclimate.com/github/kigster/sym)
 [![Test Coverage](https://codeclimate.com/github/kigster/sym/badges/coverage.svg)](https://codeclimate.com/github/kigster/sym/coverage)
 [![Issue Count](https://codeclimate.com/github/kigster/sym/badges/issue_count.svg)](https://codeclimate.com/github/kigster/sym)
-
-<hr/>
+[![Gitter](https://img.shields.io/gitter/room/gitterHQ/gitter.svg)](https://gitter.im/kigster/sym)
 
 **March 10th, 2017**: Please read the blog post [Dead Simple Encryption with Sym](http://kig.re/2017/03/10/dead-simple-encryption-with-sym.html) launching this tool and a library. Please leave comments or questions in the discussion thread at the bottom of that post. Thanks!
+
+[![Donate](https://www.paypalobjects.com/en_US/i/btn/btn_donate_SM.gif)](https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_id=FSFYYNEQ8RKWU)
 
 ## Description
 
