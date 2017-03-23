@@ -24,7 +24,7 @@ Your donation of absolutely any amount is very much appreciated.
 
 <div style="padding 40px; margin: 40px; font-size: 13pt;">
 
-<p><strong>sym</strong> is an open source command line utility and Ruby API which makes it very <em>easy to add reliable encryption and decryption</em> of sensitive data to any Ruby, or Ruby on Rails project. </p>
+<p><strong>sym</strong> is an open source command line utility and Ruby API which makes it very <em>easy to add reliable encryption and decryption</em> of sensitive data to an application or a project written in any language.</p>
 
 <p>Unlike many existing encryption tools, <strong>sym</strong> focuses on narrowing the gap between convenience and security, by offering enhanced usability and a streamlined ruby API and a CLI. The primary goal of the library is to make encryption very easy and transparent. </p>
 
