@@ -1,25 +1,34 @@
 # Sym — Light Weight Symmetric Encryption for Humans
 
-<hr/>
 [![Gem Version](https://badge.fury.io/rb/sym.svg)](https://badge.fury.io/rb/sym)
 [![Downloads](http://ruby-gem-downloads-badge.herokuapp.com/sym?type=total)](https://rubygems.org/gems/sym)
+
 [![Build Status](https://travis-ci.org/kigster/sym.svg?branch=master)](https://travis-ci.org/kigster/sym)
 [![Code Climate](https://codeclimate.com/github/kigster/sym/badges/gpa.svg)](https://codeclimate.com/github/kigster/sym)
 [![Test Coverage](https://codeclimate.com/github/kigster/sym/badges/coverage.svg)](https://codeclimate.com/github/kigster/sym/coverage)
 [![Issue Count](https://codeclimate.com/github/kigster/sym/badges/issue_count.svg)](https://codeclimate.com/github/kigster/sym)
 [![Gitter](https://img.shields.io/gitter/room/gitterHQ/gitter.svg)](https://gitter.im/kigster/sym)
 
-**March 10th, 2017**: Please read the blog post [Dead Simple Encryption with Sym](http://kig.re/2017/03/10/dead-simple-encryption-with-sym.html) launching this tool and a library. Please leave comments or questions in the discussion thread at the bottom of that post. Thanks!
 
-[![Donate](https://www.paypalobjects.com/en_US/i/btn/btn_donate_SM.gif)](https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_id=FSFYYNEQ8RKWU)
+> **March 10th, 2017**. Blog post "**[Dead Simple Encryption with Sym](http://kig.re/2017/03/10/dead-simple-encryption-with-sym.html)**" announces this library, and provides further in-depth discussion. 
+
+> [![Donate](https://www.paypalobjects.com/en_US/i/btn/btn_donate_SM.gif)](https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_id=FSFYYNEQ8RKWU)
+> 
+> Your donation of absolutely any amount is very much appreciated.
+
+---
 
 ## Description
 
 <div style="padding 40px; margin: 40px; font-size: 13pt;">
 
-<strong>sym</strong> is a command line utility and a Ruby API that makes it <em>trivial to encrypt and decrypt sensitive data</em>. Unlike many other existing encryption tools, <strong>sym</strong> focuses on usability and streamlined interface (CLI), with the goal of making encryption easy and transparent. The result? There is no longer any excuse for keeping your application secrets unencrypted or outside of your repo.<br /><br />
+<p><strong>sym</strong> is an open source command line utility and Ruby API which makes it extremely easy to add reliable encryption and decryption of sensitive data to any ruby project. </p>
 
-<strong>sym</strong> uses <em>symmetric Encryption</em> which simply means that you will be using the same 256-bit key to encrypt and decrypt data. In addition to the private key, the encryption uses an IV vector. The library completely hides `iv` generation from the user, and automatically generates a random `iv` per encryption. Finally, each key can be uniquely password-protected (encrypted) and stored in OS-X Keychain, environment variable or a file.
+<p>Unlike many existing encryption tools, <strong>sym</strong> focuses on narrowing the gap between convenience and security, by offering enhanced usability and a streamlined ruby API and a CLI. The primary goal of the library is to make encryption very easy and transparent. application secrets unencrypted or outside of your repo.<br /><br />
+
+<p><strong>sym</strong> uses <em><a href="https://en.wikipedia.org/wiki/Symmetric-key_algorithm">Symmetric Encryption</a></em>, which simply means that you will be using the same 256-bit key to encrypt and decrypt your sensitive data. In addition to the private key, the encryption uses a randomized IV vector, which is automatically generated for each per encryption. </p>
+
+<p>Finally, each key can be uniquely password-protected (encrypted) and stored in OS-X Keychain, environment variable or a file.</p>
 
 </div>
 
