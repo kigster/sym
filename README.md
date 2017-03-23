@@ -1,4 +1,4 @@
-# Sym — Light Weight Symmetric Encryption for Humans
+# Sym — Light-weight Symmetric Encryption for Humans
 
 [![Gem Version](https://badge.fury.io/rb/sym.svg)](https://badge.fury.io/rb/sym)
 [![Downloads](http://ruby-gem-downloads-badge.herokuapp.com/sym?type=total)](https://rubygems.org/gems/sym)
@@ -7,14 +7,16 @@
 [![Code Climate](https://codeclimate.com/github/kigster/sym/badges/gpa.svg)](https://codeclimate.com/github/kigster/sym)
 [![Test Coverage](https://codeclimate.com/github/kigster/sym/badges/coverage.svg)](https://codeclimate.com/github/kigster/sym/coverage)
 [![Issue Count](https://codeclimate.com/github/kigster/sym/badges/issue_count.svg)](https://codeclimate.com/github/kigster/sym)
+
 [![Gitter](https://img.shields.io/gitter/room/gitterHQ/gitter.svg)](https://gitter.im/kigster/sym)
 
+---
 
-> **March 10th, 2017**. Blog post "**[Dead Simple Encryption with Sym](http://kig.re/2017/03/10/dead-simple-encryption-with-sym.html)**" announces this library, and provides further in-depth discussion. 
+**March 10th, 2017**. Please checkout the post "**[Dead Simple Encryption with Sym](http://kig.re/2017/03/10/dead-simple-encryption-with-sym.html)**" that announces this library, and provides further in-depth discussion.
 
-> [![Donate](https://www.paypalobjects.com/en_US/i/btn/btn_donate_SM.gif)](https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_id=FSFYYNEQ8RKWU)
-> 
-> Your donation of absolutely any amount is very much appreciated.
+[![Donate](https://www.paypalobjects.com/en_US/i/btn/btn_donate_SM.gif)](https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_id=FSFYYNEQ8RKWU)
+ 
+Your donation of absolutely any amount is very much appreciated.
 
 ---
 
@@ -22,24 +24,25 @@
 
 <div style="padding 40px; margin: 40px; font-size: 13pt;">
 
-<p><strong>sym</strong> is an open source command line utility and Ruby API which makes it extremely easy to add reliable encryption and decryption of sensitive data to any ruby project. </p>
+<p><strong>sym</strong> is an open source command line utility and Ruby API which makes it very <em>easy to add reliable encryption and decryption</em> of sensitive data to any Ruby, or Ruby on Rails project. </p>
 
-<p>Unlike many existing encryption tools, <strong>sym</strong> focuses on narrowing the gap between convenience and security, by offering enhanced usability and a streamlined ruby API and a CLI. The primary goal of the library is to make encryption very easy and transparent. application secrets unencrypted or outside of your repo.<br /><br />
+<p>Unlike many existing encryption tools, <strong>sym</strong> focuses on narrowing the gap between convenience and security, by offering enhanced usability and a streamlined ruby API and a CLI. The primary goal of the library is to make encryption very easy and transparent. </p>
 
-<p><strong>sym</strong> uses <em><a href="https://en.wikipedia.org/wiki/Symmetric-key_algorithm">Symmetric Encryption</a></em>, which simply means that you will be using the same 256-bit key to encrypt and decrypt your sensitive data. In addition to the private key, the encryption uses a randomized IV vector, which is automatically generated for each per encryption. </p>
+<p><strong>sym</strong> uses the <em><a href="https://en.wikipedia.org/wiki/Symmetric-key_algorithm">Symmetric Encryption</a></em> algorithm. This means that the same key is used to encrypt and decrypt data. In addition to the key, the encryption uses a randomized IV vector, which is automatically generated  per each encryption and serialized with the data. Result of encryption is zlib-compressed, and base64 encoded, to be suitable for storage as string. The generated keys are also base64-encoded for convenience.</p>
 
-<p>Finally, each key can be uniquely password-protected (encrypted) and stored in OS-X Keychain, environment variable or a file.</p>
+<p>Finally, the library offers encryption using any regular password, and in particular supports password-protected encryption keys. The key can be specified by a filename, environment variable, or OS-X Keychain password entry name, or as is.</p>
 
 </div>
 
 ## Supported Ruby Versions
 
-Sym currently builds and runs on the following ruby versions, which can be verified on Travis CI:
 [![Build Status](https://travis-ci.org/kigster/sym.svg?branch=master)](https://travis-ci.org/kigster/sym)
+
+Sym currently builds and runs on the following ruby versions:
 
  * 2.2.5
  * 2.3.3
- * 2.4.0
+ * 2.4.1
  * jruby-9.1.7.0 
 
 ### Motivation
@@ -48,9 +51,10 @@ The main goal when writing this tool was to streamline and simplify handling of 
 
 Most common use-cases include:
 
- * __Encrypting/decrypting of application secrets__, so that the encrypted secrets can be safely checked into the git repository and distributed, and yet without much of the added headache that this often requires
+ * __Encrypting/decrypting of application secrets files__, so that the encrypted secrets can be safely checked into the git repository and distributed, and yet without much of the added headache that this often requires
  * __Secure message transfer between any number of receipients__
- * __General purpose encryption/decryption with a single encryption key__, optionally itself re-encrypted with a password.
+ * __General purpose encryption/decryption with a 256-bit encryption key__, optionally itself re-encrypted with a password.
+ * __General purpose encryption/decryption with an arbitrary password__.
 
 __Sym__ is a layer built on top of the [`OpenSSL`](https://www.openssl.org/) library, and, hopefully, makes encryption more accessible to every-day developers, QA, and dev-ops folks, engaged in deploying applications.
 
@@ -58,23 +62,27 @@ __Sym__ is a layer built on top of the [`OpenSSL`](https://www.openssl.org/) lib
 
 This gem includes two primary components:
 
- 1. [Rich command line interface CLI](#cli) with many features to streamline encryption/decryption.
- 2.  Ruby API:
-     * [Basic Encryption/Decryption API](#rubyapi) is activated by including `Sym` module in a class, it adds easy to use `encr`/`decr` methods.     
-     * [Application API](#rubyapi-app) is activated by instantiating `Sym::Application`, and using the instance to drive sym's complete set of functionality, as if it was invoked from the CLI.
-     * [Sym::MagicFile API](#magic-file) is a convenience class allowing you to read encrypted files in your ruby code with a couple of lines of code.
-     * [Sym::Configuration](#rubyapi-config) class for overriding default cipher, and many other parameters such as compression, cache location, zlib compression, and more.
+ 1. **[Rich command line interface CLI](#cli)** with many features to streamline encryption/decryption, and to be integrated into the deployment flow.<br /><br />
+ 2.  Ruby APIs:
+     * **[Key Generation, Encryption & Decryption API](#rubyapi)**
+       - is activated by including `Sym` module in a class, it adds easy to use `encr`/`decr` methods.     
+     * **[Application API to shadow the CLI usage](#rubyapi-app)**
+       - You can instantiate `Sym::Application` class with a hash representing CLI arguments, and then call it's `#execute` method to mimic CLI execution.
+     * **[Sym::MagicFile API](#magic-file)**
+       - This is a convenience class allowing you to encrypt/decrypt files in your ruby code with just couple of lines of code.
+     * **[Sym::Configuration](#rubyapi-config)** 
+       - Use this class to override the default cipher, and configure other parameters such as compression, password caching, and more.
 
 ### Massive Time Savers
 
-What are the time savers that we mentioned earlier?
+**Sym** tries very hard to get out of your way, to make it *feel* as if your encrypted files are as easy to work with as the unencrypted files. It accomplishes this transparency with the following features:
  
-  * By using Mac OS-X Keychain, `sym` offers a simple yet secure way of storing the key on a local machine, much more secure then storing it on a file system.
-  * By using a password cache (`-c`) via an in-memory provider such as `memcached` or `drb`, `sym` invocations take advantage of password cache, and only ask for a password once per a configurable time period.
-  * By using `SYM_ARGS` environment variable, where common flags can be saved.
+  * By using **Mac OS-X Keychain**, `sym` offers a simple yet secure way of storing the key on a local machine, much more secure then storing it on a file system.
+  * By using a **password cache** (`-c`) via an in-memory provider such as `memcached` or `drb`, `sym` invocations take advantage of password cache, and only ask for a password once per a configurable time period.
+  * By using **`SYM_ARGS` environment variable** you can save common flags and they will be applied whenever `-A` flag is activated.
   * By reading a key from the default key source file `~/.sym.key` which requires no flags at all.
-  * By utilizing the `--negate` option to quickly encrypt a regular file, or decrypt an encrypted file with extension `.enc`.
-  * By using the `-t` (edit) mode, that opens an encrypted file in your `$EDITOR`, and replaces the encrypted version upon save & exit.
+  * By utilizing the **`--negate` option to quickly encrypt a regular file**, or decrypt an encrypted file with extension `.enc`.
+  * By using the **`-t` (edit) mode**, that opens an encrypted file in your `$EDITOR`, and replaces the encrypted version upon save & exit.
 
 As you can see, we really tried to build a tool that provides good security for application secrets, including password-based encryption, but does not annoyingly ask for password every time. With `--edit` option, and `--negate` options you can treat encrypted files like regular files. 
 
@@ -578,21 +586,29 @@ Bug reports and pull requests are welcome on GitHub at [https://github.com/kigst
 
 ### License
 
-`Sym` library is &copy; 2016-2017 Konstantin Gredeskoul.
+**Sym** library is &copy; 2016-2017 Konstantin Gredeskoul.
 
-The gem is available as open source under the terms of the [MIT License](http://opensource.org/licenses/MIT).
-
-The library is designed to be a layer on top of [`OpenSSL`](https://www.openssl.org/), distributed under the [Apache Style license](https://www.openssl.org/source/license.txt).
+The gem is available as open source under the terms of the [MIT License](http://opensource.org/licenses/MIT). The library is designed to be a layer on top of [`OpenSSL`](https://www.openssl.org/), distributed under the [Apache Style license](https://www.openssl.org/source/license.txt).
 
 ### Acknowledgements
 
-While [Konstantin Gredeskoul](http:/kig.re) is the primary developer of this library, contributions  are very much encouraged. Any pull requests will be reviewed promptly. Please submit feature requests, bugs, or a good word :) 
+ * The blog post [(Symmetric) Encryption With Ruby (and Rails)](http://stuff-things.net/2015/02/12/symmetric-encryption-with-ruby-and-rails/) provided the inspiration for this gem. 
+ * We'd like to thank [Spike Ilacqua](http://stuff-things.net/spike/), the author of the [strongbox](https://github.com/spikex/strongbox) gem, for providing very easy-to-read code examples of symmetric encryption.
+ * We'd like to thank [Wissam Jarjoui](https://github.com/bosswissam) for support and inspiration, as well as testing of the early versions of this gem.
+
 
 #### Contributors:
 
- * [Wissam Jarjoui](https://github.com/bosswissam)
- * Megan Mathews 
- * Barry Anderson
+Contributions of any kind are very much welcome from anyone. 
+
+Any pull requests will be reviewed promptly. 
+
+Please submit feature requests, bugs, or donations :) 
+
+ * [Konstantin Gredeskoul](http:/kig.re) (primary developer)
+ * [Wissam Jarjoui](https://github.com/bosswissam) (testing, inspiration)
+ * [Megan Mathews](https://github.com/meganmmathews) (UX, CLI suggestions)
+ * [Barry Anderson](https://twitter.com/z3ndrag0n) (sanity checking, review)
 
  
 
