@@ -2,7 +2,14 @@
 
 ## [HEAD](https://github.com/kigster/sym/tree/HEAD)
 
-[Changes since the last tag](https://github.com/kigster/sym/compare/v2.6.3...HEAD)
+[Changes since the last tag](https://github.com/kigster/sym/compare/v2.7.0...HEAD)
+
+## [v2.7.0](https://github.com/kigster/sym/tree/v2.7.0) (2017-06-23)
+[Full Changelog](https://github.com/kigster/sym/compare/v2.6.3...v2.7.0)
+
+ * Changing -t flag to expect a file argument, removing the need
+   for "-f file" in addition to "-t"
+ * Adding 'irbtools' to development gems.
 
 ## [v2.6.3](https://github.com/kigster/sym/tree/v2.6.3) (2017-03-13)
 [Full Changelog](https://github.com/kigster/sym/compare/v2.6.2...v2.6.3)
