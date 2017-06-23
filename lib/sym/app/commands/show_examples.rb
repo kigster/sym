@@ -43,8 +43,8 @@ module Sym
           output << example(comment: 'decrypt an encrypted file and print it to STDOUT:',
                             command: 'sym -ck production.key -df secrets.yml.enc')
 
-          output << example(comment: 'edit an encrypted file in $EDITOR, use default key file, create file backup',
-                            command: 'sym -tbf secrets.enc',
+          output << example(comment: 'edit an encrypted file in $EDITOR, use default key file, create a backup',
+                            command: 'sym -bt secrets.enc',
                             result:  '
 Private Key: ••••••••••••••••••••••••••••••••••••••••••••
 Saved encrypted content to sym.enc.
@@ -64,7 +64,7 @@ Diff:
                             command: 'sym -e -c -k staging.key -n etc/passwords.enc')
 
           output << example(comment: 'use the new key to inline-edit the encrypted file:',
-                            command: 'sym -k mykey -tf sym.yml.enc')
+                            command: 'sym -k mykey -t sym.yml.enc')
           end
 
           output.flatten.compact.join("\n")

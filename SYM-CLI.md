@@ -138,6 +138,6 @@ sym -gpcx staging.key
 sym -e -c -k staging.key -n etc/passwords.enc
 ————————————————————————————————————————————————————————————————————————————————
 # use the new key to inline-edit the encrypted file:
-sym -k mykey -tf sym.yml.enc
+sym -k mykey -t sym.yml.enc
 ————————————————————————————————————————————————————————————————————————————————
 ```

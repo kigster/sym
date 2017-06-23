@@ -92,7 +92,6 @@ RSpec.describe 'CLI execution', :type => :aruba do
       end
 
       context 'using a temporary file' do
-
         context 'encrypt with redirect' do
           let(:args) { %Q[-e -k #{KEY_PLAIN} -s "hello\n" -o #{TEMP_FILE} ] }
 

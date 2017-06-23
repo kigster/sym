@@ -82,7 +82,7 @@ This gem includes two primary components:
   * By using **`SYM_ARGS` environment variable** you can save common flags and they will be applied whenever `-A` flag is activated.
   * By reading a key from the default key source file `~/.sym.key` which requires no flags at all.
   * By utilizing the **`--negate` option to quickly encrypt a regular file**, or decrypt an encrypted file with extension `.enc`.
-  * By using the **`-t` (edit) mode**, that opens an encrypted file in your `$EDITOR`, and replaces the encrypted version upon save & exit.
+  * By using the **`-t file` (edit) mode**, that opens an encrypted file in your `$EDITOR`, and replaces the encrypted version upon save & exit.
 
 As you can see, we really tried to build a tool that provides good security for application secrets, including password-based encryption, but does not annoyingly ask for password every time. With `--edit` option, and `--negate` options you can treat encrypted files like regular files. 
 
@@ -131,8 +131,8 @@ Should you choose to install it (this part is optional), you will be able to use
   4. Finally, we are ready to encrypt. The data to be encrypted can be read from a file with `-f filename`, or it can be read from STDIN, or a passed on the command line with `-s string`. For example, `sym -e -k ~/.key -f /etc/passwd` will encrypt the file and print the encrypted contents to STDOUT.
   4. Instead of printing to STDOUT, the output can be saved to a file with `-o <file>` or a simple redirect or a pipe.
   5. Encrypted file can later be decrypted with `sym -d ...` assuming the same key it was encrypted with.
-  6. Encrypted file with extension `.enc` can be automatically decrypted with `-n/--negate` option; if the file does not end with `.enc`, it is encrypted and `.enc` extension added to the resulting file.
-  7. With `-t` flag you can open in VIM (or `$EDITOR`) any encrypted file and edit it. Once you save it, the file gets re-encrypted and replaces the previous version. A backup can be created with `-b` option. See the section on [inline editing](#inline)
+  6. Encrypted file with extension `.enc` can be automatically decrypted with `-n/--negate file` option; if the file does not end with `.enc`, it is encrypted and `.enc` extension added to the resulting file.
+  7. With `-t/--edit file` flag you can edit an encrypted file in VIM (or `$EDITOR`) any encrypted file and edit it. Once you save it, the file gets re-encrypted and replaces the previous version. A backup can be created with `-b` option. See the section on [inline editing](#inline)
 
 A sample session that uses Mac OS-X Keychain to store the password-protected key.
 
@@ -174,7 +174,7 @@ The `sym` CLI tool supports one particularly interesting mode, that streamlines 
 
 Instead of decrypting data anytime you need to change it into a new file and then manually re-encrypting the result, you can use the shortcut flag `-t` (for "edi**t**"), which decrypts your data into a temporary file, automatically opening it with an `$EDITOR`. 
 
-    sym -t -f config/application/secrets.yml.enc -k ~/.key
+    sym -t config/application/secrets.yml.enc -k ~/.key
     
 > This is one of those time-saving features that can make a difference in making encryption feel easy and transparent.
 
@@ -189,7 +189,7 @@ Here is a full command that opens a file specified by `-f | --file`, using the k
 
 Example: here we edit an encrypted file in `vim`, while using interactive mode to paste the key (`-i | --interactive`), and then creating a backup file (`-b | --backup`) upon save:
 
-    sym -tibf data.enc
+    sym -ibt data.enc
     # => Private Key: ••••••••••••••••••••••••••••••••••••••••••••
     #
     # => Diff:
@@ -398,9 +398,9 @@ You can use the generated private key by passing an argument to the `-k` flag.
 
 #### Inline Editing
 
-The `sym` CLI tool supports one particularly interesting mode, that streamlines handling of encrypted files. The mode is called __edit mode__, and is activated with the `-t` flag. 
+The `sym` CLI tool supports one particularly interesting mode, that streamlines handling of encrypted files. The mode is called __edit mode__, and is activated with the `-t file` flag. 
 
-In this mode `sym` can decrypt the file, and open the result in an `$EDITOR`. Once you make any changes, and save it (exiting the editor), `sym` will automatically diff the new and old content, and if different – will save encrypt it and overwrite the original file.
+In this mode `sym` will automaticaly decrypt the encrypted file into a temporary file, and then open it in `$EDITOR`. Once you quit the editor, `sym` will automatically diff the new and old content, and if it is different, `sym` will re-encrypt the new contents and overwrite the original file. You can create an optional backup by adding `-b` flag.
 
 > NOTE: this mode does not seem to work with GUI editors such as Atom or TextMate. Since `sym` waits for the editor process to complete, GUI editors "complete" immediately upon starting a windowed application. 
 In this mode several flags are of importance:
@@ -408,7 +408,7 @@ In this mode several flags are of importance:
     -b (--backup)   – will create a backup of the original file
     -v (--verbose) - will show additional info about file sizes
 
-Here is a full command that opens a file specified by `-f | --file`, using the key specified in `-k | --keyfile`, in the editor defined by the `$EDITOR` environment variable (or if not set – defaults to `/bin/vi`)".
+Here is a full command that opens a file specified by `-t | --edit file`, using the key specified in `-k | --keyfile`, in the editor defined by the `$EDITOR` environment variable (or if not set – defaults to `/bin/vi`)".
 
 To edit an encrypted file in `$EDITOR`, while asking to paste the key (`-i | --interactive`), while creating a backup file (`-b | --backup`):
 
