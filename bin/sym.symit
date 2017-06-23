@@ -252,7 +252,7 @@ symit() {
     return $(symit::exit 5)
   }
 
-  command="sym -ck ${cli__opts[key]} -tf ${file}"
+  command="sym -ck ${cli__opts[key]} -t ${file}"
 
   [[ ${cli_opts[dry_run]} ]] && printf "[dry_run] "
 

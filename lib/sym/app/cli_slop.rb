@@ -29,11 +29,11 @@ module Sym
           o.separator ''
           o.separator '   Auto-detect mode based on a special file extension '.dark + '".enc"'.dark.bold
           o.separator ' '
-          o.separator '       sym -n/--negate  '.green.bold + key_spec + ' file[.enc] '.green
+          o.separator '       sym '.green.bold + key_spec + ' -n/--negate file[.enc] '.green.bold
           o.separator ' '
           o.separator '   Edit an encrypted file in $EDITOR '.dark
           o.separator ' '
-          o.separator '       sym -t/--edit    '.green.bold + key_spec + ' -f file [ -b/--backup ]'.green.bold
+          o.separator '       sym '.green.bold + key_spec + ' -t/--edit file[.enc] [ -b/--backup ]'.green.bold
           o.separator ' '
           o.separator '   Save commonly used flags in a BASH variable. Below we save the KeyChain '.dark
           o.separator '   "staging" as the default key name, and enable password caching.'.dark
@@ -48,7 +48,7 @@ module Sym
           o.separator 'Modes:'.yellow
           o.bool      '-e', '--encrypt',            '           encrypt mode'
           o.bool      '-d', '--decrypt',            '           decrypt mode'
-          o.bool      '-t', '--edit',               '           edit encrypted file in an $EDITOR'
+          o.string    '-t', '--edit',               '[file]  '.blue + '   edit encrypted file in an $EDITOR', default: nil
           o.string    '-n', '--negate',             '[file]  '.blue + "   encrypts any regular #{'file'.green} into #{'file.enc'.green}" + "\n" +
                                      "                                    conversely decrypts #{'file.enc'.green} into #{'file'.green}."
           o.separator ' '

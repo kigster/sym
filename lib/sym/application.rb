@@ -42,6 +42,7 @@ module Sym
       self.opts      = opts.is_a?(Hash) ? opts : opts.to_hash
 
       process_negated_option(opts[:negate]) if opts[:negate]
+      process_edit_option
 
       self.args = ::Sym::App::Args.new(self.provided_options)
 
@@ -182,6 +183,13 @@ module Sym
       args[:provider] = opts[:cache_provider] if opts[:cache_provider]
 
       self.password_cache = Sym::App::Password::Cache.instance.configure(args)
+    end
+
+    def process_edit_option
+      if opts[:edit] && opts[:edit].is_a?(String) && opts[:file].nil?
+        opts[:file] = opts[:edit]
+        opts[:edit] = true
+      end
     end
 
     def process_negated_option(file)

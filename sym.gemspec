@@ -55,6 +55,7 @@ EOF
 
   spec.add_development_dependency 'codeclimate-test-reporter', '~> 1.0'
   spec.add_development_dependency 'simplecov'
+  spec.add_development_dependency 'irbtools'
   spec.add_development_dependency 'aruba'
   spec.add_development_dependency 'bundler', '~> 1'
   spec.add_development_dependency 'rake'
