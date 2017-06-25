@@ -30,9 +30,15 @@ Your donation of absolutely any amount is very much appreciated.
 
 <p><strong>sym</strong> uses the <em><a href="https://en.wikipedia.org/wiki/Symmetric-key_algorithm">Symmetric Encryption</a></em> algorithm. This means that the same key is used to encrypt and decrypt data. In addition to the key, the encryption uses a randomized IV vector, which is automatically generated  per each encryption and serialized with the data. Result of encryption is zlib-compressed, and base64 encoded, to be suitable for storage as string. The generated keys are also base64-encoded for convenience.</p>
 
-<p>Finally, the library offers encryption using any regular password, and in particular supports password-protected encryption keys. The key can be specified by a filename, environment variable, or OS-X Keychain password entry name, or as is.</p>
+<p>Finally, the library offers encryption using any regular password, and in particular supports password-protected encryption keys. Automatic key detection algorithm attempts to resolve a provided key as a filename, an environment variable name, an OS-X Keychain password entry name, a key itself, or a default key file.</p>
 
 </div>
+
+### Quick Demo of the CLI in Action
+
+[![asciicast](design/ascii-cinema.png)](https://asciinema.org/a/106737)
+
+
 
 ## Supported Ruby Versions
 
@@ -44,10 +50,6 @@ Sym currently builds and runs on the following ruby versions:
  * 2.3.3
  * 2.4.1
  * jruby-9.1.7.0 
-
-### Quick Demo of the CLI in Action
-
-[![asciicast](https://asciinema.org/a/106737.png)](https://asciinema.org/a/106737)
 
 ### Motivation
 
