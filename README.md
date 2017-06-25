@@ -45,6 +45,10 @@ Sym currently builds and runs on the following ruby versions:
  * 2.4.1
  * jruby-9.1.7.0 
 
+### Quick Demo of the CLI in Action
+
+[![asciicast](https://asciinema.org/a/106737.png)](https://asciinema.org/a/106737)
+
 ### Motivation
 
 The main goal when writing this tool was to streamline and simplify handling of sensitive data in a  trasparent and easy to use way without sacrificing security.
