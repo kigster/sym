@@ -51,8 +51,8 @@ module Sym
           @timestamp ||= Time.now.to_a.select { |d| d.is_a?(Fixnum) }.map { |d| '%02d' % d }[0..-3].reverse.join
         end
 
-        def process(code)
-          if code == true
+        def process(exit_code)
+          if exit_code
             content_edited = File.read(tempfile.path)
             md5            = ::Base64.encode64(Digest::MD5.new.digest(content))
             md5_edited     = ::Base64.encode64(Digest::MD5.new.digest(content_edited))

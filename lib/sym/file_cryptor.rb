@@ -15,16 +15,16 @@ module Sym
   # the key to be used in decryption. Note that methods +decrypt+ and +read+ are
   # synomymous
   #
-  #    require 'sym/magic_file'
-  #    magic = Sym::MagicFile.new('/usr/local/etc/secrets.yml.enc', 'PRIVATE_KEY')
-  #    YAML.load(magic.read)
+  #    require 'sym/file_cryptor'
+  #    cryptor = Sym::FileCryptor.new('/usr/local/etc/secrets.yml.enc', 'PRIVATE_KEY')
+  #    YAML.load(cryptor.read)
   #
   # Or, lets say you are using the +config+ gem. Then you would do something like this:
   #
   #    require 'config'
-  #    Settings.add_source!(YAML.load(magic.decrypt))
+  #    Settings.add_source!(YAML.load(cryptor.decrypt))
   #
-  class MagicFile
+  class FileCryptor
     attr_accessor :pathname, :opts, :key_value, :action
 
     def initialize(pathname, key_value, **opts)
@@ -38,13 +38,13 @@ module Sym
 
     # Encrypts +pathname+ to a +filename+
     def encrypt_to(filename)
-      self.opts.merge!({output: filename})
+      self.opts.merge!({ output: filename })
       encrypt
     end
 
     # Decrypts +pathname+ to a +filename+
     def decrypt_to(filename)
-      self.opts.merge!({output: filename})
+      self.opts.merge!({ output: filename })
       decrypt
     end
 
@@ -67,17 +67,15 @@ module Sym
       self.pathname  = pathname
       self.opts      = opts || {}
       self.key_value = key_value
-      self.opts.merge!({ file: pathname, key: key_value, quiet: true})
+      self.opts.merge!({ file: pathname, key: key_value, quiet: true })
     end
 
     def action
-      app    = Sym::Application.new(opts)
-      result = app.execute
-      if result.is_a?(Hash)
-        log :error, result.inspect
-        raise result[:exception] if result[:exception]
-      else
-        return result
+      Sym::Application.new(opts).execute.tap do |result|
+        if result.is_a?(Hash)
+          log :error, result.inspect
+          raise result[:exception] if result[:exception]
+        end
       end
     end
 

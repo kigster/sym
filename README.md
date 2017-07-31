@@ -74,7 +74,7 @@ This gem includes two primary components:
        - is activated by including `Sym` module in a class, it adds easy to use `encr`/`decr` methods.     
      * **[Application API to shadow the CLI usage](#rubyapi-app)**
        - You can instantiate `Sym::Application` class with a hash representing CLI arguments, and then call it's `#execute` method to mimic CLI execution.
-     * **[Sym::MagicFile API](#magic-file)**
+     * **[Sym::FileCryptor API](#file-cryptor)**
        - This is a convenience class allowing you to encrypt/decrypt files in your ruby code with just couple of lines of code.
      * **[Sym::Configuration](#rubyapi-config)** 
        - Use this class to override the default cipher, and configure other parameters such as compression, password caching, and more.
@@ -280,16 +280,16 @@ For this purpose, two more instance methods exist:
 
 They can be used independently of `encr` and `decr` to encrypt/decrypt any data with a password.
 
-<a name="magic-file"></a>
+<a name="file-cryptor"></a>
 
-### Using `Sym::MagicFile` API for Reading/Writing Encrypted/Decrypted data
+### Using `Sym::FileCryptor` API for Reading/Writing Encrypted/Decrypted Files
 
-This is probably the easiest way to leverage Sym-encrypted files in your application — by loading them into memory with `Sym::MagicFile`. This class provides a very simple API while supporting all of the convenience features of the rich application API (see below).
+`Sym::FileCryptor` is probably the easiest way to leverage Sym-encrypted files in your ruby application. The class provides a very simple API while supporting all of the convenience features of the rich application API (see below).
 
-You instantiate `Sym::MagicFile` with just two parameters: a `pathname` to a file (encrypted
+You instantiate `Sym::FileCryptor` with just two parameters: a `pathname` to a file (encrypted
 or not), and the `key` identifier. The identifier can either be a filename, or
-OS-X Keychain entry, or environment variable name, etc — basically it is resolve
-like any other `-k <value>` CLI flag.
+OS-X Keychain entry, or environment variable name, etc —  basically it resolves
+the same way as the arguments any the `-k <value>` CLI flag described in detail above.
 
 The following methods are available:
 
@@ -298,15 +298,15 @@ The following methods are available:
  * `#encrypt_to(filename)` — encrypts the contents of a file specified by the pathname, and writes the result to a `filename`. 
  * `#decrypt_to(filename)` — decrypts the contents of a file specified by the pathname, and writes the result to a `filename`. 
 
-#### Example: Using `Sym::MagicFile` with the `RailsConfig` (or `Settings`) gem
+#### Example: Using `Sym::FileCryptor` with the `RailsConfig` (or `Settings`) gem
 
 In this example, we assume that the environment variable `$PRIVATE_KEY` contain
 the key to be used in decryption. 
 
 ```ruby
-require 'sym/magic_file'
+require 'sym/file_cryptor'
 require 'yaml'
-secrets = Sym::MagicFile.new('/usr/local/etc/secrets.yml.enc', 'PRIVATE_KEY')
+secrets = Sym::FileCryptor.new('/usr/local/etc/secrets.yml.enc', 'PRIVATE_KEY')
 hash = YAML.load(secrets.decrypt)
 ```
 
@@ -314,11 +314,11 @@ Let's say that you are using [RailsConfig](https://github.com/railsconfig/config
 
 ```ruby
 require 'config'
-require 'sym/magic_file'
+require 'sym/file_cryptor'
 require 'yaml'
 Settings.add_source!(
     YAML.load(
-        Sym::MagicFile.new(
+        Sym::FileCryptor.new(
             '/usr/local/etc/secrets.yml.enc', 
             'PRIVATE_KEY'
         ).decrypt)
@@ -345,7 +345,7 @@ key  = Sym::Application.new(generate: true).execute
 
 ### Ruby API Conclusion
 
-Using `Sym`'s rich ruby API you can perform both low-level encryption/decryption, as well as high-level management of encrypted files. By using `Sym::MagicFile` and/or `Sym::Application` classes you can access the entire set of functionality expressed vi the CLI, described in details below.
+Using `Sym`'s rich ruby API you can perform both low-level encryption/decryption, as well as high-level management of encrypted files. By using `Sym::FileCryptor` and/or `Sym::Application` classes you can access the entire set of functionality expressed vi the CLI, described in details below.
 
 <a name="cli"></a>
 ## Using `sym` with the Command Line
