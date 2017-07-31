@@ -16,7 +16,7 @@ end
 task :build => :permissions
 
 YARD::Rake::YardocTask.new(:doc) do |t|
-  t.files = %w(lib/**/*.rb exe/*.rb - README.md LICENSE sym-3.0-cli.md)
+  t.files = %w(lib/**/*.rb exe/*.rb - README.md LICENSE)
   t.options.unshift('--title','"Sym – Symmetric Key Encryption for Your Data"')
   t.after = ->() { exec('open doc/index.html') }
 end
