@@ -228,7 +228,7 @@ The following example illustrates this point:
 require 'sym'
 
 class TestClass
-  include Sym
+  include Sym::Crypt
 end
 
 @key = TestClass.create_private_key
@@ -236,7 +236,7 @@ end
 # A new key was created and saved in #private_key accessor.
 
 class SomeClass
-  include Sym
+  include Sym::Crypt
   private_key TestClass.private_key
 end
 
@@ -257,7 +257,7 @@ Therefore you could write something like this below, protecting a sensitive stri
 ```ruby
 require 'sym'
 class TestClass
-  include Sym
+  include Sym::Crypt
   private_key ENV['SECRET']
 
   def sensitive_value=(value)

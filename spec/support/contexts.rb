@@ -5,7 +5,7 @@ require_relative 'fake_terminal'
 
 TEST_KEY = 'LxRV7pqW5XY5DDcuh128byukvsr3JLGX54v6eKNl8a0='
 class TestClass
-  include Sym
+  include Sym::Crypt
   private_key TEST_KEY # Use ENV['SECRET'] in prod
 
   def secure_value=(value)
@@ -113,13 +113,13 @@ RSpec.shared_context :abc_classes do
   let(:c_private_key) { 'BOT+8SVzRKQSl5qecjB4tUW1ENakJQw8wojugYQnEHc=' }
   before do
     class AClass
-      include Sym
+      include Sym::Crypt
     end
     class BClass
-      include Sym
+      include Sym::Crypt
     end
     class CClass
-      include Sym
+      include Sym::Crypt
       private_key 'BOT+8SVzRKQSl5qecjB4tUW1ENakJQw8wojugYQnEHc='
     end
 

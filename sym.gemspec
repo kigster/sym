@@ -52,6 +52,7 @@ EOF
   spec.add_dependency 'highline', '~> 1.7'
   spec.add_dependency 'coin', '~> 0.1.8'
   spec.add_dependency 'dalli', '~> 2.7'
+  spec.add_dependency 'sym-crypt'
 
   spec.add_development_dependency 'codeclimate-test-reporter', '~> 1.0'
   spec.add_development_dependency 'simplecov'

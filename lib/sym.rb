@@ -2,12 +2,13 @@ require 'colored2'
 require 'zlib'
 require 'logger'
 
+require 'sym/crypt'
 require 'sym/configuration'
 require 'sym/constants'
 require 'sym/version'
 require 'sym/errors'
 
-Sym::Configuration.configure do |config|
+::Sym::Configuration.configure do |config|
   config.password_cipher          = 'AES-128-CBC'
   config.data_cipher              = 'AES-256-CBC'
   config.private_key_cipher       = config.data_cipher
@@ -38,8 +39,6 @@ Sym::Configuration.configure do |config|
 end
 
 require 'sym/extensions/stdlib'
-require 'sym/extensions/class_methods'
-require 'sym/extensions/instance_methods'
 #
 # == Using Sym Library
 #
@@ -77,7 +76,7 @@ require 'sym/extensions/instance_methods'
 #     require 'sym'
 #
 #     class TestClass
-#       include Sym
+#       include Sym::Crypt
 #       # read the key from environmant variable and assign to this class.
 #       private_key ENV['PRIVATE_KEY']
 #

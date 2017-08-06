@@ -5,7 +5,7 @@ module Sym
   module App
     module PrivateKey
       class Decryptor
-        include Sym
+        include Sym::Crypt
 
         attr_accessor :encrypted_key, :input_handler, :password_cache
 

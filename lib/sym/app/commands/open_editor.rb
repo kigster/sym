@@ -8,7 +8,7 @@ module Sym
   module App
     module Commands
       class OpenEditor < BaseCommand
-        include Sym
+        include Sym::Crypt
 
         required_options [ :key, :interactive ],
                            :edit,

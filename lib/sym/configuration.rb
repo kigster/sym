@@ -1,3 +1,5 @@
+require 'sym/crypt/configuration'
+
 module Sym
   # This class encapsulates application configuration, and exports
   # a familiar method +#configure+ for defining configuration in a
@@ -19,24 +21,10 @@ module Sym
   #       config.compression_enabled = true
   #       config.compression_level = Zlib::BEST_COMPRESSION
   #     end
-  class Configuration
-    class << self
-      attr_accessor :config
-
-      def configure
-        self.config ||= Configuration.new
-        yield config if block_given?
-      end
-
-      def property(name)
-        self.config.send(name)
-      end
-    end
+  class Configuration < Sym::Crypt::Configuration
 
     # See file +lib/sym.rb+ where these values are defined.
 
-    attr_accessor :data_cipher, :password_cipher, :private_key_cipher
-    attr_accessor :compression_enabled, :compression_level
     attr_accessor :password_cache_default_provider, :password_cache_timeout
     attr_accessor :password_cache_arguments
     attr_accessor :default_key_file, :encrypted_file_extension

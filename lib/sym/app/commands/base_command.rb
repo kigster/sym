@@ -46,7 +46,7 @@ module Sym
           end
         end
 
-        include Sym
+        include Sym::Crypt
         extend Forwardable
 
         attr_accessor :application

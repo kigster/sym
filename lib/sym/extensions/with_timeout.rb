@@ -3,7 +3,7 @@ module Sym
     module WithTimeout
 
       def with_timeout(timeout = 3)
-        status = Timeout::timeout(timeout) {
+        Timeout::timeout(timeout) {
           yield if block_given?
         }
       end
