@@ -1,4 +1,5 @@
 require 'sym/app/commands/base_command'
+require 'colored2'
 module Sym
   module App
     module Commands
