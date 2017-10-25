@@ -1,9 +1,11 @@
 require 'sym'
 require 'sym/app'
+require 'sym/crypt'
 
 require_relative 'fake_terminal'
 
 TEST_KEY = 'LxRV7pqW5XY5DDcuh128byukvsr3JLGX54v6eKNl8a0='
+
 class TestClass
   include Sym::Crypt
   private_key TEST_KEY # Use ENV['SECRET'] in prod
@@ -16,7 +18,6 @@ class TestClass
     decr(@secure_value)
   end
 end
-
 
 unless Sym::App::CLI.instance_methods.include?(:old_execute)
   class Sym::App::CLI

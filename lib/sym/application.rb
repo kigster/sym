@@ -177,7 +177,7 @@ module Sym
 
     def initialize_password_cache
       args            = {}
-      args[:timeout]  = (opts[:cache_timeout] || ENV['SYM_CACHE_TTL'] || Sym::Configuration.config.password_cache_timeout).to_i
+      args[:timeout]  = (opts[:cache_timeout] || ENV['SYM_CACHE_TTL'] || Sym::Config.config.password_cache_timeout).to_i
       args[:enabled]  = opts[:cache_passwords]
       args[:verbose]  = opts[:verbose]
       args[:provider] = opts[:cache_provider] if opts[:cache_provider]

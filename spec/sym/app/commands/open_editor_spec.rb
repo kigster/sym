@@ -6,7 +6,7 @@ module Sym
       RSpec.describe OpenEditor do
         include_context :commands
 
-        let(:fixture_file) { 'spec/fixtures/hamlet.enc' }
+        let(:fixture_file) { 'spec/fixtures/hamlet.txt.enc' }
         let(:fixture_file_md5) { Digest::MD5.new(File.read(fixture_file)) }
         let(:argv) { "-t #{fixture_file} -k #{key} -v --trace -b".split(' ') }
         let(:command_class) { OpenEditor }

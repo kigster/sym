@@ -3,7 +3,7 @@ require 'sym/file_cryptor'
 
 module Sym
   describe FileCryptor do
-    let(:pathname_encrypted) { 'spec/fixtures/hamlet.enc' }
+    let(:pathname_encrypted) { 'spec/fixtures/hamlet.txt.enc' }
     let(:pathname_decrypted) { 'spec/fixtures/hamlet.txt' }
 
     let(:cryptor_encrypted) { Sym::FileCryptor.new(pathname_encrypted, key) }
@@ -20,6 +20,7 @@ module Sym
       end
 
       it 'should transparently read file' do
+        expect(cryptor_encrypted.read.size).to eq(decrypted_contents.size)
         expect(cryptor_encrypted.read).to eq(decrypted_contents)
       end
     end

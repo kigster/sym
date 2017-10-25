@@ -29,8 +29,7 @@ BLOG POST
 http://kig.re/2017/03/10/dead-simple-encryption-with-sym.html
 
 BASH COMPLETION
-===============
-To enable bash command line completion, please run the following 
+=============== To enable bash command line completion, please run the following 
 command, which appends sym's shell completion wrapper to the file 
 specified in arguments to -B/--bash-support flag.
 
@@ -39,20 +38,17 @@ specified in arguments to -B/--bash-support flag.
  
 Thank you for using Sym and happy crypting :)
 
-For bonus points, run 'symit -h' after installing and loading bash
-completion.
-
 @kigster on Github, 
     @kig on Twitter.
 
 EOF
   spec.add_dependency 'colored2', '~> 3'
-  spec.add_dependency 'slop', '~> 4.3'
+  spec.add_dependency 'slop', '~> 4'
   spec.add_dependency 'activesupport'
-  spec.add_dependency 'highline', '~> 1.7'
+  spec.add_dependency 'highline', '~> 1'
   spec.add_dependency 'coin', '~> 0.1.8'
-  spec.add_dependency 'dalli', '~> 2.7'
-  spec.add_dependency 'sym-crypt'
+  spec.add_dependency 'dalli', '~> 2'
+  spec.add_dependency 'sym-crypt', '~> 1.1.1'
 
   spec.add_development_dependency 'codeclimate-test-reporter', '~> 1.0'
   spec.add_development_dependency 'simplecov'
@@ -63,4 +59,6 @@ EOF
   spec.add_development_dependency 'rspec', '~> 3'
   spec.add_development_dependency 'rspec-its'
   spec.add_development_dependency 'yard'
+  spec.add_development_dependency 'guard'
+  spec.add_development_dependency 'guard-rspec'
 end

@@ -10,7 +10,7 @@ module Sym
           attr_accessor :coin
 
           def initialize(**opts)
-            Coin.uri  = opts[:uri] || Sym::Configuration.config.password_cache_arguments[:drb][:opts][:uri]
+            Coin.uri  = opts[:uri] || Sym::Config.config.password_cache_arguments[:drb][:opts][:uri]
             self.coin = Coin
             alive?
             self

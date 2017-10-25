@@ -76,7 +76,7 @@ This gem includes two primary components:
        - You can instantiate `Sym::Application` class with a hash representing CLI arguments, and then call it's `#execute` method to mimic CLI execution.
      * **[Sym::FileCryptor API](#file-cryptor)**
        - This is a convenience class allowing you to encrypt/decrypt files in your ruby code with just couple of lines of code.
-     * **[Sym::Configuration](#rubyapi-config)** 
+     * **[Sym::Config](#rubyapi-config)** 
        - Use this class to override the default cipher, and configure other parameters such as compression, password caching, and more.
 
 ### Massive Time Savers
@@ -519,20 +519,23 @@ Please take a look at the [SYM-CLI](SYM-CLI.md) for a complete help screen and t
 
 ### Configuration
 
-The library contains a `Sym::Configuration` singleton class, which can be used to tweak some of the internals of the gem. Its meant for advanced users who know what they are doing. The code snippet shown below is an actual default configuration. You can override the defaults by including a similar snipped in your application initialization, right after the `require 'sym'`. The `Configuration` class is a Singleton, so changes to it will propagate to any subsequent calls to the gem.
+The library contains a `Sym::Config` singleton class, which can be used to tweak some of the internals of the gem. Its meant for advanced users who know what they are doing. The code snippet shown below is an actual default configuration. You can override the defaults by including a similar snipped in your application initialization, right after the `require 'sym'`. This `Config` class is a Singleton, so changes to it will propagate to any subsequent calls to the gem.
 
 ```ruby
 require 'zlib'
-require 'sym'
-Sym::Configuration.configure do |config|
+require 'sym/config'
+
+Sym::Config.configure do |config|
+  # These settings come from +Sym::Crypt::Configuration+
   config.password_cipher          = 'AES-128-CBC'
   config.data_cipher              = 'AES-256-CBC'
   config.private_key_cipher       = config.data_cipher
   config.compression_enabled      = true
   config.compression_level        = Zlib::BEST_COMPRESSION
+  
+  # Thwese settings are defined on the +Sym::Config+ class.
   config.encrypted_file_extension = 'enc'
   config.default_key_file         = "#{ENV['HOME']}/.sym.key"
-
   config.password_cache_timeout          = 300
 
   # When nil is selected, providers are auto-detected.
