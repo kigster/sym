@@ -4,7 +4,7 @@ require 'colored2'
 require 'timeout'
 require 'sym/extensions/with_retry'
 require 'sym/extensions/with_timeout'
-require 'sym/configuration'
+require 'sym/config'
 require 'sym/app/password/providers'
 
 module Sym
@@ -35,7 +35,7 @@ module Sym
         def configure(**opts)
           self.enabled = opts[:enabled]
           self.verbose = opts[:verbose]
-          self.timeout = opts[:timeout] || ::Sym::Configuration.config.password_cache_timeout
+          self.timeout = opts[:timeout] || ::Sym::Config.config.password_cache_timeout
           self.provider = Providers.provider(opts[:provider], opts[:provider_opts] || {})
           self.enabled = false unless self.provider
           self

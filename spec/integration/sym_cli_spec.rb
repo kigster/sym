@@ -4,7 +4,7 @@ require 'sym'
 require 'sym/constants'
 require 'sym/application'
 
-RSpec.describe 'CLI execution', :type => :aruba do
+RSpec.describe 'Aruba CLI Integration', :type => :aruba do
 
   BASE62_REGEX    = %r{^[a-zA-Z0-9=.\-_]+=$}
   KEY_PLAIN       = 'm4G6b7Lb-0bom5l8uxog_cL1x08mvH1ASsv1Svl3UGQ='

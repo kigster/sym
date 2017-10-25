@@ -94,7 +94,8 @@ module Sym
       end
 
       def append_sym_args(argv)
-        if env_args = sym_args
+        env_args = sym_args
+        unless env_args.nil?
           argv << env_args.split(' ')
           argv.flatten!
           argv.compact!

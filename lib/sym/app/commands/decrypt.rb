@@ -3,7 +3,7 @@ module Sym
   module App
     module Commands
       class Decrypt < BaseCommand
-        include Sym
+        include Sym::Crypt
 
         required_options [ :key, :interactive ],
                          [ :decrypt ],

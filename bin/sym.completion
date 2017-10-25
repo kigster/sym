@@ -64,6 +64,41 @@ _sym()
     return 0
 } && complete -F _sym $nospace $filenames sym
 
+# Helpers
+
+sym-encrypt() {
+  local key=$3
+  local from=$1
+  local to=$2
+  local args=
+  [[ -n $key ]] && args="${args} -ck ${key}"
+  [[ -n $from ]] && args="${args} -f ${from}"
+  [[ -n $to ]] && args="${args} -o ${to}"
+  if [[ -z $args ]]; then
+    echo "usage: sym-encrypt key from-file to-file" 
+  else
+    sym -e ${args}
+  fi
+}
+
+sym-decrypt() {
+  local key=$3
+  local from=$1
+  local to=$2
+  local args=
+  [[ -n $key ]] && args="${args} -ck ${key}"
+  [[ -n $from ]] && args="${args} -f ${from}"
+  [[ -n $to ]] && args="${args} -o ${to}"
+  if [[ -z $args ]]; then
+    echo "usage: sym-decrypt key from-file to-file" 
+  else
+    sym -d ${args}
+  fi
+}
+
+alias syme="sym-encrypt"
+alias symd="sym-decrypt"
+
 # Local variables:
 # mode: shell-script
 # sh-basic-offset: 4

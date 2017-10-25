@@ -10,7 +10,7 @@ module Sym
       # This class figures out what is the private key that is
       # provided to be used.
       class Handler < Struct.new(:opts, :input_handler, :password_cache)
-        include Sym
+        include Sym::Crypt
         attr_accessor :key, :key_source
 
         def initialize(*args)

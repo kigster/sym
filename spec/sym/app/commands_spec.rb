@@ -5,7 +5,7 @@ module Sym
   module App
     module Commands
       class FakeCommand < ::Sym::App::Commands::BaseCommand
-        include Sym
+        include Sym::Crypt
         required_options :fake, [:one, :other], ->(arg) { arg[:booboo].eql?(:doodoo) }
       end
       RSpec.describe 'Sym::App::Commands' do

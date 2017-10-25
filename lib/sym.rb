@@ -2,44 +2,15 @@ require 'colored2'
 require 'zlib'
 require 'logger'
 
-require 'sym/configuration'
+require 'sym/crypt'
+require 'sym/config'
 require 'sym/constants'
 require 'sym/version'
 require 'sym/errors'
 
-Sym::Configuration.configure do |config|
-  config.password_cipher          = 'AES-128-CBC'
-  config.data_cipher              = 'AES-256-CBC'
-  config.private_key_cipher       = config.data_cipher
-  config.compression_enabled      = true
-  config.compression_level        = Zlib::BEST_COMPRESSION
-  config.encrypted_file_extension = 'enc'
-  config.default_key_file         = Sym::Constants::SYM_KEY_FILE
-
-  config.password_cache_timeout          = 300
-
-  # When nil is selected, providers are auto-detected.
-  config.password_cache_default_provider = nil
-  config.password_cache_arguments        = {
-    drb:       {
-      opts: {
-        uri: 'druby://127.0.0.1:24924'
-      }
-    },
-    memcached: {
-      args: %w(127.0.0.1:11211),
-      opts: { namespace:  'sym',
-              compress:   true,
-              expires_in: config.password_cache_timeout
-      }
-
-    }
-  }
-end
+Sym::Config.configure(&Sym::Config::DEFAULT_CONFIG)
 
 require 'sym/extensions/stdlib'
-require 'sym/extensions/class_methods'
-require 'sym/extensions/instance_methods'
 #
 # == Using Sym Library
 #
@@ -77,7 +48,7 @@ require 'sym/extensions/instance_methods'
 #     require 'sym'
 #
 #     class TestClass
-#       include Sym
+#       include Sym::Crypt
 #       # read the key from environmant variable and assign to this class.
 #       private_key ENV['PRIVATE_KEY']
 #
@@ -124,7 +95,7 @@ module Sym
 
   class << self
     def config
-      Sym::Configuration.config
+      Sym::Config.config
     end
 
     def default_key_file
