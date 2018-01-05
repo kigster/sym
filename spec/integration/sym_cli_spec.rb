@@ -15,6 +15,8 @@ RSpec.describe 'CLI execution', :type => :aruba do
     FileUtils.mkdir_p(File.dirname(TEMP_FILE))
   end
 
+  RESET_TEMP_FILE.call
+
   context 'using Aruba framework' do
     let(:command) { "bundle exec exe/sym #{args}" }
     let(:output) { last_command_started.stdout.chomp }
@@ -32,12 +34,10 @@ RSpec.describe 'CLI execution', :type => :aruba do
         expect(::Sym::Constants::Bash::Config.size).to eq(2)
       end
 
-      unless ENV['TRAVIS']
-        it 'should run command' do
-          expect(File.exist?(TEMP_FILE)).to be(true)
-          expect(File.read(TEMP_FILE)).to include(::Sym::Constants::Bash::Config[:completion][:script])
-          expect(File.read(TEMP_FILE)).to include(::Sym::Constants::Bash::Config[:symit][:script])
-        end
+      it 'should run command' do
+        expect(File.exist?(TEMP_FILE)).to be(true)
+        expect(File.read(TEMP_FILE)).to include(::Sym::Constants::Bash::Config[:completion][:script])
+        expect(File.read(TEMP_FILE)).to include(::Sym::Constants::Bash::Config[:symit][:script])
       end
     end
 
