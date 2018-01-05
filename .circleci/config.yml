@@ -32,7 +32,7 @@ jobs:
           name: install memcached
           command: |
             sudo apt-get update && sudo apt-get install -y memcached
-            sudo memcached -d
+            sudo memcached -d -u travis
 
       - run:
           name: install sym bash helpers

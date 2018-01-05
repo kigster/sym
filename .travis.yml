@@ -24,7 +24,7 @@ after_success:
 before_script:
   - echo stats | nc localhost 11211
 script:
-  - bundle exec exe/sym --bash-install ~/.bash_profile -vTD
+  - bundle exec exe/sym -B ~/.bash_profile -vTD
   - ls -alF ~/.sym*
   - ls -alF .
   - mkdir -p temp
