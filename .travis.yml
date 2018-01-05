@@ -24,3 +24,5 @@ addons:
 # regular test configuration
 after_success:
   - bundle exec codeclimate-test-reporter
+before_script:
+  - mkdir -p temp
