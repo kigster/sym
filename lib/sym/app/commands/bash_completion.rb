@@ -17,7 +17,8 @@ module Sym
           out = ''
           Sym::Constants::Bash::Config.each_pair do |key, config|
             script_name = key.to_s
-            unless FileUtils.identical?(config[:source], config[:dest])
+            if (!File.exist?(config[:dest])) ||
+                (File.exist?(config[:dest]) && !FileUtils.identical?(config[:source], config[:dest]))
               FileUtils.cp(config[:source], config[:dest])
               out << "#{} installing #{config[:dest].bold.blue }...\n"
             else
