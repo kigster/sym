@@ -54,7 +54,6 @@ EOF
   spec.add_dependency 'coin', '~> 0.1.8'
   spec.add_dependency 'dalli', '~> 2.7'
 
-  spec.add_development_dependency 'rspec_junit_formatter'
   spec.add_development_dependency 'codeclimate-test-reporter', '~> 1.0'
   spec.add_development_dependency 'simplecov'
   spec.add_development_dependency 'irbtools'
@@ -64,4 +63,5 @@ EOF
   spec.add_development_dependency 'rspec', '~> 3'
   spec.add_development_dependency 'rspec-its'
   spec.add_development_dependency 'yard'
+  spec.add_development_dependency 'rspec_junit_formatter', '~> 0.3.0'
 end

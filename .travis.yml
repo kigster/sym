@@ -25,4 +25,4 @@ addons:
 after_success:
   - bundle exec codeclimate-test-reporter
 before_script:
-  - echo stats | nc 127.0.0.1 11211
+  - echo stats | nc localhost 11211
