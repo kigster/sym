@@ -1,7 +1,6 @@
 language: ruby
 os:
 - linux
-- osx
 env:
 - CODECLIMATE_REPO_TOKEN=c71874cc22acffe1e2543d3388d3a96c73a65f0cfe17169dadd8de4a6c062c39 
 - TEST_DRB=true
@@ -10,7 +9,6 @@ services:
 rvm:
 - 2.3.5
 - 2.4.2
-- jruby-9.1.9.0
 notifications:
   email:
     recipients:
