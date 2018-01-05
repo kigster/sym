@@ -190,21 +190,29 @@ function __symit::usage()  {
 
   __lib::color::h1 'Examples:'
 
-  printf "  Eg: To import a key securely,\n"
+  printf "  Ex1: To import a key securely,\n"
   printf "     \$ ${bldgrn}symit${bldblu} import key ${clr}\n\n"
 
-  printf "  Eg: To edit an encrypted file ${txtblu}config/application.yml.enc${clr}\n"
+  printf "  Ex2.: To encrypt (or decrypt) ALL files in the 'config' directory:${clr}\n"
+  printf "     \$ ${bldgrn}symit${bldblu} encrypt|decrypt -a -f config ${clr}\n\n"
+
+  printf "  Ex3: To decrypt all *.yml.enc files in the 'config' directory:${clr}\n"
+  printf "     \$ ${bldgrn}symit${bldblu} decrypt '*.yml' -f config ${clr}\n\n"
+
+  printf "  Ex4: To edit an encrypted file ${txtblu}config/application.yml.enc${clr}\n"
   printf "     \$ ${bldgrn}symit${bldblu} application.yml${clr}\n\n"
 
-  printf "  Eg.: To auto decrypt a file ${txtblu}config/settings/crypt/pass.yml.enc${clr}\n"
+  printf "  Ex5.: To auto decrypt a file ${txtblu}config/settings/crypt/pass.yml.enc${clr}\n"
   printf "     \$ ${bldgrn}symit${bldblu} auto config/settings/crypt/pass.yml.enc${clr}\n\n"
 
-  printf "  Eg.: To auto encrypt a file ${txtblu}config/settings/crypt/pass.yml${clr}\n"
-  printf "     \$ ${bldgrn}symit${bldblu} auto config/settings/crypt/pass.yml${clr}\n\n"
+  printf "  Ex6.: To automatically decide to either encrypt or decrypt a file,\n"
+  printf "       based on the file extension. First example encrypts the file, second\n"
+  printf "       decrypts it (because file extension is .enc):${clr}\n"
+  printf "     \$ ${bldgrn}symit${bldblu} auto config/settings/crypt/pass.yml${clr}\n"
+  printf "     \$ ${bldgrn}symit${bldblu} auto config/settings/crypt/pass.yml.enc${clr}\n\n"
 
-  printf "  Eg.: To encrypt a file ${txtblu}config/settings.yml${clr}\n"
-  printf "     \$ ${bldgrn}symit${bldblu} encrypt config/settings.yml${clr}\n"
-  printf "     \$ ${bldgrn}symit${bldblu} pass.yml -f config/setting/crypt ${clr}\n"
+  printf "  Ex7.: To encrypt a file ${txtblu}config/settings.yml${clr}\n"
+  printf "     \$ ${bldgrn}symit${bldblu} encrypt config/settings.yml${clr}\n\n"
 
 }
 function __datum()   {
@@ -212,13 +220,13 @@ function __datum()   {
 }
 
 function __err()  {
-  __lib::color::cursor_to_col 0
-  printf "${txtpur}[$(__datum)]  ${bldred}ERROR:  ${txterr}$* ${bldylw}\n"
+  #__lib::color::cursor_to_col 0
+  printf "${txtpur}[$(__datum)]  ${bldred}ERROR: ${txterr}$* ${bldylw}\n"
 }
 
 function __inf()  {
-  __lib::color::cursor_to_col 0
-  printf "${txtpur}[$(__datum)]  ${bldgrn}INFO:   ${clr}${bldblu}$*${clr}\n"
+  #__lib::color::cursor_to_col 0
+  printf "${txtpur}[$(__datum)]  ${bldgrn}INFO:  ${clr}${bldblu}$*${clr}\n"
 }
 
 function __symit::install::gem()  {
@@ -244,18 +252,27 @@ function __symit::install::gem()  {
     fi
   fi
 }
-
 function __symit::files()  {
-  if [[ -n ${cli__opts[file]} && -n ${cli__opts[extension]} ]]; then
+  eval $(__symit::files::cmd)
+}
 
-    local folder="${cli__opts[folder]}/$(dirname ${cli__opts[file]})"
+function __symit::files::cmd() {
+  if [[ -n ${cli__opts[file]} && -n ${cli__opts[extension]} ]]; then
+    local folder
+    if [[ ${cli__opts[file]} =~ '/' ]]; then
+      folder="${cli__opts[folder]}/$(dirname ${cli__opts[file]})"
+    else
+      folder="${cli__opts[folder]}"
+    fi
     local file="$(basename ${cli__opts[file]})"
     local ext="${cli__opts[extension]}"
 
     if [[ "${cli__opts[action]}" == "auto" || "${cli__opts[action]}" == "encrypt" ]] ; then
-      find ${folder} -name "${file}"
+      #find ${folder} -name "${file}" >&2
+      printf "find ${folder} -name '${file}' -and -not -name '*${ext}'"
     else
-      find ${folder} -name "${file}${ext}"
+      #find ${folder} -name "${file}${ext}" >&2
+      printf "find ${folder} -name '${file}${ext}'"
     fi
   fi
 }
@@ -266,8 +283,10 @@ function __symit::command()  {
     action="${cli__opts[action]}"
     flags="${sym__actions[${action}]}"
     if [[ ${action} =~ "key" ]]; then
+      [[ -n ${cli__opts[verbose]} ]] && printf "processing key import action ${bldylw}${action}${clr}\n" >&2
       printf "sym ${flags} ${cli__opts[key]} "
-    elif [[ ${action}"generate" ]] ; then
+    elif [[ ${action} =~ "generate" ]] ; then
+      [[ -n ${cli__opts[verbose]} ]] && printf "processing generate key action ${bldylw}${action}${clr}\n" >&2
       if [[ -n $(which pbcopy) ]]; then
         out_key=/tmp/outkey
         command="sym ${flags} ${cli__opts[key]} -q -o ${out_key}; cat ${out_key} | pbcopy; rm -f ${out_key}"
@@ -276,7 +295,18 @@ function __symit::command()  {
         printf "sym ${flags} ${cli__opts[key]} "
       fi
     elif [[ -n ${file} ]] ; then
-      printf "sym ${flags} ${file} -ck ${cli__opts[key]} "
+      ext="${cli__opts[extension]}"
+      [[ -z ${ext} ]] && ext='.enc'
+      ext=$(echo ${ext} | sed -E 's/[\*\/,.]//g')
+      if [[ ${action} =~ "encrypt" ]]; then
+        printf "sym ${flags} ${file} -ck ${cli__opts[key]} -o ${file}.${ext}"
+      elif [[ ${action} =~ "decrypt" ]]; then
+        new_name=$(echo ${file} | sed "s/\.${ext}//g")
+        [[ "${new_name}" == "${file}" ]] && name="${file}.decrypted"
+        printf "sym ${flags} ${file} -ck ${cli__opts[key]} -o ${new_name}"
+      else
+        printf "sym ${flags} ${file} -ck ${cli__opts[key]} "
+      fi
     else
       printf "printf \"ERROR: not sure how to generate a correct command\\n\""
     fi
@@ -324,6 +354,10 @@ function __symit::validate_args()  {
     __err "Key was not defined, pass it with ${bldblu}-k KEY_ID${bldred}"
     __err "or set it via ${bldgrn}\$SYMIT__KEY${bldred} variable."
     return $(__symit::exit 4)
+  fi
+
+  if [[ -z ${cli__opts[extension]} ]]; then
+    cli__opts[extension]='.enc'
   fi
 }
 
@@ -394,6 +428,11 @@ function __symit::run()  {
             cli__opts[folder]=${1}
             shift
           fi
+          ;;
+
+      -a|--all-files)
+          shift
+          cli__opts[file]="'*'"
           ;;
 
       -n|--dry-run)
@@ -470,11 +509,20 @@ function __symit::run()  {
     done
   else
     if [[ -n "${cli__opts[file]}" ]]; then
+      [[ -n ${cli__opts[verbose]} ]] && __inf $(__symit::files)
+      declare -a file_list
       for file in $(__symit::files); do
-        __inf "   ${bldblu}$(__symit::command ${file})${clr}\n"
+        file_list=(${file} "${file_list[*]}")
+        __inf "❯ ${bldblu}$(__symit::command ${file})${clr}"
         eval $(__symit::command ${file})
-        code=$?; [[ ${code} != 0 ]] && return $(symits::exit ${code})
+        code=$?; [[ ${code} != 0 ]] && __err "sym returned non-zero code ${code}"
       done
+      if [[ ${#file_list} == 0 ]]; then
+        __inf "No files matched your specification. The following 'find' command"
+        __inf "ran to find them: \n"
+        __inf "   ${bldylw}$(__symit::files::cmd)${clr}\n\n"
+        return $(__symit::exit 5)
+      fi
     else
       [[ -n ${cli__opts[verbose]} ]] && __inf $(__symit::command)
       eval $(__symit::command)
