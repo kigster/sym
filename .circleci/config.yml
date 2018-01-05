@@ -31,7 +31,7 @@ jobs:
       - run: 
           name: install memcached
           command: |
-            apt-get update && apt-get install -y memcached
+            sudo apt-get update && sudo apt-get install -y memcached
 
       - run:
           name: run tests
