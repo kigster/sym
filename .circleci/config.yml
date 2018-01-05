@@ -43,10 +43,14 @@ jobs:
           name: run tests
           command: |
             mkdir /tmp/test-results
-            TEST_DRB=true USER=circleci HOME=/home/${USER} \ 
-              bundle exec rspec --format RspecJunitFormatter \
-                            --out /tmp/test-results/rspec.xml \
-                            --format progress 
+            export TEST_DRB=true 
+            export USER=circleci 
+            export HOME=/home/${USER}
+            bundle exec rspec --format RspecJunitFormatter \
+                              --out /tmp/test-results/rspec.xml \
+                              --backtrace \
+                              --warnings \
+                              --format documentation
       # collect reports
       - store_test_results:
           path: /tmp/test-results
