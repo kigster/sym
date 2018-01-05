@@ -39,6 +39,14 @@ Your donation of absolutely any amount is very much appreciated.
 [![asciicast](design/ascii-cinema.png)](https://asciinema.org/a/106737)
 
 
+#### Help Screens, Examples and Symit Bash Wrapper
+
+This may be a good time to take a look at the full help message for the `sym` tool, shown naturally with a `-h` or `--help` option. Examples can be shown with `-E/--examples` flag. 
+
+Additionally, Sym comes with a helpful BASH wrapper `symit`. 
+
+**Help screens for `sym` and `symit` are shown in full on another page — [Sym Help Screens and Symit](SYM-CLI.md). Please refer to it for complete help screens and the examples.**
+
 
 ## Supported Ruby Versions
 
@@ -507,12 +515,6 @@ sym -Adf file.enc -o file.original
 sym -Atf file.enc
 ```
 
-#### CLI Help Screen and Examples
-
-This may be a good time to take a look at the full help message for the `sym` tool, shown naturally with a `-h` or `--help` option. Examples can be shown with `-E/--examples` flag.
-
-Please take a look at the [SYM-CLI](SYM-CLI.md) for a complete help screen and the examples.
-
 ## Fine Tuning
 
 <a name="rubyapi-config"></a>
@@ -617,4 +619,3 @@ Please submit feature requests, bugs, or donations :)
  * [Barry Anderson](https://twitter.com/z3ndrag0n) (sanity checking, review)
 
  
-

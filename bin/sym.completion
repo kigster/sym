@@ -64,33 +64,45 @@ _sym()
     return 0
 } && complete -F _sym $nospace $filenames sym
 
-# Helpers
-
 sym-encrypt() {
-  local from=$1
-  local to=$2
-  local key=$3
+  local key=$1
+  local from=$2
+  local to=$3
   local args=
-  [[ -n $from ]] && args="${args} -f ${from}"
-  [[ -n $to ]] && args="${args} -o ${to}"
+
   [[ -n $key ]] && args="${args} -ck ${key}"
+
+  if [[ -n $to ]]; then
+    args="${args} -o ${to}"
+    [[ -n $from ]] && args="${args} -f ${from}"
+  else
+    [[ -n $from ]] && args="${args} -n ${from}"
+  fi
+
   if [[ -z $args ]]; then
-    echo "usage: sym-encrypt <from-file> [ <to-file> [ key-name ] ] " 
+    echo "usage: sym-encrypt key file [ outfile ]"
   else
     sym -e ${args}
   fi
 }
 
 sym-decrypt() {
-  local from=$1
-  local to=$2
-  local key=$3
+  local key=$1
+  local from=$2
+  local to=$3
   local args=
-  [[ -n $from ]] && args="${args} -f ${from}"
-  [[ -n $to ]] && args="${args} -o ${to}"
+
   [[ -n $key ]] && args="${args} -ck ${key}"
+
+  if [[ -n $to ]]; then
+    args="${args} -o ${to}"
+    [[ -n $from ]] && args="${args} -f ${from}"
+  else
+    [[ -n $from ]] && args="${args} -n ${from}"
+  fi
+
   if [[ -z $args ]]; then
-    echo "usage: sym-decrypt from-file [ to-file [ key-name ] ] " 
+    echo "usage: sym-decrypt key file [ outfile ]"
   else
     sym -d ${args}
   fi

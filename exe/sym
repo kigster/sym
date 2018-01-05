@@ -8,11 +8,12 @@ require 'sym/app'
 
 #ARGV.any?{ |a| a =~ /^-/ } ?
 begin
-  ::Sym::App::CLI.new(ARGV.dup).execute
+  exit ::Sym::App::CLI.new(ARGV.dup).execute
 rescue Interrupt => e
   STDERR.flush
   STDERR.puts "Interrupt, #{e.message}, exiting."
   STDERR.flush
+  exit 1
 end
 
 

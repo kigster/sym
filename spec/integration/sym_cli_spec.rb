@@ -19,7 +19,7 @@ RSpec.describe 'CLI execution', :type => :aruba do
     context 'install bash completion' do
       before &RESET_TEMP_FILE
       after &RESET_TEMP_FILE
-      let(:args) { "--bash-support #{TEMP_FILE}" }
+      let(:args) {  "--bash-support #{TEMP_FILE}" }
 
       it 'should run command' do
         run_simple command

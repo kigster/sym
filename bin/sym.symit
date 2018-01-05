@@ -1,4 +1,5 @@
 #!/usr/bin/env bash
+
 #==============================================================================
 #
 # (c) 2017 Konstantin Gredeskoul
@@ -6,82 +7,222 @@
 #          https://github.com/kigster/sym
 #
 #==============================================================================
-# Purpuse of this script is to transparently edit application secrets in a
-# Rails app. It's a simple enough wrapper around sym.
+# The purpose of this script is to transparently edit application secrets in a
+# Rails apps or other repos. It simplifies the process of key import, as well
+# as the direct editing.
 #
-# What the fuck?
+# If you set some or (ideally) ALL variables below to values specific to your
+# system, things will get easy.
 #
-# 1) This assumes you are storing application secrets in a file, say named,
-#    RAILS_ROOT/config/special/secrets/production.yml.enc
+# SYMIT__FOLDER is a relative folder to your project root, under which you
+# might keep ALL of your encrypted files.  Alternatively, if you keep encrypted
+# files sprinkled around your project, just leave it out, because it defaults
+# to "." — the current folder, and search anything beneath.
 #
-# 2) You want to be able to easily and transparently edit it with sym, without
-#    having to remember sym's CLI.
+# Variables:
 #
-# 3) You may want to have a search paths to look for the file in...
+#     # only search ./config folder
+#     export SYMIT__FOLDER="config"
 #
-# 4) You may want to override the file extension assumed (instead of .yml.enc).
+#     # this will be the name of your key in OS-X KeyChain
+#     export SYMIT__KEY="MY_KEYCHAIN_NAME"
 #
-# SO: here is what you do:
-#
-#     export sym__ext="json.enc"
-#     export sym__folder="config/special/secrets"
-#     export sym__key="application-key"
+#     # This is the extension given to the encrypted files. Ideally, leave it
+#     # be as ".enc"
+#     export SYMIT__EXTENSION=".enc"
 #
 # And then
 #
-#     symit production
+#     symit key-import [ insecure ]           # import a key and password-protect it (or not)
+#     symit auto application.yml.enc          # auto-decrypts it
+#     symit auto application.yml              # auto-encrypts it
+#     symit decrypt application.yml           # finds application.yml.enc and decrypts that.
+#
 #
 # ...and vola! You are editing the encrypted file with sym from the root of
 # your Rails application. Neat, no?
 #
-symit::init() {
-  [[ -z "${sym__ext}" ]] && export sym__ext="yml.enc"
-  [[ -z "${sym__folder}" ]] && export sym__folder="config/settings/secrets"
+function __lib::color::setup()  {
+  if [[ -z "${setup_colors_loaded}" ]]; then
 
-  export true=1
-  export false=0
+    export txtblk='\e[0;30m' # Black - Regular
+    export txtred='\e[0;31m' # Red
+    export txtgrn='\e[0;32m' # Green
+    export txtylw='\e[0;33m' # Yellow
+    export txtblu='\e[0;34m' # Blue
+    export txtpur='\e[0;35m' # Purple
+    export txtcyn='\e[0;36m' # Cyan
+    export txtwht='\e[0;37m' # White
 
-  export txtrst='\e[0m'    # Text Reset
-  export bldred='\e[1;31m' # Red
-  export bldgrn='\e[1;32m' # Green
-  export bldylw='\e[1;33m' # Yellow
-  export bldblu='\e[1;34m' # Blue
+    export bldblk='\e[1;30m' # Black - Bold
+    export bldred='\e[1;31m' # Red
+    export bldgrn='\e[1;32m' # Green
+    export bldylw='\e[1;33m' # Yellow
+    export bldblu='\e[1;34m' # Blue
+    export bldpur='\e[1;35m' # Purple
+    export bldcyn='\e[1;36m' # Cyan
+    export bldwht='\e[1;37m' # White
 
-  unset cli__opts
+    export unkblk='\e[4;30m' # Black - Underline
+    export undred='\e[4;31m' # Red
+    export undgrn='\e[4;32m' # Green
+    export undylw='\e[4;33m' # Yellow
+    export undblu='\e[4;34m' # Blue
+    export undpur='\e[4;35m' # Purple
+    export undcyn='\e[4;36m' # Cyan
+    export undwht='\e[4;37m' # White
+
+    export bakblk='\e[40m' # Black - Background
+    export bakred='\e[41m' # Red
+    export bakgrn='\e[42m' # Green
+    export bakylw='\e[43m' # Yellow
+    export bakblu='\e[44m' # Blue
+    export bakpur='\e[45m' # Purple
+    export bakcyn='\e[46m' # Cyan
+    export bakwht='\e[47m' # White
+
+    export clr='\e[0m' # Text Reset
+    export txtrst='\e[0m' # Text Reset
+    export rst='\e[0m' # Text Reset
+    export GREP_COLOR=32
+    export setup_colors_loaded=1
+  else
+    [[ -n ${DEBUG} ]] && echo "colors already loaded..."
+  fi
 }
 
-symit::usage() {
-  printf "${bldblu}symit: ${txtrst}edit an encrypted file using configuration from environment\n\n"
+function __lib::color::hr()  {
+  local cols=${1:-${COLUMNS}}
+  local char=${2:-"—"}
+  local color=${3:-${txtylw}}
 
-  printf " Usage: ${bldgrn}symit ${bldylw}[file-spec] [options]${txtrst}\n\n"
-
-  printf "    Eg: To edit an encrypted file config/settings/secrets/development.yml.enc${txtrst}\n"
-  printf "        ${bldgrn}symit${bldylw} development${txtrst}\n\n"
-
-  printf "options: \n"
-  printf "    -k | --key         [key-spec]   Pass an alternative key, other than ${sym__key}\n"
-  printf "    -x | --extension   [extension]  Use extension other than ${bldylw}${sym__ext}${txtrst}\n"
-  printf "    -l | --locations                Print search locations for [file-spec]\n"
-  printf "    -i | --install                  Install the latest version of ${bldylw}sym${txtrst}\n"
-  printf "    -h | --help                     Show this help message\n"
-  printf "    -n | --dry-run                  Show the generated sym command\n\n"
-
-  printf "configuration:
-
-     export sym__ext=yml.enc
-     export sym__folder=config/special/secrets
-     export sym__key=my-encryption-key
-
-  And then, eg from RAILS_ROOT of your app:
-
-     ${bldgrn}symit production${txtrst}\n\n"
+  printf "${color}"
+  eval "printf \"%0.s${char}\" {1..${cols}}"
+  printf "${clr}\n"
 }
 
-symit::error() {
-  printf "${bldred}error: $* ${bldylw}\n\n"
+function __lib::color::h1()  {
+  local title=$(echo "$*" | tr 'a-z' 'A-Z')
+  len=${#title}
+  printf "${bldylw}${title}\n"
+  __lib::color::hr ${len} '—'
 }
 
-symit::install() {
+function __lib::color::h2()  {
+  printf "${bldpur}$*${clr}\n"
+}
+
+function __lib::color::cursor_to_col()  {
+  position=$1
+  echo -en "\e[${position}C"
+}
+
+function __lib::color::cursor_to_row()  {
+  position=$1
+  echo -en "\e[${position}H"
+}
+
+((${setup_colors_loaded})) ||__lib::color::setup
+
+function __symit::init()  {
+  export SYMIT__EXTENSION=${SYMIT__EXTENSION:-'.enc'}
+  export SYMIT__FOLDER=${SYMIT__FOLDER:-'.'}
+  export SYMIT__KEY=${SYMIT__KEY}
+}
+function __symit::usage()  {
+  __lib::color::setup
+  __lib::color::h1 "symit"
+  printf "
+  This a BASH wrapper for the encryption tool (ruby gem) 'Sym'. It streamlines
+  editing encrypted of files, importing and securing your key, and other
+  actions.  The wrapper can be configured with ENV variables, or CLI flags.\n"
+
+  printf "
+  The easiest way to take advantage of this wrapper is to set the following
+  environment variables, which removes the need to pass these values via the
+  flags. These variables default to the shown values if not set elsewhere:${txtylw}
+
+  export SYMIT__EXTENSION='${SYMIT__EXTENSION}'
+  export SYMIT__FOLDER='${SYMIT__FOLDER}'
+  export SYMIT__KEY='${SYMIT__KEY}'
+  ${clr}\n"
+
+  __lib::color::h2 "Usage:"
+  printf "    ${bldgrn}symit [ action ] [ partial-file-path ] [ flags ]${clr}\n\n"
+
+  __lib::color::h2 "Actions:"
+  printf "    Action is the first word that defaults to ${bldylw}edit${clr}.\n\n"
+  printf "    Valid actions are:\n"
+  printf "    ${bldylw}— install       ${bldblk}ensures you are on the latest gem version\n"
+  printf "    ${bldylw}— generate      ${bldblk}create a new secure key, and copies it to \n"
+  printf "                    clipboard (if supported), otherwise prints to STDOUT\n"
+  printf "                    Key is required, and used as a name within OSX KeyChain\n\n"
+  printf "    ${bldylw}— import [key] [insecure]\n"
+  printf "                    ${bldblk}imports the key from clipboard and adds password\n"
+  printf "                    encryption unless 'insecure' is passed in\n\n"
+  printf "    ${bldylw}— edit          ${bldblk}Finds all files, and opens them in $EDITOR\n"
+  printf "    ${bldylw}— encrypt       ${bldblk}Encrypts files matching file-path\n"
+  printf "    ${bldylw}— decrypt       ${bldblk}Adds the extension to file pattern and decrypts\n"
+  printf "    ${bldylw}— auto          ${bldblk}encrypts decrypted file, and vice versa\n"
+
+  echo
+  __lib::color::h2 "Flags:"
+  printf "    -f | --folder    DIR   ${bldblk}Top level folder to search.${clr}\n"
+  printf "    -k | --key       KEY   ${bldblk}Key identifier${clr}\n"
+  printf "    -x | --extension EXT   ${bldblk}Default extension of encrypted files.${clr}\n"
+  printf "    -n | --dry-run         ${bldblk}Print stuff, but don't do it${clr}\n"
+  printf "    -h | --help            ${bldblk}Show this help message${clr}\n"
+
+  echo
+  __lib::color::h2 'Encryption key identifier can be:'
+  printf "${clr}\
+  1. name of the keychain item storing the keychain (secure)
+  2. name of the environment variable storing the Key (*)
+  3. name of the file storing the key (*)
+  4. the key itself (*)
+
+  ${bldred}(*) 2-4 are insecure UNLESS the key is encrypted with a password.${clr}
+
+  Please refer to README about generating password protected keys:
+  ${bldblu}${undblu}https://github.com/kigster/sym#generating-the-key--examples${clr}\n\n"
+
+  echo
+
+  __lib::color::h1 'Examples:'
+
+  printf "  Eg: To import a key securely,\n"
+  printf "     \$ ${bldgrn}symit${bldblu} import key ${clr}\n\n"
+
+  printf "  Eg: To edit an encrypted file ${txtblu}config/application.yml.enc${clr}\n"
+  printf "     \$ ${bldgrn}symit${bldblu} application.yml${clr}\n\n"
+
+  printf "  Eg.: To auto decrypt a file ${txtblu}config/settings/crypt/pass.yml.enc${clr}\n"
+  printf "     \$ ${bldgrn}symit${bldblu} auto config/settings/crypt/pass.yml.enc${clr}\n\n"
+
+  printf "  Eg.: To auto encrypt a file ${txtblu}config/settings/crypt/pass.yml${clr}\n"
+  printf "     \$ ${bldgrn}symit${bldblu} auto config/settings/crypt/pass.yml${clr}\n\n"
+
+  printf "  Eg.: To encrypt a file ${txtblu}config/settings.yml${clr}\n"
+  printf "     \$ ${bldgrn}symit${bldblu} encrypt config/settings.yml${clr}\n"
+  printf "     \$ ${bldgrn}symit${bldblu} pass.yml -f config/setting/crypt ${clr}\n"
+
+}
+function __datum()   {
+  date +"%m/%d/%Y.%H:%M:%S"
+}
+
+function __err()  {
+  __lib::color::cursor_to_col 0
+  printf "${txtpur}[$(__datum)]  ${bldred}ERROR:  ${txterr}$* ${bldylw}\n"
+}
+
+function __inf()  {
+  __lib::color::cursor_to_col 0
+  printf "${txtpur}[$(__datum)]  ${bldgrn}INFO:   ${clr}${bldblu}$*${clr}\n"
+}
+
+function __symit::install::gem()  {
+  __inf "Verifying current Sym version, please wait..."
   if [[ -z "${_symit__installed}" ]]; then
     current_version=$(gem list | grep sym | awk '{print $2}' | sed 's/(//g;s/)//g')
     if [[ -z "${current_version}" ]]; then
@@ -91,75 +232,144 @@ symit::install() {
       unset SYM_ARGS
       remote_version=$(gem search sym | egrep '^sym \(' | awk '{print $2}' | sed 's/(//g;s/)//g')
       if [[ "${remote_version}" != "${current_version}" ]]; then
-        printf "detected an older ${bldgrn}sym (${current_version}), installing ${bldgrn}sym (${remote_version})${txtrst}...\n"
-        echo y | gem uninstall sym -a 2>/dev/null
+        __inf "detected an older ${bldgrn}sym (${current_version})"
+        __inf "installing ${bldgrn}sym (${remote_version})${clr}..."
+        echo y | gem uninstall sym -a 2> /dev/null
         gem install sym
         export _symit__installed="yes"
+        __inf "Installed sym version ${bldylw}$(sym --version)"
       else
-        printf "${bldgrn}sym${txtrst} is on the latest version ${remote_version} already\n"
+        __inf "${bldgrn}sym${clr} ${txtblu}is on the latest version ${remote_version} already\n"
       fi
     fi
   fi
 }
 
-symit::locs() {
-  if [[ -n ${encrypted_file} ]]; then
-    [[ -n ${cli__opts[extension]} ]] && export sym__ext=${cli__opts[extension]}
-    declare -a locations=("${sym__folder}/${encrypted_file}.${sym__ext}" "${sym__folder}/${encrypted_file}" "${encrypted_file}")
-  fi
-  echo -n ${locations[*]}
-}
+function __symit::files()  {
+  if [[ -n ${cli__opts[file]} && -n ${cli__opts[extension]} ]]; then
 
-symit::locs::print() {
-  printf "Search locations:\n"
-  for loc in ${locations[@]}; do
-    if [[ -n "${loc}" ]] ; then
-      printf "\t - ${bldblu}${loc}${txtrst}\n"
+    local folder="${cli__opts[folder]}/$(dirname ${cli__opts[file]})"
+    local file="$(basename ${cli__opts[file]})"
+    local ext="${cli__opts[extension]}"
+
+    if [[ "${cli__opts[action]}" == "auto" || "${cli__opts[action]}" == "encrypt" ]] ; then
+      find ${folder} -name "${file}"
+    else
+      find ${folder} -name "${file}${ext}"
     fi
-  done
+  fi
 }
 
-symit::exit() {
+function __symit::command()  {
+  file=${1}
+  if [[ -n "${cli__opts[key]}" && -n "${cli__opts[extension]}" ]]; then
+    action="${cli__opts[action]}"
+    flags="${sym__actions[${action}]}"
+    if [[ ${action} =~ "key" ]]; then
+      printf "sym ${flags} ${cli__opts[key]} "
+    elif [[ ${action}"generate" ]] ; then
+      if [[ -n $(which pbcopy) ]]; then
+        out_key=/tmp/outkey
+        command="sym ${flags} ${cli__opts[key]} -q -o ${out_key}; cat ${out_key} | pbcopy; rm -f ${out_key}"
+        printf "${command}"
+      else
+        printf "sym ${flags} ${cli__opts[key]} "
+      fi
+    elif [[ -n ${file} ]] ; then
+      printf "sym ${flags} ${file} -ck ${cli__opts[key]} "
+    else
+      printf "printf \"ERROR: not sure how to generate a correct command\\n\""
+    fi
+  fi
+}
+
+function __symit::cleanup()  {
+  unset sym__actions
+  unset cli__opts
+}
+
+function __symit::exit()  {
   code=${1:-0}
+  __symit::cleanup
   echo -n ${code}
 }
 
-symit::cleanup() {
-  unset encrypted_file
-  unset cli__opts
-  unset locations
+function __symit::print_cli_args()  {
+  local -A args=$@
+  __inf "action     ${bldylw}: ${cli__opts[action]}${clr}"
+  __inf "key        ${bldylw}: ${cli__opts[key]}${clr}"
+  __inf "file       ${bldylw}: ${cli__opts[file]}${clr}"
+  __inf "extension  ${bldylw}: ${cli__opts[extension]}${clr}"
+  __inf "folder     ${bldylw}: ${cli__opts[folder]}${clr}"
+  __inf "verbose    ${bldylw}: ${cli__opts[verbose]}${clr}"
+  __inf "dry_run    ${bldylw}: ${cli__opts[dry_run]}${clr}"
 }
 
-symit() {
-  [[ -n "${1}" && "${1:0:1}" != "-" ]] && {
-    export encrypted_file=$1
-    shift
-  }
+function __symit::args::needs_file()  {
+  if [[ "${cli__opts[action]}" == 'edit' || \
+  "${cli__opts[action]}" == 'auto' || \
+  "${cli__opts[action]}" == 'encrypt' || \
+  "${cli__opts[action]}" == 'decrypt' ]]; then
+    printf 'yes'
+  fi
+}
 
-  symit::init
+function __symit::validate_args()  {
+  if [[ -n $(__symit::args::needs_file) && -z ${cli__opts[file]} ]]; then
+    __err "missing file argument, config/application.yml"
+    return $(__symit::exit 2)
+  fi
+
+  if [[ -z "${cli__opts[key]}" ]]; then
+    __err "Key was not defined, pass it with ${bldblu}-k KEY_ID${bldred}"
+    __err "or set it via ${bldgrn}\$SYMIT__KEY${bldred} variable."
+    return $(__symit::exit 4)
+  fi
+}
+
+function __symit::run()  {
+
+  __symit::cleanup
+  __symit::init
 
   declare -A cli__opts=(
-    [verbose]=${true}
-    [key]=${sym__key}
-    [extension]=${sym__ext}
-    [dry_run]=${false}
+    [verbose]=''
+    [key]=${SYMIT__KEY}
+    [extension]=${SYMIT__EXTENSION}
+    [folder]=${SYMIT__FOLDER}
+    [dry_run]=''
+    [action]=edit
+    [file]=''
   )
 
-  [[ -z ${encrypted_file} && -z $* ]] && symit::usage
+  declare -A sym__actions=(
+    [generate]=' -cpgx '
+    [edit]=' -t '
+    [encrypt]='-e -f '
+    [decrypt]='-d -f '
+    [auto]=' -n '
+    [key_secure]=' -iqcpx '
+    [key_insecure]=' -iqcx '
+  )
+
+  if [[ -z $1 ]]; then
+    __symit::usage
+    return $(__symit::exit 0)
+  fi
 
   while :; do
     case $1 in
       -h|-\?|--help)
           shift
-          symit::usage
-          symit::cleanup
-          return $(symit::exit 0)
+          __symit::usage
+          __symit::cleanup
+          return $(__symit::exit 0)
           ;;
 
       -k|--key)
           shift
           if [[ -z $1 ]]; then
-            symit::error "-k/--key requires an argument" && return $(symit::exit 1)
+            __err "-k/--key requires an argument" && return $(__symit::exit 1)
           else
             cli__opts[key]=$1
             shift
@@ -169,143 +379,109 @@ symit() {
       -x|--extension)
           shift
           if [[ -z $1 ]]; then
-            symit::error "-x/--extension requires an argument" && return $(symit::exit 1)
+            __err "-x/--extension requires an argument" && return $(__symit::exit 1)
           else
             cli__opts[extension]=${1}
             shift
           fi
           ;;
 
-      -l|--locations)
+      -f|--folder)
           shift
-          cli__opts[locations]=${true}
-          ;;
-
-      -i|--install)
-          shift
-          symit::install
-          symit::cleanup
-          return $(symit::exit 0)
+          if [[ -z $1 ]]; then
+            __err "-f/--folder requires an argument" && return $(__symit::exit 1)
+          else
+            cli__opts[folder]=${1}
+            shift
+          fi
           ;;
 
       -n|--dry-run)
           shift
-          cli__opts[dry_run]=${true}
+          cli__opts[dry_run]="yes"
           ;;
 
-      --)              # End of all options.
+      -v|--verbose)
+          shift
+          cli__opts[verbose]="yes"
+          ;;
+
+      import|key)
+          shift
+          cli__opts[action]="key_secure"
+          ;;
+
+      insecure)
+          shift
+          if [[ "${cli__opts[action]}" == 'key_secure' ]] ; then
+            cli__opts[action]="key_insecure"
+          fi
+          ;;
+
+      --) # End of all options.
           shift
           break
           ;;
 
       -?*)
-          printf 'WARN: Unknown option (ignored): %s\n' "$1" >&2
-          symit::cleanup
-          return $(symit::exit 127)
+          __err 'WARN: Unknown option: %s\n' "$1" >&2
+          return $(__symit::exit 127)
           shift
           ;;
 
-      *)               # Default case: If no more options then break out of the loop.
+
+      ?*)
+          param=$1
+          if [[ -n "${sym__actions[${param}]}" ]]; then
+            cli__opts[action]=${param}
+          else
+            cli__opts[file]=${1}
+          fi
+          shift
+          ;;
+
+      *) # Default case: If no more options then break out of the loop.
           break
           shift
     esac
   done
 
-  declare -a locations=$(symit::locs)
+  [[ -n ${cli__opts[verbose]} ]] &&__symit::print_cli_args
 
-  if [[ ${cli__opts[locations]} == ${true} ]]; then
-    if [[ -z ${encrypted_file} ]]; then
-      symit::error "-l/--locations requires file-spec to be provided as the 1st argument"
-      symit::cleanup
-      return $(symit::exit 2)
+  if [[ "${cli__opts[action]}" == 'install' ]]; then
+    if [[ -n ${cli__opts[dry_run]} ]]; then
+      __inf "This command verifies that Sym is properly installed,"
+      __inf "and if not found — installs it."
+      return $(__symit::exit 0)
     else
-      symit::locs::print
-      symit::cleanup
-      return $(symit::exit 0)
+      __symit::install::gem
+      return $(__symit::exit 0)
     fi
   fi
 
-  if [[ -z "${encrypted_file}" ]]; then
-    symit::error "Missing 1st argument — file name to be loaded, eg 'production', etc."
-    symit::cleanup
-    return $(symit::exit 3)
-  fi
+  __symit::validate_args
 
-  if [[ -z "${cli__opts[key]}" ]]; then
-    symit::error "Key was not defined, pass it with ${bldblu}-k key-spec${bldred} or set it via ${bldgrn}\$sym__key${bldred} variable."
-    symit::cleanup
-    return $(symit::exit 4)
-  fi
+  changed_count=0
 
-  file=
-  for loc in ${locations[@]}; do
-    if [[ -s "${loc}" ]] ; then
-      file=${loc}
-      break
+  if [[ -n "${cli__opts[dry_run]}" ]] ; then
+    __lib::color::h1 "Dry Run — printing commands that would be run:"
+    for file in $(__symit::files); do
+      printf "   \$ ${bldblu}$(__symit::command ${file})${clr}\n"
+    done
+  else
+    if [[ -n "${cli__opts[file]}" ]]; then
+      for file in $(__symit::files); do
+        __inf "   ${bldblu}$(__symit::command ${file})${clr}\n"
+        eval $(__symit::command ${file})
+        code=$?; [[ ${code} != 0 ]] && return $(symits::exit ${code})
+      done
+    else
+      [[ -n ${cli__opts[verbose]} ]] && __inf $(__symit::command)
+      eval $(__symit::command)
+      code=$?; [[ ${code} != 0 ]] && return $(__symits::exit ${code})
     fi
-  done
-
-  [[ -z "${file}" ]] && {
-    symit::error "${bldylw}${encrypted_file}${bldred} could not be found."
-    symit::locs::print
-    symit::cleanup
-    return $(symit::exit 5)
-  }
-
-  command="sym -ck ${cli__opts[key]} -t ${file}"
-
-  [[ ${cli_opts[dry_run]} ]] && printf "[dry_run] "
-
-  printf "${bldgrn}${command}${txtrst}\n"
-
-  [[ ${cli_opts[dry_run]} ]] || ${command}
-}
-
-
-sym-encrypt() {
-  local key=$1
-  local from=$2
-  local to=$3
-  local args=
-
-  [[ -n $key ]] && args="${args} -ck ${key}"
-
-  if [[ -n $to ]]; then
-    args="${args} -o ${to}"
-    [[ -n $from ]] && args="${args} -f ${from}"
-  else
-    [[ -n $from ]] && args="${args} -n ${from}"
-  fi
-
-  if [[ -z $args ]]; then
-    echo "usage: sym-encrypt key file [ outfile ]"
-  else
-    sym -e ${args}
   fi
 }
-
-sym-decrypt() {
-  local key=$1
-  local from=$2
-  local to=$3
-  local args=
-  
-  [[ -n $key ]] && args="${args} -ck ${key}"
-
-  if [[ -n $to ]]; then
-    args="${args} -o ${to}"
-    [[ -n $from ]] && args="${args} -f ${from}"
-  else
-    [[ -n $from ]] && args="${args} -n ${from}"
-  fi
-
-  if [[ -z $args ]]; then
-    echo "usage: sym-decrypt key file [ outfile ]"
-  else
-    sym -d ${args}
-  fi
+function symit()  {
+  __symit::run $@
 }
-
-alias syme="sym-encrypt"
-alias symd="sym-decrypt"
-
