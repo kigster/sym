@@ -28,18 +28,18 @@ jobs:
             - ./vendor/bundle
           key: v1-dependencies-{{ checksum "Gemfile.lock" }}
         
-      - run:
-          name: run tests
-          command: |
-            mkdir /tmp/test-results
-            bundle exec rspec --format RspecJunitFormatter \
-                            --out /tmp/test-results/rspec.xml \
-                            --format progress 
       - run: 
           name: install memcached
           command: |
             apt-get update && apt-get install -y memcached
 
+      - run:
+          name: run tests
+          command: |
+            mkdir /tmp/test-results
+            USER=circleci HOME=/home/${USER} bundle exec rspec --format RspecJunitFormatter \
+                            --out /tmp/test-results/rspec.xml \
+                            --format progress 
       # collect reports
       - store_test_results:
           path: /tmp/test-results
