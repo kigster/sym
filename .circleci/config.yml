@@ -32,29 +32,22 @@ jobs:
           name: install memcached
           command: |
             sudo apt-get update && sudo apt-get install -y memcached
-            memcached -d
+            memcached --version
+            memcached -d -v 
+            echo "checking if memcached is running...."
+            ps -ef | grep [m]emcached
 
       - run:
           name: install sym bash helpers
           command: |
-            bundle exec exe/sym -B ~/.bash_profile -vTD
+            bundle exec exe/sym -B ~/.bash_profile
 
       - run:
           name: run tests
           command: |
-            mkdir /tmp/test-results
             export TEST_DRB=true 
             export USER=circleci 
             export HOME=/home/${USER}
-            bundle exec rspec --format RspecJunitFormatter \
-                              --out /tmp/test-results/rspec.xml \
-                              --backtrace \
+            bundle exec rspec --backtrace \
                               --warnings \
                               --format documentation
-      # collect reports
-      - store_test_results:
-          path: /tmp/test-results
-      - store_artifacts:
-          path: /tmp/test-results
-          destination: test-results
-          
