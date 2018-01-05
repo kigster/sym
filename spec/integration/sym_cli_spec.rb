@@ -9,7 +9,7 @@ RSpec.describe 'CLI execution', :type => :aruba do
   BASE62_REGEX    = %r{^[a-zA-Z0-9=.\-_]+=$}
   KEY_PLAIN       = 'm4G6b7Lb-0bom5l8uxog_cL1x08mvH1ASsv1Svl3UGQ='
   HELLO_ENCRYPTED = 'BAhTOh1TeW06OkRhdGE6OldyYXBwZXJTdHJ1Y3QLOhNlbmNyeXB0ZWRfZGF0YSIluUtFV4ibk5B65MTjQMXvphsSi7pKPVXt9B2atfMD7cg6B2l2IhWp0jYYSo0CHrm0gWh57mDPOhBjaXBoZXJfbmFtZSIQQUVTLTI1Ni1DQkM6CXNhbHQwOgx2ZXJzaW9uaQY6DWNvbXByZXNzVA=='
-  TEMP_FILE       = "/tmp/sym.#{rand % 8984798712}"
+  TEMP_FILE       = "/tmp/sym.#{(rand % 8984798712 % (Time.now.to_i)).to_s[3..-1]}"
   RESET_TEMP_FILE = ->(*) { File.unlink(TEMP_FILE) if File.exist?(TEMP_FILE) }
 
   context 'using Aruba framework' do
@@ -19,7 +19,7 @@ RSpec.describe 'CLI execution', :type => :aruba do
     context 'install bash completion' do
       before &RESET_TEMP_FILE
       after &RESET_TEMP_FILE
-      let(:args) {  "--bash-support #{TEMP_FILE}" }
+      let(:args) {  "-B #{TEMP_FILE}" }
 
       it 'should run command' do
         run_simple command
