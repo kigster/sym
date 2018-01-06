@@ -1,12 +1,12 @@
 #!/usr/bin/env bash
-
+#
+# (c) 2017-2018 Konstantin Gredeskoul
+#
+# MIT License, distributed as part of `sym` ruby gem.
+# • https://github.com/kigster/sym
+#
 #==============================================================================
 #
-# (c) 2017 Konstantin Gredeskoul
-#          MIT License, distributed as part of `sym` ruby gem.
-#          https://github.com/kigster/sym
-#
-#==============================================================================
 # The purpose of this script is to transparently edit application secrets in a
 # Rails apps or other repos. It simplifies the process of key import, as well
 # as the direct editing.
@@ -33,7 +33,7 @@
 #
 # And then
 #
-#     symit key-import [ insecure ]           # import a key and password-protect it (or not)
+#     symit import key [ insecure ]           # import a key and password-protect it (or not)
 #     symit auto application.yml.enc          # auto-decrypts it
 #     symit auto application.yml              # auto-encrypts it
 #     symit decrypt application.yml           # finds application.yml.enc and decrypts that.
@@ -42,6 +42,21 @@
 # ...and vola! You are editing the encrypted file with sym from the root of
 # your Rails application. Neat, no?
 #
+
+(   [[ -n $ZSH_EVAL_CONTEXT && $ZSH_EVAL_CONTEXT =~ :file$ ]] || \
+    [[ -n $BASH_VERSION && $0 != "$BASH_SOURCE" ]]) && _s_=1 || _s_=0
+
+(( $_s_ )) && _is_sourced=1
+(( $_s_ )) || _is_sourced=0
+
+bash_version=$(/usr/bin/env bash --version | awk '{FS="version"}{print $4}')
+bash_version=${bash_version:0:1}
+
+if [[ "${bash_version}" -lt 4 ]]; then
+    (( $_s_ )) && return 1
+    (( $_s_ )) || exit 1
+fi
+
 function __lib::color::setup()  {
   if [[ -z "${setup_colors_loaded}" ]]; then
 
@@ -123,6 +138,21 @@ function __lib::color::cursor_to_row()  {
 }
 
 ((${setup_colors_loaded})) ||__lib::color::setup
+
+
+(( $_s_ )) || {
+  printf "${bldred}This script is meant to be sourced into your environment,\n"
+  printf "not run on a command line.${clr} \n\n"
+
+  printf "Please add 'source $0' to your BASH initialization file,\n"
+  printf "or run the following command:\n\n"
+
+  printf "    \$ ${bldgrn}sym -B ~/.bash_profile${clr}\n\n"
+  
+  printf "${bldblu}Thanks for using Sym!${clr}\n"
+  exit 1
+
+}
 
 function __symit::init()  {
   export SYMIT__EXTENSION=${SYMIT__EXTENSION:-'.enc'}
