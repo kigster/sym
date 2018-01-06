@@ -63,5 +63,4 @@ EOF
   spec.add_development_dependency 'rspec', '~> 3'
   spec.add_development_dependency 'rspec-its'
   spec.add_development_dependency 'yard'
-  spec.add_development_dependency 'rspec_junit_formatter', '~> 0.3.0'
 end
