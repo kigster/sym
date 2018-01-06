@@ -24,7 +24,7 @@ RSpec.describe 'CLI execution', :type => :aruba do
     context 'install bash completion' do
       let(:args) { "-B #{TEMP_FILE}" }
 
-      before &RESET_TEMP_FILE
+      before { RESET_TEMP_FILE.call }
       before do
         File.open(TEMP_FILE, 'w') { |f| f.write("#!/usr/bin/env bash\n") }
         run_simple command, fail_on_error: true

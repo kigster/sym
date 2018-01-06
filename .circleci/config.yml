@@ -32,8 +32,8 @@ jobs:
           name: install memcached
           command: |
             sudo apt-get update && sudo apt-get install -y memcached
-            memcached --version
-            memcached -d -v 
+            sudo service start memcached || true
+            memcached -d || true
             echo "checking if memcached is running...."
             ps -ef | grep [m]emcached
 
@@ -45,9 +45,9 @@ jobs:
       - run:
           name: run tests
           command: |
-            export TEST_DRB=true 
-            export USER=circleci 
-            export HOME=/home/${USER}
-            bundle exec rspec --backtrace \
-                              --warnings \
-                              --format documentation
+            bash -l -c "
+              export TEST_DRB=true 
+              export USER=circleci 
+              export HOME=/home/${USER}
+              bundle exec rspec --backtrace --format documentation"
+      
