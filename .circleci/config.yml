@@ -36,6 +36,7 @@ jobs:
             memcached -d || true
             echo "checking if memcached is running...."
             ps -ef | grep [m]emcached
+            echo 'stats' | nc localhost 11211
 
       - run:
           name: install sym bash helpers
@@ -45,8 +46,11 @@ jobs:
       - run:
           name: run tests
           command: |
-            bash -l -c "
-              export TEST_DRB=true 
+            [[ -z ${_bash} && -x /usr/local/bin/bash ]] && _bash=/usr/local/bin/bash
+            [[ -z ${_bash} && -x /usr/bin/bash ]] && _bash=/usr/bin/bash
+            [[ -z ${_bash} && -x /bin/bash ]] && _bash=/bin/bash
+            ${_bash} -l -c "
+              #export TEST_DRB=true 
               export USER=circleci 
               export HOME=/home/${USER}
               bundle exec rspec --backtrace --format documentation"
