@@ -36,8 +36,8 @@ jobs:
             memcached -d || true
             echo "checking if memcached is running...."
             ps -ef | grep [m]emcached
-            echo 'stats' | nc localhost 11211
-            echo "if we see the stats, memcached is running!"
+            # echo 'stats' | nc localhost 11211
+            # echo "if we see the stats, memcached is running!"
 
       - run:
           name: install sym bash helpers
