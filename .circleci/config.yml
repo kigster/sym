@@ -1,0 +1,59 @@
+# Ruby CircleCI 2.0 configuration file
+#
+# Check https://circleci.com/docs/2.0/language-ruby/ for more details
+#
+version: 2
+jobs:
+  build:
+    docker:
+      # specify the version you desire here
+       - image: circleci/ruby:2.4.1-node-browsers
+      
+    working_directory: ~/repo
+
+    steps:
+      - checkout
+      - restore_cache:
+          keys:
+          - v1-dependencies-{{ checksum "Gemfile.lock" }}
+          - v1-dependencies-
+
+      - run:
+          name: install dependencies
+          command: |
+            bundle install --jobs=4 --retry=3 --path vendor/bundle
+
+      - save_cache:
+          paths:
+            - ./vendor/bundle≤
+          key: v1-dependencies-{{ checksum "Gemfile.lock" }}
+        
+      - run: 
+          name: install memcached
+          command: |
+            sudo apt-get update && sudo apt-get install -y memcached
+            sudo service start memcached || true
+            memcached -d || true
+            echo "checking if memcached is running...."
+            ps -ef | grep [m]emcached
+
+      - run:
+          name: install sym bash helpers
+          command: |
+            bundle exec exe/sym -B ~/.bash_profile
+
+      - run:
+          name: run tests
+          command: |
+            [[ -z ${_bash} && -x /usr/local/bin/bash ]] && _bash=/usr/local/bin/bash
+            [[ -z ${_bash} && -x /usr/bin/bash ]] && _bash=/usr/bin/bash
+            [[ -z ${_bash} && -x /bin/bash ]] && _bash=/bin/bash
+            ${_bash} -l -c "
+              export USER=circleci 
+              export HOME=/home/${USER}/repo
+              ruby --version
+              bundle exec rspec --version
+              bundle exec exe/sym --version
+              bundle exec rspec --backtrace --format documentation
+            "
+      

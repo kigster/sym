@@ -30,17 +30,18 @@ http://kig.re/2017/03/10/dead-simple-encryption-with-sym.html
 
 BASH COMPLETION
 ===============
-To enable bash command line completion, please run the following 
-command, which appends sym's shell completion wrapper to the file 
-specified in arguments to -B/--bash-support flag.
+To enable bash command line completion and install highly useful
+command line BASH wrapper 'symit', please run the following 
+command after installing the gem. It appends sym's shell completion 
+wrapper to the file specified in arguments to -B flag.
 
   sym -B ~/.bash_profile
   source ~/.bash_profile
+  # then:
+  sym --help
+  symit --help
  
-Thank you for using Sym and happy crypting :)
-
-For bonus points, run 'symit -h' after installing and loading bash
-completion.
+Thank you for using Sym and happy encrypting :)
 
 @kigster on Github, 
     @kig on Twitter.
@@ -57,7 +58,7 @@ EOF
   spec.add_development_dependency 'simplecov'
   spec.add_development_dependency 'irbtools'
   spec.add_development_dependency 'aruba'
-  spec.add_development_dependency 'bundler', '~> 1'
+  spec.add_development_dependency 'bundler'
   spec.add_development_dependency 'rake'
   spec.add_development_dependency 'rspec', '~> 3'
   spec.add_development_dependency 'rspec-its'

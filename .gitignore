@@ -13,3 +13,4 @@
 /*.enc
 **/.DS_Store
 .ruby-version
+temp/

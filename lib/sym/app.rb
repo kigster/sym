@@ -52,11 +52,11 @@ module Sym
       reason    = exception.message if exception
 
       if exception && (config && config[:trace] || reason == 'Unknown Error')
-        lines << "#{error_type.red.on.white.bold}:\n#{error_details.white.on.red}\n" + ''.normal
+        lines << "#{error_type.bold.red}:\n#{error_details.red.italic}\n" + ''.normal
         lines << exception.backtrace.join("\n").red.bold if config[:trace]
         lines << "\n"
       else
-        lines << "| SYM Error #{operation} → |".white.on.red + (reason ? " #{reason} ".bold.black.on.white : " #{error_details}")[0..70] + ' '.normal + "\n"
+        lines << " ✖ Sym Error #{operation}:".bold.red + (reason ? " #{reason} ".red.italic: " #{error_details}")[0..70] + ' '.normal + "\n"
         lines << "#{comments}" if comments
       end
 

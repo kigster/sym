@@ -9,23 +9,35 @@ RSpec.describe 'CLI execution', :type => :aruba do
   BASE62_REGEX    = %r{^[a-zA-Z0-9=.\-_]+=$}
   KEY_PLAIN       = 'm4G6b7Lb-0bom5l8uxog_cL1x08mvH1ASsv1Svl3UGQ='
   HELLO_ENCRYPTED = 'BAhTOh1TeW06OkRhdGE6OldyYXBwZXJTdHJ1Y3QLOhNlbmNyeXB0ZWRfZGF0YSIluUtFV4ibk5B65MTjQMXvphsSi7pKPVXt9B2atfMD7cg6B2l2IhWp0jYYSo0CHrm0gWh57mDPOhBjaXBoZXJfbmFtZSIQQUVTLTI1Ni1DQkM6CXNhbHQwOgx2ZXJzaW9uaQY6DWNvbXByZXNzVA=='
-  TEMP_FILE       = "/tmp/sym.#{rand % 8984798712}"
-  RESET_TEMP_FILE = ->(*) { File.unlink(TEMP_FILE) if File.exist?(TEMP_FILE) }
+  TEMP_FILE       = "#{Dir.pwd}/temp/sym.test.output"
+  RESET_TEMP_FILE = ->(*) do
+    FileUtils.rm_rf(File.dirname(TEMP_FILE))
+    FileUtils.mkdir_p(File.dirname(TEMP_FILE))
+  end
+
+  RESET_TEMP_FILE.call
 
   context 'using Aruba framework' do
-    let(:command) { "exe/sym #{args}" }
+    let(:command) { "bundle exec exe/sym #{args}" }
     let(:output) { last_command_started.stdout.chomp }
 
     context 'install bash completion' do
-      before &RESET_TEMP_FILE
-      after &RESET_TEMP_FILE
-      let(:args) { "--bash-support #{TEMP_FILE}" }
+      let(:args) { "-B #{TEMP_FILE}" }
+
+      before { RESET_TEMP_FILE.call }
+      before do
+        File.open(TEMP_FILE, 'w') { |f| f.write("#!/usr/bin/env bash\n") }
+        run_simple command, fail_on_error: true
+      end
+
+      it 'should have two files to install' do
+        expect(::Sym::Constants::Bash::Config.size).to eq(2)
+      end
 
       it 'should run command' do
-        run_simple command
-        expect(File.exist?(TEMP_FILE))
-        expect(File.read(TEMP_FILE)).to include(Sym::Constants::Bash::Config[:completion][:script])
-        expect(File.read(TEMP_FILE)).to include(Sym::Constants::Bash::Config[:symit][:script])
+        expect(File.exist?(TEMP_FILE)).to be(true)
+        expect(File.read(TEMP_FILE)).to include(::Sym::Constants::Bash::Config[:completion][:script])
+        expect(File.read(TEMP_FILE)).to include(::Sym::Constants::Bash::Config[:symit][:script])
       end
     end
 
@@ -108,8 +120,6 @@ RSpec.describe 'CLI execution', :type => :aruba do
               expect(File.exist?(TEMP_FILE)).to be true
               expect(output).to eq('hello')
             end
-
-            after &RESET_TEMP_FILE
           end
         end
       end

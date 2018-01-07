@@ -4,6 +4,17 @@
 
 [Changes since the last tag](https://github.com/kigster/sym/compare/v2.7.0...HEAD)
 
+## [v2.8.0](https://github.com/kigster/sym/tree/v2.8.0) (2018-01-05)
+[Full Changelog](https://github.com/kigster/sym/compare/v2.7.0...v2.8.0)
+
+Version 2.8.0 with several key changes below:
+
+ - Ensuring that Sym exits with a non-zero code when errors occur
+ - Ensuring that coverage, and doc folders are removed before release
+ - Adding sym-encrypt() and sym-decrypt() BASH helpers 
+ - Major update to `sym.symit` to provide easier access to commands.
+ - Cleaning up output of the errors
+
 ## [v2.7.0](https://github.com/kigster/sym/tree/v2.7.0) (2017-06-23)
 [Full Changelog](https://github.com/kigster/sym/compare/v2.6.3...v2.7.0)
 

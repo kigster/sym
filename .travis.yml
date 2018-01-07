@@ -1,14 +1,11 @@
 language: ruby
-cache: bundler
 env:
-- CODECLIMATE_REPO_TOKEN=c71874cc22acffe1e2543d3388d3a96c73a65f0cfe17169dadd8de4a6c062c39 TEST_DRB=true
+- CODECLIMATE_REPO_TOKEN=c71874cc22acffe1e2543d3388d3a96c73a65f0cfe17169dadd8de4a6c062c39 TEST_DRB=true HOME=/home/travis USER=travis
 services:
 - memcached
 rvm:
-- 2.2.7
-- 2.3.4
-- 2.4.1
-- jruby-9.1.9.0
+- 2.3.5
+- 2.4.2
 notifications:
   email:
     recipients:
@@ -24,3 +21,11 @@ addons:
 # regular test configuration
 after_success:
   - bundle exec codeclimate-test-reporter
+before_script:
+  - echo stats | nc localhost 11211
+script:
+  - bundle exec exe/sym -B ~/.bash_profile -vTD
+  - ls -alF ~/.sym*
+  - ls -alF .
+  - mkdir -p temp
+  - bundle exec rspec --format documentation

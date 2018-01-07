@@ -1,16 +1,24 @@
 #!/usr/bin/env bash
 #
-# Sym command line completion
+# Sym Command Line completion and other utilities
+# 
+# © 2015-2018, Konstantin Gredeskoul,  https://github.com/kigster/sym
 #
-# © 2015-2016, Konstantin Gredeskoul,  https://github.com/kigster/sym
 # MIT LICENSE
 #
+###########################################################################
+
+( [[ -n $ZSH_EVAL_CONTEXT && $ZSH_EVAL_CONTEXT =~ :file$ ]] || \
+  [[ -n $BASH_VERSION && $0 != "$BASH_SOURCE" ]]) && _s_=1 || _s_=0
+
+bash_version=$(bash --version | awk '{FS="version"}{print $4}')
+bash_version=${bash_version:0:1}
 
 declare -a bash_completion_locations=(/usr/local/etc/bash_completion /usr/etc/bash_completion /etc/bash_completion)
 loaded=false
 for file in ${bash_completion_locations[@]}; do
-    [[ -s $file ]] && {
-      source $file
+    [[ -s ${file} ]] && {
+      source ${file}
       break
     }
 done
@@ -64,33 +72,45 @@ _sym()
     return 0
 } && complete -F _sym $nospace $filenames sym
 
-# Helpers
-
 sym-encrypt() {
-  local from=$1
-  local to=$2
-  local key=$3
+  local key=$1
+  local from=$2
+  local to=$3
   local args=
-  [[ -n $from ]] && args="${args} -f ${from}"
-  [[ -n $to ]] && args="${args} -o ${to}"
+
   [[ -n $key ]] && args="${args} -ck ${key}"
+
+  if [[ -n $to ]]; then
+    args="${args} -o ${to}"
+    [[ -n $from ]] && args="${args} -f ${from}"
+  else
+    [[ -n $from ]] && args="${args} -n ${from}"
+  fi
+
   if [[ -z $args ]]; then
-    echo "usage: sym-encrypt <from-file> [ <to-file> [ key-name ] ] " 
+    echo "usage: sym-encrypt key file [ outfile ]"
   else
     sym -e ${args}
   fi
 }
 
 sym-decrypt() {
-  local from=$1
-  local to=$2
-  local key=$3
+  local key=$1
+  local from=$2
+  local to=$3
   local args=
-  [[ -n $from ]] && args="${args} -f ${from}"
-  [[ -n $to ]] && args="${args} -o ${to}"
+
   [[ -n $key ]] && args="${args} -ck ${key}"
+
+  if [[ -n $to ]]; then
+    args="${args} -o ${to}"
+    [[ -n $from ]] && args="${args} -f ${from}"
+  else
+    [[ -n $from ]] && args="${args} -n ${from}"
+  fi
+
   if [[ -z $args ]]; then
-    echo "usage: sym-decrypt from-file [ to-file [ key-name ] ] " 
+    echo "usage: sym-decrypt key file [ outfile ]"
   else
     sym -d ${args}
   fi
