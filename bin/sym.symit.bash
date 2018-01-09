@@ -277,6 +277,8 @@ function __symit::usage()  {
   printf "    -k | --key       KEY   ${clr}Key identifier${clr}\n"
   printf "    -x | --extension EXT   ${clr}Default extension of encrypted files.${clr}\n"
   printf "    -n | --dry-run         ${clr}Print stuff, but dont do it${clr}\n"
+  printf "    -v | --verbose         ${clr}Print more stuff${clr}\n"
+  printf "    -q | --quiet           ${clr}Print less stuff${clr}\n"
   printf "    -h | --help            ${clr}Show this help message${clr}\n"
 
   echo
