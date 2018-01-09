@@ -49,6 +49,22 @@
 (( $_s_ )) && _is_sourced=1
 (( $_s_ )) || _is_sourced=0
 
+
+# returns 3 for 3.2.57(1)-release
+# returns 4 for 4.... etc.
+
+function __lib::shell::name() {
+  echo $(basename $(printf $SHELL))
+}
+
+function __lib::shell::is_bash() {
+  [[ $(__lib::shell::name) == "bash" ]] && echo yes
+}
+
+function __lib::bash::version_number() {
+  echo $BASH_VERSION | awk 'BEGIN{FS="."}{print $1}'
+}
+
 function __lib::color::setup()  {
   if [[ -z "${setup_colors_loaded}" ]]; then
 
@@ -98,8 +114,33 @@ function __lib::color::setup()  {
   fi
 }
 
-((${setup_colors_loaded})) ||__lib::color::setup
+((${setup_colors_loaded})) || __lib::color::setup
 
+if [[ $(__lib::bash::version_number) -lt 4 ]]; then
+  printf "${bldred}On noes, Symit requires BASH version 4+.\n"
+
+  if [[ $(uname -s) == 'Darwin' ]]; then
+
+    printf "Since you are on OS-X, we refer you to either the following
+blog post ${undblu}https://johndjameson.com/blog/updating-your-shell-with-homebrew/${clr}
+
+Or, you can run the following commands yourself to use Brew to change
+your shell to the latest BASH:\n"
+
+    printf "${bldylw}"
+    printf '
+    [[ $(which brew) ]] || /usr/bin/ruby -e "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/master/install)"
+    brew install bash
+    [[ $(grep "/usr/local/bin/bash" /etc/shells) ]] || sudo echo /usr/local/bin/bash >> /etc/shells
+    [[ ${SHELL} != /usr/local/bin/bash && -x /usr/local/bin/bash ]] && chsh -s /usr/local/bin/bash
+
+    echo "NOTE: do not close your current session. Start a new terminal,"
+    echo "to verify you are on a new shell by running: echo $BASH_VERSION"
+    '
+    printf "${clr}"
+  fi
+fi
+  
 (( $_s_ )) || {
   printf "${bldred}This script is meant to be sourced into your environment,\n"
   printf "not run on a command line.${clr} \n\n"
@@ -108,7 +149,7 @@ function __lib::color::setup()  {
   printf "or run the following command:\n\n"
 
   printf "    \$ ${bldgrn}sym -B ~/.bash_profile${clr}\n\n"
-  
+
   printf "${bldblu}Thanks for using Sym!${clr}\n"
   exit 1
 }
@@ -127,44 +168,89 @@ function __lib::color::h1()  {
   local title=$(echo "$*" | tr 'a-z' 'A-Z')
   len=${#title}
   printf "${bldylw}${title}\n"
-  __lib::color::hr ${len} '—'
+  __lib::color::hr ${len} '─'
 }
 
 function __lib::color::h2()  {
   printf "${bldpur}$*${clr}\n"
 }
 
-function __lib::color::cursor_to_col()  {
+function __lib::color::cursor-right-by()  {
   position=$1
   echo -en "\e[${position}C"
 }
 
-function __lib::color::cursor_to_row()  {
+function __lib::color::cursor-left-by()  {
   position=$1
-  echo -en "\e[${position}H"
+  echo -en "\e[${position}D"
 }
+
+function __lib::color::cursor-up-by()  {
+  position=$1
+  echo -en "\e[${position}A"
+}
+
+function __lib::color::cursor-down-by()  {
+  position=$1
+  echo -en "\e[${position}B"
+}
+
+# Convert a version string such as "1.50.17" to an integer
+# 101050017
+function __lib::ver-to-i() {
+  version=${1}
+  echo ${version} | awk 'BEGIN{FS="."}{ printf "1%02d%03.3d%03.3d", $1, $2, $3}'
+}
+
+function __lib::i-to-ver() {
+  version=${1}
+  /usr/bin/env ruby -e "ver='${version}'; printf %Q{%d.%d.%d}, ver[1..2].to_i, ver[3..5].to_i, ver[6..8].to_i"
+}
+
+################################################################################
 
 function __symit::init()  {
   export SYMIT__EXTENSION=${SYMIT__EXTENSION:-'.enc'}
   export SYMIT__FOLDER=${SYMIT__FOLDER:-'.'}
   export SYMIT__KEY=${SYMIT__KEY}
+  export SYMIT__MIN_VERSION='latest'
 }
+
 function __symit::usage()  {
   __lib::color::setup
   __lib::color::h1 "symit"
   printf "
-  This a BASH wrapper for the encryption tool (ruby gem) 'Sym'. It streamlines
-  editing encrypted of files, importing and securing your key, and other
-  actions.  The wrapper can be configured with ENV variables, or CLI flags.\n"
+  ${bldylw}symit${bldgrn} is a BASH helper for the encryption tool ${bldred}Sym${clr}. 
+
+  Sym has an extensive CLI interface, but it only handles one encryption/decryption
+  operation per invocation. With this script, you can auto decrypt all files in 
+  a given folder, you can import the key in a simpler way, and you can save into the
+  environment sym configuration that will be used. It also streamlines editing of 
+  encrypted files in a given folder. Symit can be configured with ENV variables, 
+  or using CLI flags, use whichever you prefer.\n"
 
   printf "
-  The easiest way to take advantage of this wrapper is to set the following
+  The recommended way to use ${bldred}symit${clr} is to set the following
   environment variables, which removes the need to pass these values via the
-  flags. These variables default to the shown values if not set elsewhere:${txtylw}
+  flags. These variables default to the shown values if not set elsewhere:
 
-  export SYMIT__EXTENSION='${SYMIT__EXTENSION}'
-  export SYMIT__FOLDER='${SYMIT__FOLDER}'
-  export SYMIT__KEY='${SYMIT__KEY}'
+  Perhaps the most critically important variable to set is ${txtylw}SYMIT__KEY${clr}:
+
+       export SYMIT__KEY='my-org.my-app.dev'
+   eg: export SYMIT__KEY='github.web.development' 
+
+  If you have a different key per 'environment' you can have a script change
+  SYMIT__KEY when you change the environment.
+
+  Additional configuration is available through these variables:
+
+     export SYMIT__EXTENSION='${SYMIT__EXTENSION}'
+     export SYMIT__FOLDER='${SYMIT__FOLDER}'
+     export SYMIT__MIN_VERSION='latest'
+
+  The last variable defines the minimum Sym version desired. Set it to
+  'latest' to have symit auto-upgrade Sym every time its called.
+
   ${clr}\n"
 
   __lib::color::h2 "Usage:"
@@ -173,39 +259,43 @@ function __symit::usage()  {
   __lib::color::h2 "Actions:"
   printf "    Action is the first word that defaults to ${bldylw}edit${clr}.\n\n"
   printf "    Valid actions are:\n"
-  printf "    ${bldylw}— install       ${bldblk}ensures you are on the latest gem version\n"
-  printf "    ${bldylw}— generate      ${bldblk}create a new secure key, and copies it to \n"
-  printf "                    clipboard (if supported), otherwise prints to STDOUT\n"
+  printf "    ${bldylw}— install       ${clr}ensures you are on the latest gem version\n"
+  printf "    ${bldylw}— generate      ${clr}create a new secure key, and copies it to \n"
+  #printf '                    clipboard (if supported), otherwise prints to STDOUT'; echo
   printf "                    Key is required, and used as a name within OSX KeyChain\n\n"
   printf "    ${bldylw}— import [key] [insecure]\n"
-  printf "                    ${bldblk}imports the key from clipboard and adds password\n"
+  printf "                    ${clr}imports the key from clipboard and adds password\n"
   printf "                    encryption unless 'insecure' is passed in\n\n"
-  printf "    ${bldylw}— edit          ${bldblk}Finds all files, and opens them in $EDITOR\n"
-  printf "    ${bldylw}— encrypt       ${bldblk}Encrypts files matching file-path\n"
-  printf "    ${bldylw}— decrypt       ${bldblk}Adds the extension to file pattern and decrypts\n"
-  printf "    ${bldylw}— auto          ${bldblk}encrypts decrypted file, and vice versa\n"
+  printf "    ${bldylw}— edit          ${clr}Finds all files, and opens them in $EDITOR\n"
+  printf "    ${bldylw}— encrypt       ${clr}Encrypts files matching file-path\n"
+  printf "    ${bldylw}— decrypt       ${clr}Adds the extension to file pattern and decrypts\n"
+  printf "    ${bldylw}— auto          ${clr}encrypts decrypted file, and vice versa\n"
 
   echo
   __lib::color::h2 "Flags:"
-  printf "    -f | --folder    DIR   ${bldblk}Top level folder to search.${clr}\n"
-  printf "    -k | --key       KEY   ${bldblk}Key identifier${clr}\n"
-  printf "    -x | --extension EXT   ${bldblk}Default extension of encrypted files.${clr}\n"
-  printf "    -n | --dry-run         ${bldblk}Print stuff, but don't do it${clr}\n"
-  printf "    -h | --help            ${bldblk}Show this help message${clr}\n"
+  printf "    -f | --folder    DIR   ${clr}Top level folder to search.${clr}\n"
+  printf "    -k | --key       KEY   ${clr}Key identifier${clr}\n"
+  printf "    -x | --extension EXT   ${clr}Default extension of encrypted files.${clr}\n"
+  printf "    -n | --dry-run         ${clr}Print stuff, but dont do it${clr}\n"
+  printf "    -h | --help            ${clr}Show this help message${clr}\n"
 
   echo
   __lib::color::h2 'Encryption key identifier can be:'
-  printf "${clr}\
+  printf "${clr}"
+
+  printf '
   1. name of the keychain item storing the keychain (secure)
   2. name of the environment variable storing the Key (*)
   3. name of the file storing the key (*)
-  4. the key itself (*)
+  4. the key itself (*)'
 
-  ${bldred}(*) 2-4 are insecure UNLESS the key is encrypted with a password.${clr}
-
-  Please refer to README about generating password protected keys:
+  echo
+  printf "${bldred}"
+  printf '
+  (*) 2-4 are insecure UNLESS the key is encrypted with a password.'; echo
+  printf "${clr}\
+  Please refer to README about generating password protected keys:\n
   ${bldblu}${undblu}https://github.com/kigster/sym#generating-the-key--examples${clr}\n\n"
-
   echo
 
   __lib::color::h1 'Examples:'
@@ -213,7 +303,7 @@ function __symit::usage()  {
   printf "  Ex1: To import a key securely,\n"
   printf "     \$ ${bldgrn}symit${bldblu} import key ${clr}\n\n"
 
-  printf "  Ex2.: To encrypt (or decrypt) ALL files in the 'config' directory:${clr}\n"
+  printf "  Ex2.: To encrypt or decrypt ALL files in the 'config' directory:${clr}\n"
   printf "     \$ ${bldgrn}symit${bldblu} encrypt|decrypt -a -f config ${clr}\n\n"
 
   printf "  Ex3: To decrypt all *.yml.enc files in the 'config' directory:${clr}\n"
@@ -227,48 +317,82 @@ function __symit::usage()  {
 
   printf "  Ex6.: To automatically decide to either encrypt or decrypt a file,\n"
   printf "       based on the file extension. First example encrypts the file, second\n"
-  printf "       decrypts it (because file extension is .enc):${clr}\n"
+  printf "       decrypts it, because the file extension is .enc:${clr}\n"
   printf "     \$ ${bldgrn}symit${bldblu} auto config/settings/crypt/pass.yml${clr}\n"
   printf "     \$ ${bldgrn}symit${bldblu} auto config/settings/crypt/pass.yml.enc${clr}\n\n"
 
   printf "  Ex7.: To encrypt a file ${txtblu}config/settings.yml${clr}\n"
   printf "     \$ ${bldgrn}symit${bldblu} encrypt config/settings.yml${clr}\n\n"
-
 }
+
 function __datum()   {
   date +"%m/%d/%Y.%H:%M:%S"
 }
 
 function __err()  {
-  #__lib::color::cursor_to_col 0
+  __lib::color::cursor-left-by 1000
   printf "${txtpur}[$(__datum)]  ${bldred}ERROR: ${txterr}$* ${bldylw}\n"
 }
 
 function __inf()  {
-  #__lib::color::cursor_to_col 0
+  [[ ${cli__opts[quiet]} ]] && return
+
+  __lib::color::cursor-left-by 1000
   printf "${txtpur}[$(__datum)]  ${bldgrn}INFO:  ${clr}${bldblu}$*${clr}\n"
+}
+
+function __symit::sym::installed_version() {
+  __lib::ver-to-i $(gem list | grep sym | awk '{print $2}' | sed 's/(//g;s/)//g')
+}
+
+function __symit::sym::latest_version() {
+  __lib::ver-to-i $(gem query --remote -n '^sym$' | awk '{print $2}' | sed 's/(//g;s/)//g')
+}
+
+function __symit::install::update() {
+  local desired_version=$1
+  shift
+  local current_version=$2
+  shift
+  local version_args=$*
+
+  __inf "updating sym to version ${bldylw}$(__lib::i-to-ver ${desired_version})${clr}..."
+  printf "${bldblu}" >&1
+  echo y | gem uninstall sym --force -x  2>/dev/null
+  printf "${clr}" >&1
+
+  command="gem install sym ${version_args} "
+  eval "${command}" >/dev/null
+  code=$?
+  printf "${clr}" >&2
+  if [[ ${code} != 0 ]]; then
+    __err "gem install returned ${code}, with command ${bldylw}${command}"
+    return 127
+  fi
+  current_version=$(__symit::sym::installed_version)
+  __inf "installed sym version ${bldylw}$(__lib::i-to-ver ${current_version})"
 }
 
 function __symit::install::gem()  {
   __inf "Verifying current Sym version, please wait..."
-  if [[ -z "${_symit__installed}" ]]; then
-    current_version=$(gem list | grep sym | awk '{print $2}' | sed 's/(//g;s/)//g')
-    if [[ -z "${current_version}" ]]; then
-      gem install sym
+  current_version=$(__symit::sym::installed_version)
+  if [[ -n ${SYMIT__MIN_VERSION} ]]; then
+    if [[ ${SYMIT__MIN_VERSION} -eq 'latest' ]]; then
+      desired_version=$(__symit::sym::latest_version)
+      version_args=''
     else
-      local help=$(sym -h 2>&1)
-      unset SYM_ARGS
-      remote_version=$(gem search sym | egrep '^sym \(' | awk '{print $2}' | sed 's/(//g;s/)//g')
-      if [[ "${remote_version}" != "${current_version}" ]]; then
-        __inf "detected an older ${bldgrn}sym (${current_version})"
-        __inf "installing ${bldgrn}sym (${remote_version})${clr}..."
-        echo y | gem uninstall sym -a 2> /dev/null
-        gem install sym
-        export _symit__installed="yes"
-        __inf "Installed sym version ${bldylw}$(sym --version)"
-      else
-        __inf "${bldgrn}sym${clr} ${txtblu}is on the latest version ${remote_version} already\n"
-      fi
+      desired_version=$( __lib::ver-to-i ${SYMIT__MIN_VERSION})
+      version_args=" --version ${SYMIT__MIN_VERSION}"
+    fi
+
+    if [[ "${desired_version}" != "${current_version}" ]]; then
+      __symit::install::update "${desired_version}" "${current_version}" "${version_args}"
+    else
+      __inf "${bldgrn}sym${clr} ${txtblu}is on the correct version ${bldylw}$(__lib::i-to-ver ${desired_version})${txtblu} already"
+    fi
+  else
+    if [[ -z ${current_version} ]] ; then
+      __inf "installing latest version of ${bldylw}sym..."
     fi
   fi
 }
@@ -388,6 +512,7 @@ function __symit::run()  {
 
   declare -A cli__opts=(
     [verbose]=''
+    [quiet]=''
     [key]=${SYMIT__KEY}
     [extension]=${SYMIT__EXTENSION}
     [folder]=${SYMIT__FOLDER}
@@ -404,6 +529,7 @@ function __symit::run()  {
     [auto]=' -n '
     [key_secure]=' -iqcpx '
     [key_insecure]=' -iqcx '
+    [install]='# N/A'
   )
 
   if [[ -z $1 ]]; then
@@ -465,6 +591,11 @@ function __symit::run()  {
           cli__opts[verbose]="yes"
           ;;
 
+      -q|--quiet)
+          shift
+          cli__opts[quiet]="yes"
+          ;;
+
       import|key)
           shift
           cli__opts[action]="key_secure"
@@ -492,8 +623,11 @@ function __symit::run()  {
       ?*)
           param=$1
           if [[ -n "${sym__actions[${param}]}" ]]; then
+            __inf "Action ${bldylw}${sym__actions[${param}]}${clr} recognized"
             cli__opts[action]=${param}
           else
+            __inf "Parameter ${bldylw}${param}${clr} is not a valid action"
+            __inf "⇨  Interpreting it as a file pattern to search for..."
             cli__opts[file]=${1}
           fi
           shift
@@ -505,7 +639,7 @@ function __symit::run()  {
     esac
   done
 
-  [[ -n ${cli__opts[verbose]} ]] &&__symit::print_cli_args
+  [[ -n "${cli__opts[verbose]}" ]] && __symit::print_cli_args
 
   if [[ "${cli__opts[action]}" == 'install' ]]; then
     if [[ -n ${cli__opts[dry_run]} ]]; then
@@ -519,11 +653,12 @@ function __symit::run()  {
   fi
 
   __symit::validate_args
+  __symit::install::gem
 
   changed_count=0
 
   if [[ -n "${cli__opts[dry_run]}" ]] ; then
-    __lib::color::h1 "Dry Run — printing commands that would be run:"
+    __lib::color::h1 "DRY RUN"
     for file in $(__symit::files); do
       printf "   \$ ${bldblu}$(__symit::command ${file})${clr}\n"
     done
@@ -531,22 +666,27 @@ function __symit::run()  {
     if [[ -n "${cli__opts[file]}" ]]; then
       [[ -n ${cli__opts[verbose]} ]] && __inf $(__symit::files)
       declare -a file_list
+
       for file in $(__symit::files); do
-        file_list=(${file} "${file_list[*]}")
         __inf "❯ ${bldblu}$(__symit::command ${file})${clr}"
-        eval $(__symit::command ${file})
-        code=$?; [[ ${code} != 0 ]] && __err "sym returned non-zero code ${code}"
+        local cmd="$(__symit::command ${file})"
+        eval "${cmd}"
+        code=$?; [[ ${code} != 0 ]] && __err "command '${bldblu}${cmd}${bldred}' exited with code ${bldylw}${code}"
+        changed_count=$(( ${changed_count} + 1))
       done
-      if [[ ${#file_list} == 0 ]]; then
+
+      if [[ ${changed_count} == 0 ]]; then
         __inf "No files matched your specification. The following 'find' command"
         __inf "ran to find them: \n"
         __inf "   ${bldylw}$(__symit::files::cmd)${clr}\n\n"
         return $(__symit::exit 5)
       fi
-    else
+
+    else # opts[file]
       [[ -n ${cli__opts[verbose]} ]] && __inf $(__symit::command)
       eval $(__symit::command)
       code=$?; [[ ${code} != 0 ]] && return $(__symits::exit ${code})
+      changed_count=$(( ${changed_count} + 1))
     fi
   fi
 }
