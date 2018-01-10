@@ -475,21 +475,27 @@ function __symit::files()  {
 
 function __symit::files::cmd() {
   if [[ -n ${cli__opts__file} && -n ${cli__opts__extension} ]]; then
-    local folder
-    if [[ ${cli__opts__file} =~ '/' ]]; then
-      folder="${cli__opts__folder}/$(dirname ${cli__opts__file})"
-    else
-      folder="${cli__opts__folder}"
-    fi
-    local file="$(basename ${cli__opts__file})"
+
+    local folder=${cli__opts__folder}
+    local file="${cli__opts__file}"
     local ext="${cli__opts__extension}"
 
-    if [[ "${cli__opts__action}" == "auto" || "${cli__opts__action}" == "encrypt" ]] ; then
-      #find ${folder} -name "${file}" >&2
+    if [[ ${file} =~ '/' ]]; then
+      if [[ ${folder} == '.' ]]; then
+        folder="$(dirname ${file})"
+      else
+        folder="${folder}/$(dirname ${file})"
+      fi
+      file="$(basename ${file})"
+    fi
+
+    if [[ "${cli__opts__action}" == "encrypt" ]] ; then
       printf "find ${folder} -name '${file}' -and -not -name '*${ext}'"
-    else
-      #find ${folder} -name "${file}${ext}" >&2
-      printf "find ${folder} -name '${file}${ext}'"
+    elif [[ "${cli__opts__action}" == "auto" ]] ; then
+      printf "find ${folder} -name '${file}'"
+    else # edit, decrypt
+      [[ ${file} =~ "${ext}" ]] || file="${file}${ext}"
+      printf "find ${folder} -name '${file}'"
     fi
   fi
 }
