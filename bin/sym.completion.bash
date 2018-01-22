@@ -44,16 +44,19 @@ _sym()
 
     _expand || return 0
 
-    case "$prev" in
-        --@(key|file|output|negate))
-            _filedir
-            return 0
-            ;;
-        -@(f|k|o|n))
-            _filedir
-            return 0
-            ;;
-    esac
+    if [[ -n $(set | grep BASH_COMPLETION) ]]; then
+
+      case "$prev" in
+          --@(key|file|output|negate))
+              _filedir
+              return 0
+              ;;
+          -@(f|k|o|n))
+              _filedir
+              return 0
+              ;;
+      esac
+    fi
 
     case "$cur" in
         --*)
