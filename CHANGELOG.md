@@ -2,7 +2,13 @@
 
 ## [HEAD](https://github.com/kigster/sym/tree/HEAD)
 
-[Changes since the last tag](https://github.com/kigster/sym/compare/v2.7.0...HEAD)
+[Changes since the last tag](https://github.com/kigster/sym/compare/v2.8.4...HEAD)
+
+## [v2.8.4](https://github.com/kigster/sym/tree/v2.8.4) (2018-04-12)
+[Full Changelog](https://github.com/kigster/sym/compare/v2.8.0...v2.8.4)
+
+ - Fixed CircleCI
+ - made BASH completions faster
 
 ## [v2.8.0](https://github.com/kigster/sym/tree/v2.8.0) (2018-01-05)
 [Full Changelog](https://github.com/kigster/sym/compare/v2.7.0...v2.8.0)
