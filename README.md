@@ -4,6 +4,8 @@
 [![Sym Downloads](http://ruby-gem-downloads-badge.herokuapp.com/sym?extension=png)](https://rubygems.org/gems/sym)
 
 [![Build Status](https://travis-ci.org/kigster/sym.svg?branch=master)](https://travis-ci.org/kigster/sym)
+[![CircleCI](https://circleci.com/gh/kigster/sym.svg?style=svg)](https://circleci.com/gh/kigster/sym)
+
 [![Code Climate](https://codeclimate.com/github/kigster/sym/badges/gpa.svg)](https://codeclimate.com/github/kigster/sym)
 [![Test Coverage](https://codeclimate.com/github/kigster/sym/badges/coverage.svg)](https://codeclimate.com/github/kigster/sym/coverage)
 [![Issue Count](https://codeclimate.com/github/kigster/sym/badges/issue_count.svg)](https://codeclimate.com/github/kigster/sym)
