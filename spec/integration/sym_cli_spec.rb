@@ -18,7 +18,7 @@ RSpec.describe 'CLI execution', :type => :aruba do
   RESET_TEMP_FILE.call
 
   context 'using Aruba framework' do
-    let(:command) { "bundle exec exe/sym #{args}" }
+    let(:command) { "exe/sym #{args}" }
     let(:output) { last_command_started.stdout.chomp }
 
     context 'install bash completion' do
@@ -126,3 +126,4 @@ RSpec.describe 'CLI execution', :type => :aruba do
     end
   end
 end
+

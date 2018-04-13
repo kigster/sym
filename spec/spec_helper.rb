@@ -22,7 +22,7 @@ RSpec.configure do |spec|
 
   spec.after :all do
     `/usr/bin/env bash -c "kill $(ps -ef | egrep ruby | egrep [c]oin | awk '{print $2}' ) 2>/dev/null"`
-    `echo flush_all | nc localhost 11211 2>/dev/null`
+    `echo flush_all | nc -G 2 127.0.0.1 11211 2>/dev/null`
   end
 end
 

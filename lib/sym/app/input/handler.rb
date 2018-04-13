@@ -27,7 +27,13 @@ module Sym
         end
 
         def prompt(message, color)
-          raise Sym::Errors::CantReadPasswordNoTTY.new('key requires a password, however STDIN is not a TTY') unless stdin.tty?
+          unless STDIN.isatty && STDIN.tty?
+            raise Sym::Errors::CantReadPasswordNoTTY.new('key requires a password, however STDIN is not a TTY')
+          end
+          highline(message, color)
+        end
+
+        def highline(message, color)
           HighLine.new(stdin, stderr).ask(message.bold) { |q| q.echo = '•'.send(color) }
         end
 

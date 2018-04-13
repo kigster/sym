@@ -8,6 +8,10 @@ jobs:
     docker:
       # specify the version you desire here
        - image: circleci/ruby:2.4.1-node-browsers
+         environment: 
+            TEST_DRB: false
+
+       - image: memcached:1.4-alpine
       
     working_directory: ~/repo
 
@@ -15,8 +19,7 @@ jobs:
       - checkout
       - restore_cache:
           keys:
-          - v1-dependencies-{{ checksum "Gemfile.lock" }}
-          - v1-dependencies-
+          - v1-dependencies-{{ checksum "Gemfile" }}
 
       - run:
           name: install dependencies
@@ -25,29 +28,26 @@ jobs:
 
       - save_cache:
           paths:
-            - ./vendor/bundle≤
-          key: v1-dependencies-{{ checksum "Gemfile.lock" }}
+            - ./vendor/bundle
+          key: v1-dependencies-{{ checksum "Gemfile" }}
         
       - run: 
-          name: install memcached
-          command: |
-            sudo apt-get update && sudo apt-get install -y memcached
-            sudo service start memcached || true
-            memcached -d || true
-            echo "checking if memcached is running...."
-            ps -ef | grep [m]emcached
+          name: install dockerize
+          command: wget https://github.com/jwilder/dockerize/releases/download/$DOCKERIZE_VERSION/dockerize-linux-amd64-$DOCKERIZE_VERSION.tar.gz && sudo tar -C /usr/local/bin -xzvf dockerize-linux-amd64-$DOCKERIZE_VERSION.tar.gz && rm dockerize-linux-amd64-$DOCKERIZE_VERSION.tar.gz
+          environment:
+            DOCKERIZE_VERSION: v0.3.0
 
       - run:
-          name: install sym bash helpers
-          command: |
-            bundle exec exe/sym -B ~/.bash_profile
-            [[ -f ~/.sym.completion.bash ]] || exit 1
-            [[ -f ~/.sym.symit.bash ]] || exit 1
+          name: Wait for memcached
+          command: dockerize -wait tcp://localhost:11211 -timeout 1m
 
       - run:
           name: run tests
           command: |
             bundle exec rspec --version
             bundle exec exe/sym --version
-            bundle exec rspec --backtrace --format documentation
+            if [[ -t 1 ]]; then echo "this is a TTY!"; else echo "this is NOT a tty"; fi
+            if [[ -p /dev/stdout ]]; then echo "this is a PIPE!"; else echo "this is NOT a pipe"; fi
+            if [[ ! -t 1 && ! -p /dev/stdout ]]; then echo "this is a REDIRECT!"; else echo "this is NOT a redirect"; fi
+            CI=true timeout -k 2 -s HUP 30 bundle exec rspec --order random --format documentation --backtrace
 
