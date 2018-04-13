@@ -14,14 +14,16 @@
 bash_version=$(bash --version | awk '{FS="version"}{print $4}')
 bash_version=${bash_version:0:1}
 
-declare -a bash_completion_locations=(/usr/local/etc/bash_completion /usr/etc/bash_completion /etc/bash_completion)
-loaded=false
-for file in ${bash_completion_locations[@]}; do
+[[ -z $(type _filedir 2>/dev/null) ]] && {
+  declare -a bash_completion_locations=(/usr/local/etc/bash_completion /usr/etc/bash_completion /etc/bash_completion)
+  loaded=false
+  for file in ${bash_completion_locations[@]}; do
     [[ -s ${file} ]] && {
       source ${file}
       break
     }
-done
+  done
+}
 
 _sym_long_opts() {
     sym -h | grep -- '--' | egrep '^  -' | awk '{print $2}' | sort
@@ -44,19 +46,16 @@ _sym()
 
     _expand || return 0
 
-    if [[ -n $(set | grep BASH_COMPLETION) ]]; then
-
-      case "$prev" in
-          --@(key|file|output|negate))
-              _filedir
-              return 0
-              ;;
-          -@(f|k|o|n))
-              _filedir
-              return 0
-              ;;
-      esac
-    fi
+    case "$prev" in
+        --@(key|file|output|negate))
+            _filedir
+            return 0
+            ;;
+        -@(f|k|o|n))
+            _filedir
+            return 0
+            ;;
+    esac
 
     case "$cur" in
         --*)
