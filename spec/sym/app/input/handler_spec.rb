@@ -1,27 +1,26 @@
 require 'spec_helper'
 require 'singleton'
 
-def setup_handler(calls = [])
-  calls.each do |hash|
-    expect(handler).to receive(:prompt).with(hash[:message], hash[:color]).and_return(hash[:password])
-  end
-end
-
 module Sym
   module App
+    RSpec.describe Input::Handler do
+      def setup_handler(calls = [])
+        calls.each do |hash|
+          expect(handler).to receive(:prompt).with(hash[:message], hash[:color]).and_return(hash[:password])
+        end
+      end
 
-    RSpec.describe Sym::App::Input::Handler do
       let(:password) { 'boobooboo' }
       let(:opts) { { password: true } }
-      let(:handler) { Input::Handler.new  }
+      let(:handler) { Input::Handler.new }
 
       context 'entering password' do
         it 'should save what the stupid user entered' do
-          setup_handler [ { message: 'Password: ', color: :green, password: password } ]
+          setup_handler [{ message: 'Password: ', color: :green, password: password }]
           expect { handler.ask }.to_not raise_error
         end
         it 'should be what the stupid user entered' do
-          setup_handler [ { message: 'Password: ', color: :green, password: password } ]
+          setup_handler [{ message: 'Password: ', color: :green, password: password }]
           expect(handler.ask).to eql(password)
         end
       end
@@ -29,8 +28,8 @@ module Sym
       context 'creating new password' do
         context 'passwords dont match' do
           it 'should raise an exception' do
-            setup_handler [ { message: 'New Password     :  ', color: :blue, password: 'right password' },
-                            { message: 'Confirm Password :  ', color: :blue, password: 'WhatsUpYo' }]
+            setup_handler [{ message: 'New Password     :  ', color: :blue, password: 'right password' },
+                           { message: 'Confirm Password :  ', color: :blue, password: 'WhatsUpYo' }]
             expect { handler.new_password }.to raise_error(Sym::Errors::PasswordsDontMatch)
           end
         end
