@@ -1,7 +1,7 @@
 # Sym — Light-weight Symmetric Encryption for Humans
 
 [![Gem Version](https://badge.fury.io/rb/sym.svg)](https://badge.fury.io/rb/sym)
-[![Sym Downloads](http://ruby-gem-downloads-badge.herokuapp.com/sym?extension=png)](https://rubygems.org/gems/sym)
+[![Sym Downloads](http://ruby-gem-downloads-badge.herokuapp.com/sym?extension=svg)](https://rubygems.org/gems/sym)
 
 [![Build Status](https://travis-ci.org/kigster/sym.svg?branch=master)](https://travis-ci.org/kigster/sym)
 [![CircleCI](https://circleci.com/gh/kigster/sym.svg?style=svg)](https://circleci.com/gh/kigster/sym)
