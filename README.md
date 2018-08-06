@@ -6,8 +6,8 @@
 [![Build Status](https://travis-ci.org/kigster/sym.svg?branch=master)](https://travis-ci.org/kigster/sym)
 [![CircleCI](https://circleci.com/gh/kigster/sym.svg?style=svg)](https://circleci.com/gh/kigster/sym)
 
-[![Code Climate](https://codeclimate.com/github/kigster/sym/badges/gpa.svg)](https://codeclimate.com/github/kigster/sym)
-[![Test Coverage](https://codeclimate.com/github/kigster/sym/badges/coverage.svg)](https://codeclimate.com/github/kigster/sym/coverage)
+[![Maintainability](https://api.codeclimate.com/v1/badges/4f1d1614ccaa61c974dd/maintainability)](https://codeclimate.com/github/kigster/sym/maintainability)
+[![Test Coverage](https://api.codeclimate.com/v1/badges/4f1d1614ccaa61c974dd/test_coverage)](https://codeclimate.com/github/kigster/sym/test_coverage)
 [![Issue Count](https://codeclimate.com/github/kigster/sym/badges/issue_count.svg)](https://codeclimate.com/github/kigster/sym)
 
 **Discuss Sym on Gitter**:
