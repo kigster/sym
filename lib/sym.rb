@@ -29,6 +29,7 @@ Sym::Configuration.configure do |config|
     memcached: {
       args: %w(127.0.0.1:11211),
       opts: { namespace:  'sym',
+
               compress:   true,
               expires_in: config.password_cache_timeout
       }

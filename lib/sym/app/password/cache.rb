@@ -30,14 +30,17 @@ module Sym
         include Sym::Extensions::WithRetry
         include Sym::Extensions::WithTimeout
 
-        attr_accessor :provider, :enabled, :timeout, :verbose
+        attr_accessor :provider, :enabled, :active, :timeout, :verbose
 
         def configure(**opts)
-          self.enabled = opts[:enabled]
-          self.verbose = opts[:verbose]
-          self.timeout = opts[:timeout] || ::Sym::Configuration.config.password_cache_timeout
-          self.provider = Providers.provider(opts[:provider], opts[:provider_opts] || {})
-          self.enabled = false unless self.provider
+          @timeout = opts[:timeout] || ::Sym::Configuration.config.password_cache_timeout
+          @verbose = opts[:verbose]
+
+          @enabled = opts[:enabled]
+          if @enabled
+            @provider = Providers.provider(opts[:provider], opts[:provider_opts] || {})
+            @active = false unless @provider
+          end
           self
         end
 
@@ -58,7 +61,7 @@ module Sym
         private
 
         def operation
-          return nil unless self.enabled
+          return nil unless @enabled && @active
           with_timeout(1) do
             with_retry do
               yield if block_given?
@@ -71,13 +74,13 @@ module Sym
         end
 
         def error(exception = nil, message = nil)
-          if self.verbose
+          if @verbose
             print 'WARNING: '
             print message ? message.yellow : ''
             print exception ? exception.message.red : ''
             puts
           end
-          self.enabled = false
+          @enabled = false
           nil
         end
       end
