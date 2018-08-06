@@ -16,7 +16,7 @@
 
 ---
 
-**March 10th, 2017**. Please checkout the post "**[Dead Simple Encryption with Sym](http://kig.re/2017/03/10/dead-simple-encryption-with-sym.html)**" that announces this library, and provides further in-depth discussion.
+Please checkout the post "**[Dead Simple Encryption with Sym](http://kig.re/2017/03/10/dead-simple-encryption-with-sym.html)**" that announces this library, and provides further in-depth discussion.
 
 [![Donate](https://www.paypalobjects.com/en_US/i/btn/btn_donate_SM.gif)](https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_id=FSFYYNEQ8RKWU)
  
