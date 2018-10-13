@@ -111,7 +111,7 @@ module Sym
     end
 
     def editor
-      editors_to_try.find { |editor| File.exist?(editor) }
+      editors_to_try.compact.find { |editor| File.exist?(editor) }
     end
 
     def process_output(result)
