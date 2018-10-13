@@ -2,29 +2,22 @@
 
 [![Gem Version](https://badge.fury.io/rb/sym.svg)](https://badge.fury.io/rb/sym)
 [![Sym Downloads](http://ruby-gem-downloads-badge.herokuapp.com/sym?extension=svg)](https://rubygems.org/gems/sym)
-
 [![Build Status](https://travis-ci.org/kigster/sym.svg?branch=master)](https://travis-ci.org/kigster/sym)
 [![CircleCI](https://circleci.com/gh/kigster/sym.svg?style=svg)](https://circleci.com/gh/kigster/sym)
 
 [![Maintainability](https://api.codeclimate.com/v1/badges/4f1d1614ccaa61c974dd/maintainability)](https://codeclimate.com/github/kigster/sym/maintainability)
 [![Test Coverage](https://api.codeclimate.com/v1/badges/4f1d1614ccaa61c974dd/test_coverage)](https://codeclimate.com/github/kigster/sym/test_coverage)
 [![Issue Count](https://codeclimate.com/github/kigster/sym/badges/issue_count.svg)](https://codeclimate.com/github/kigster/sym)
-
-**Discuss Sym on Gitter**:
-
 [![Gitter](https://img.shields.io/gitter/room/gitterHQ/gitter.svg)](https://gitter.im/kigster/sym)
+
 
 ---
 
-Please checkout the post "**[Dead Simple Encryption with Sym](http://kig.re/2017/03/10/dead-simple-encryption-with-sym.html)**" that announces this library, and provides further in-depth discussion.
+Please checkout the post "**[Dead Simple Encryption with Sym](http://kig.re/2017/03/10/dead-simple-encryption-with-sym.html)**" that announces this library, and provides further in-depth discussion. Your donation of absolutely any amount is very much appreciated.
 
 [![Donate](https://www.paypalobjects.com/en_US/i/btn/btn_donate_SM.gif)](https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_id=FSFYYNEQ8RKWU)
  
-Your donation of absolutely any amount is very much appreciated.
-
----
-
-## Description
+## Sym — Symmetric Encryption that's easy on Humans
 
 <div style="padding 40px; margin: 40px; font-size: 13pt;">
 
@@ -58,9 +51,10 @@ Additionally, Sym comes with a helpful BASH wrapper `symit`.
 
 Sym currently builds and runs on the following ruby versions:
 
- * 2.2.5
- * 2.3.3
- * 2.4.1
+ * 2.2.9
+ * 2.3.6
+ * 2.4.3
+ * 2.5.1
  * jruby-9.1.7.0 
 
 ### Motivation
@@ -598,7 +592,7 @@ Bug reports and pull requests are welcome on GitHub at [https://github.com/kigst
 
 ### License
 
-**Sym** library is &copy; 2016-2017 Konstantin Gredeskoul.
+**Sym** library is &copy; 2016-2018 Konstantin Gredeskoul.
 
 The gem is available as open source under the terms of the [MIT License](http://opensource.org/licenses/MIT). The library is designed to be a layer on top of [`OpenSSL`](https://www.openssl.org/), distributed under the [Apache Style license](https://www.openssl.org/source/license.txt).
 
@@ -621,5 +615,6 @@ Please submit feature requests, bugs, or donations :)
  * [Wissam Jarjoui](https://github.com/bosswissam) (testing, inspiration)
  * [Megan Mathews](https://github.com/meganmmathews) (UX, CLI suggestions)
  * [Barry Anderson](https://twitter.com/z3ndrag0n) (sanity checking, review)
+ * [Justin Nazari](https://github.com/JustinNazari) (bug fixes)
 
  

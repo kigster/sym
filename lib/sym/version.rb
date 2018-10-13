@@ -1,5 +1,5 @@
 module Sym
-  VERSION     = '2.8.4'
+  VERSION     = '2.8.5'
   DESCRIPTION = <<-eof
 Sym is a ruby library (gem) that offers both the command line interface (CLI) and a set of rich Ruby APIs, which make it rather trivial to add encryption and decryption of sensitive data to your development or deployment flow. As a layer of additional security, you can encrypt the private key itself with a password.  Unlike many other existing encryption tools, Sym focuses on getting out of the way — by offering its streamlined interface, hoping to make encryption of application secrets nearly completely transparent to the developers.  For the data encryption Sym uses a symmetric 256-bit key with the AES-256-CBC cipher, same cipher as used by the US Government. For password-protecting the key Sym uses AES-128-CBC cipher. The resulting data is zlib-compressed and base64-encoded. The keys are also base64 encoded for easy copying/pasting/etc.
   

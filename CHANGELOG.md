@@ -2,7 +2,13 @@
 
 ## [HEAD](https://github.com/kigster/sym/tree/HEAD)
 
-[Changes since the last tag](https://github.com/kigster/sym/compare/v2.8.4...HEAD)
+[Changes since the last tag](https://github.com/kigster/sym/compare/v2.8.5...HEAD)
+
+## [v2.8.5](https://github.com/kigster/sym/tree/v2.8.5) (2018-10-12)
+[Full Changelog](https://github.com/kigster/sym/compare/v2.8.4...v2.8.5)
+
+ - Merge pull request from Justin Nazari to fix -t when $EDITOR is nil
+ - https://github.com/kigster/sym/pull/18
 
 ## [v2.8.4](https://github.com/kigster/sym/tree/v2.8.4) (2018-04-12)
 [Full Changelog](https://github.com/kigster/sym/compare/v2.8.0...v2.8.4)
