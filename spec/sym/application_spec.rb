@@ -49,11 +49,22 @@ module Sym
         let(:application) { Sym::Application.new(opts) }
         let(:existing_editor) { 'exe/sym' }
         let(:non_existing_editor) { '/tmp/broohaha/vim' }
-        it 'should return the first valid editor from the list' do
-          expect(application).to_not be_nil
-          expect(application).to receive(:editors_to_try).
-            and_return([non_existing_editor, existing_editor])
-          expect(application.editor).to eql(existing_editor)
+
+        RSpec.shared_examples 'editor detection' do
+          it 'should return the first valid editor from the list' do
+            expect(application).to_not be_nil
+            expect(application).to receive(:editors_to_try).
+              and_return([non_existing_editor, existing_editor])
+            expect(application.editor).to eql(existing_editor)
+          end
+        end
+
+        it_behaves_like 'editor detection'
+
+        context 'the EDITOR environment variable is nil' do
+          it_behaves_like 'editor detection' do
+            let(:non_existing_editor) { nil }
+          end
         end
       end
 
