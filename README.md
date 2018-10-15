@@ -22,15 +22,15 @@ Please checkout the post "**[Dead Simple Encryption with Sym](http://kig.re/2017
 <div style="padding 40px; margin: 40px; font-size: 13pt;">
 
 <ul>
-<li><strong>sym</strong> is an open source command line utility and Ruby API which makes it very <em>easy to add reliable encryption and decryption</em> of sensitive data to an application or a project written in any language.</li>
+<li><strong>sym</strong> is an open source command line utility and Ruby API which makes it very <em>easy to add reliable encryption and decryption</em> of sensitive data to an application or a project written in any language.</li><br />
 
-<li>Unlike many existing encryption tools, <strong>sym</strong> focuses on narrowing the gap between convenience and security, by offering enhanced usability and a streamlined ruby API and a CLI. The primary goal of the library is to make encryption very easy and transparent. </li>
+<li>Unlike many existing encryption tools, <strong>sym</strong> focuses on narrowing the gap between convenience and security, by offering enhanced usability and a streamlined ruby API and a CLI. The primary goal of the library is to make encryption very easy and transparent. </li><br />
 
-<li><strong>sym</strong> uses the <em><a href="https://en.wikipedia.org/wiki/Symmetric-key_algorithm">Symmetric Encryption</a></em> algorithm. This means that the same key is used to encrypt and decrypt data. In addition to the key, the encryption uses a randomized IV vector, which is automatically generated  per each encryption and serialized with the data. Result of encryption is zlib-compressed, and base64 encoded, to be suitable for storage as string. The generated keys are also base64-encoded for convenience.</li>
+<li><strong>sym</strong> uses the <em><a href="https://en.wikipedia.org/wiki/Symmetric-key_algorithm">Symmetric Encryption</a></em> algorithm. This means that the same key is used to encrypt and decrypt data. In addition to the key, the encryption uses a randomized IV vector, which is automatically generated  per each encryption and serialized with the data. Result of encryption is zlib-compressed, and base64 encoded, to be suitable for storage as string. The generated keys are also base64-encoded for convenience.</li><br />
 
-<li>Finally, the library offers encryption using any regular password, and in particular supports password-protected encryption keys. Automatic key detection algorithm attempts to resolve a provided key as a filename, an environment variable name, an OS-X Keychain password entry name, a key itself, or a default key file.</li>
+<li>Finally, the library offers encryption using any regular password, and in particular supports password-protected encryption keys. Automatic key detection algorithm attempts to resolve a provided key as a filename, an environment variable name, an OS-X Keychain password entry name, a key itself, or a default key file.</li><br />
 
-<li><strong>NOTE:</strong> Sym uses Ruby's <pre>Marshall.dump</pre> to serialize it's data, and therefore it is not currently possible or easy to deserialize the data in languages other than Ruby.</li>
+<li><strong>NOTE:</strong> Sym uses Ruby's <code>Marshall.dump</code> to serialize it's data, and therefore it is not currently possible or easy to deserialize the data in languages other than Ruby.</li>
 </ul>
 </div>
 
