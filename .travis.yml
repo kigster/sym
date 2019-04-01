@@ -5,10 +5,11 @@ env:
 services:
 - memcached
 rvm:
-- 2.2.9
-- 2.3.6
-- 2.4.3
-- 2.5.1
+- 2.2.10
+- 2.3.8
+- 2.4.6
+- 2.5.5
+- 2.6.2
 notifications:
   email:
     recipients:
