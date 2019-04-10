@@ -487,7 +487,12 @@ The above example will take an unencrypted key passed in `$mykey`, ask for a pas
 
 Nobody likes to re-type passwords over and over again, and for this reason *Sym* supports password caching via a locally running `memcached` instance (using the default port 11211, if available).
 
-Specifics of configuring both Cache Providers is left to the `Configuration` class, an example of which is shown below in the Ruby API section.
+*Multiple Providers*
+
+Cache is written using the Provider design pattern (a.k.a. plugin architecture), and so it's easy to add a new Cache Provider that uses a custom backend. The supplied production-ready provider only works with a `memcached` daemon running (ideally) locally.
+
+
+For customization of memcached location, we refer you to the `Configuration` class for an example of how to configure MemCached provider — shown below in the Ruby API section.
 
 In order to control password caching, the following flags are available:
 
