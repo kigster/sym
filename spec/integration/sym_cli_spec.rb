@@ -27,7 +27,7 @@ RSpec.describe 'CLI execution', :type => :aruba do
       before { RESET_TEMP_FILE.call }
       before do
         File.open(TEMP_FILE, 'w') { |f| f.write("#!/usr/bin/env bash\n") }
-        run_simple command, fail_on_error: true
+        run_command_and_stop command, fail_on_error: true
       end
 
       it 'should have two files to install' do
@@ -42,7 +42,7 @@ RSpec.describe 'CLI execution', :type => :aruba do
     end
 
     context 'while running commands' do
-      before { run_simple command }
+      before { run_command_and_stop command }
 
       context 'examples' do
         let(:args) { '-E' }
@@ -73,7 +73,7 @@ RSpec.describe 'CLI execution', :type => :aruba do
           expect(output).to match(BASE62_REGEX)
         end
         it 'should decrypt back' do
-          run_simple "exe/sym -d -k #{KEY_PLAIN} -s #{output}"
+          run_command_and_stop "exe/sym -d -k #{KEY_PLAIN} -s #{output}"
           expect(last_command_started.stdout.chomp).to eq(string)
         end
       end
@@ -109,7 +109,7 @@ RSpec.describe 'CLI execution', :type => :aruba do
 
           it 'should run command' do
             RESET_TEMP_FILE.call
-            run_simple command
+            run_command_and_stop command
             expect(File.read(TEMP_FILE)).to_not be_nil
           end
 

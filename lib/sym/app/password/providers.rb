@@ -15,7 +15,7 @@ module Sym
             self.providers << provider_class
           end
 
-          # Detect first instance that is "alive?" and return it.
+          # Detect first instance tht is "alive?" and return it.
           def detect
             self.detected ||= self.providers.inject(nil) do |instance, provider_class|
               instance || (p = provider_class.new; p.alive? ? p : nil)
@@ -53,4 +53,3 @@ end
 
 # Order is important — they are tried in this order for auto detect
 require 'sym/app/password/providers/memcached_provider'
-require 'sym/app/password/providers/drb_provider'

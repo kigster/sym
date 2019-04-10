@@ -21,11 +21,6 @@ Sym::Configuration.configure do |config|
   # When nil is selected, providers are auto-detected.
   config.password_cache_default_provider = nil
   config.password_cache_arguments        = {
-    drb:       {
-      opts: {
-        uri: 'druby://127.0.0.1:24924'
-      }
-    },
     memcached: {
       args: %w(127.0.0.1:11211),
       opts: { namespace:  'sym',

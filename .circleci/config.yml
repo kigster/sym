@@ -49,5 +49,7 @@ jobs:
             if [[ -t 1 ]]; then echo "this is a TTY!"; else echo "this is NOT a tty"; fi
             if [[ -p /dev/stdout ]]; then echo "this is a PIPE!"; else echo "this is NOT a pipe"; fi
             if [[ ! -t 1 && ! -p /dev/stdout ]]; then echo "this is a REDIRECT!"; else echo "this is NOT a redirect"; fi
-            CI=true timeout -k 2 -s HUP 30 bundle exec rspec --order random --format documentation --backtrace
+            echo "Flushing MemCached...."
+            echo flush_all | nc -G 4 127.0.0.1 11211
+            timeout -k 2 -s HUP 30 bundle exec rspec --order random --backtrace
 
