@@ -37,7 +37,7 @@ module Sym
     end
 
     ENV_ARGS_VARIABLE_NAME = 'SYM_ARGS'.freeze
-    SYM_KEY_FILE           = "#{ENV['HOME']}/.sym.key"
+    SYM_KEY_FILE           = "#{Dir.home}/.sym.key".freeze
 
   end
 end

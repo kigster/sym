@@ -93,7 +93,7 @@ This gem includes two primary components:
 **Sym** tries very hard to get out of your way, to make it *feel* as if your encrypted files are as easy to work with as the unencrypted files. It accomplishes this transparency with the following features:
  
   * By using **Mac OS-X Keychain**, `sym` offers a simple yet secure way of storing the key on a local machine, much more secure then storing it on a file system.
-  * By using a **password cache** (`-c`) via an in-memory provider such as `memcached` or `drb`, `sym` invocations take advantage of password cache, and only ask for a password once per a configurable time period.
+  * By using a **password cache** (`-c`) via an in-memory provider such as `memcached`, `sym` invocations take advantage of password cache, and only ask for a password once per a configurable time period.
   * By using **`SYM_ARGS` environment variable** you can save common flags and they will be applied whenever `-A` flag is activated.
   * By reading a key from the default key source file `~/.sym.key` which requires no flags at all.
   * By utilizing the **`--negate` option to quickly encrypt a regular file**, or decrypt an encrypted file with extension `.enc`.
@@ -366,7 +366,7 @@ The private key is the cornerstone of the symmetric encryption. Using `sym`, the
  * generated and printed to STDOUT, or saved to Mac OS-X KeyChain or a file
  * fetched from the Keychain in subsequent operations
  * password-protected during generation (or import) with the `-p` flag.
- * password can be cached using either `memcached` or `dRB` server, if the `-c` flag is provided.
+ * password can be cached using a locally running `memcached`, assuming the `-c` flag is provided.
  * must be kept very well protected and secure from attackers.
 
 The __unencrypted private__ key will be in the form of a base64-encoded string, 45 characters long.
@@ -485,15 +485,20 @@ The above example will take an unencrypted key passed in `$mykey`, ask for a pas
 
 #### Password Caching
 
-Nobody likes to re-type passwords over and over again, and for this reason *Sym* supports password caching via either a locally running `memcached` instance (the default, if available), or a locally started `dRB` (distributed Ruby) server based on the `Coin` gem.
+Nobody likes to re-type passwords over and over again, and for this reason *Sym* supports password caching via a locally running `memcached` instance (using the default port 11211, if available).
 
-Specifics of configuring both Cache Providers is left to the `Configuration` class, an example of which is shown below in the Ruby API section.
+*Multiple Providers*
+
+Cache is written using the Provider design pattern (a.k.a. plugin architecture), and so it's easy to add a new Cache Provider that uses a custom backend. The supplied production-ready provider only works with a `memcached` daemon running (ideally) locally.
+
+
+For customization of memcached location, we refer you to the `Configuration` class for an example of how to configure MemCached provider — shown below in the Ruby API section.
 
 In order to control password caching, the following flags are available:
 
  * `-c` turns on caching
  * `-u seconds` sets the expiration for cached passwords
- * `-r memcached | drb` controls which of the providers is used. Without this flag, *sym* auto-detects caching provider by first checking for `memcached`, and then starting the `dRB` server.
+ * `-r memcached` controls which of the providers is used. Without this flag, *sym* auto-detects caching provider by first checking for `memcached`
 
 #### Saving Common Flags in an Environment Variable
 
@@ -541,12 +546,7 @@ Sym::Configuration.configure do |config|
   # When nil is selected, providers are auto-detected.
   config.password_cache_default_provider = nil
   config.password_cache_arguments        = {
-    # Ruby dRB-based in-memory cache.
-    drb:       {
-      opts: {
-        uri: 'druby://127.0.0.1:24924'
-      }
-    },
+    # In-memory password cache configuration:
     # Memcached Provider – local is the default, but can be changed.
     memcached: {
       args: %w(127.0.0.1:11211),
@@ -572,7 +572,7 @@ The `sym` executable as well as the Ruby API provide:
    * 256-bit private key, that
      *  can be generated and is a *base64-encoded* string about 45 characters long. The *decoded* key is always 32 characters (or 256 bytes) long.
      * can be optionally password-encrypted using the 128-bit key, and then be automatically detected (and password requested) when the key is used
-     * can optionally have its password cached for 15 minutes locally on the machine using `memcached` or using a `dRB` server
+     * can optionally have its password cached for 15 minutes locally on the machine using `memcached` 
  * Rich command line interface with some innovative features, such as inline editing of an encrypted file, using your favorite `$EDITOR`.
  * Data handling:
    * Automatic compression of the data upon encryption
