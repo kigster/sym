@@ -22,15 +22,21 @@ RSpec.describe Sym::App::Password::Cache do
       expect(cache.enabled).to be_truthy
     end
 
-    context 'storing data' do
-      before { clear_memcached! }
-      
-      it 'should write and read data' do
-        expect(cache['greeting']).to be_nil
-        cache['greeting'] = 'hello'
-        sleep 0.01
-        expect(cache.provider).to_not be_nil
-        expect(cache['greeting']).to eql('hello')
+    context 'cache is live' do
+      it 'should be alive and running' do
+        expect(cache.provider.alive?).to be true
+      end
+
+      context 'storing data' do
+        before do
+          cache.provider.clear
+        end
+
+        it 'should write and read data' do
+          expect(cache['greeting']).to be_nil
+          cache['greeting'] = 'hello'
+          expect(cache['greeting']).to eql('hello')
+        end
       end
     end
   end
@@ -40,6 +46,7 @@ RSpec.describe Sym::App::Password::Cache do
     it 'should properly set enabled to false' do
       expect(cache.enabled).to be false
     end
+
     it 'should not cache values' do
       cache['foo'] = 'bar'
       expect(cache['foo']).to be_nil

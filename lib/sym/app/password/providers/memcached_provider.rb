@@ -20,7 +20,7 @@ module Sym
           def alive?
             dalli.alive!
             true
-          rescue Dalli::RingError => e
+          rescue Dalli::RingError
             false
           end
 

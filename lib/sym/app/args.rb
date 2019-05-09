@@ -1,6 +1,5 @@
 module Sym
   module App
-
     class Args
 
       OPTIONS_REQUIRE_KEY    = %i(encrypt decrypt edit)

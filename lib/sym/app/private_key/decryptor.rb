@@ -18,7 +18,7 @@ module Sym
 
         def key
           return nil if encrypted_key.nil?
-          decrypted_key = nil
+
           if should_decrypt?
             begin
               retries                                   ||= 0
@@ -29,9 +29,9 @@ module Sym
               password_cache[encrypted_key] = p
 
             rescue ::OpenSSL::Cipher::CipherError => e
-              input_handler.puts 'Invalid password. Please try again.'
+              input_handler.output 'Invalid password. Please try again.'
 
-              if ((retries += 1) < 3)
+              if (retries += 1) < 3
                 retry
               else
                 raise(Sym::Errors::InvalidPasswordProvidedForThePrivateKey.new('Invalid password.'))

@@ -129,8 +129,7 @@ module Sym
       initialize_key_source
       unless command
         raise Sym::Errors::InsufficientOptionsError,
-              " Can not determine what to do
-        from the options: \ n " +
+              " Can not determine what to do from the options: \n " +
                 " #{self.provided_options.inspect.green.bold}\n" +
                 "and flags #{self.provided_flags.to_s.green.bold}"
       end
@@ -183,6 +182,11 @@ module Sym
       args[:provider] = opts[:cache_provider] if opts[:cache_provider]
 
       self.password_cache = Sym::App::Password::Cache.instance.configure(args)
+
+      if opts[:cache_passwords] && !password_cache.enabled
+        stderr.puts "Warning: password cache is not available.".magenta.bold
+        stderr.puts "   Hint: start a local memcached instance.\n".magenta
+      end
     end
 
     def process_edit_option

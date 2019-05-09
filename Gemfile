@@ -5,7 +5,5 @@ gemspec
 
 gem 'ffi', :platforms => [:mswin, :mingw]
 
-if RUBY_PLATFORM == 'x86_64-darwin16'
-  gem 'coin', git: 'https://github.com/kigster/coin'
-end
-
+#gem 'sym-crypt', git: 'https://github.com/kigster/sym-crypt'
+gem 'sym-crypt', path: __dir__ + '/../sym-crypt'

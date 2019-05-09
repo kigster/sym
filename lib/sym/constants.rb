@@ -21,9 +21,9 @@ module Sym
           home_file   = "#{Dir.home}/.#{source_file}"
 
           hash[source_file.gsub(/sym\./, '').gsub(/\.bash/, '').to_sym] = {
-              dest:   home_file,
-              source: bash_file,
-              script: "[[ -f #{home_file} ]] && source #{home_file}"
+            dest:   home_file,
+            source: bash_file,
+            script: "[[ -f #{home_file} ]] && source #{home_file}"
           }
         end
       end
@@ -37,7 +37,7 @@ module Sym
     end
 
     ENV_ARGS_VARIABLE_NAME = 'SYM_ARGS'.freeze
-    SYM_KEY_FILE           = "#{Dir.home}/.sym.key".freeze
-
+    SYM_KEY_FILE           = (ENV['SYM_KEY_FILE'] || "#{Dir.home}/.sym.key").freeze
+    DEFAULT_CACHE_TTL      = 300
   end
 end

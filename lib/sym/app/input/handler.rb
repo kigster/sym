@@ -1,5 +1,5 @@
 require 'sym/errors'
-
+require 'colored2'
 module Sym
   module App
     module Input
@@ -17,24 +17,25 @@ module Sym
           retries ||= 0
           prompt('Password: ', :green)
         rescue ::OpenSSL::Cipher::CipherError
-          stderr.puts 'Invalid password. Please try again.'
+          output 'Invalid password. Please try again.'
           retry if (retries += 1) < 3
           nil
         end
 
-        def puts(*args)
+        def output(*args)
           stderr.puts args
         end
 
         def prompt(message, color)
           unless STDIN.isatty && STDIN.tty?
-            raise Sym::Errors::CantReadPasswordNoTTY.new('key requires a password, however STDIN is not a TTY')
+            # raise Sym::Errors::CantReadPasswordNoTTY.new('key requires a password, however STDIN is not a TTY')
+            output 'WARNING: key requires a password, however STDIN is not a TTY?'.italic.red
           end
           highline(message, color)
         end
 
         def highline(message, color)
-          HighLine.new(stdin, stderr).ask(message.bold) { |q| q.echo = '•'.send(color) }
+          HighLine.new(stdin, stderr).ask(message.yellow.bold) { |q| q.echo = '•'.send(color) }
         end
 
         def new_password

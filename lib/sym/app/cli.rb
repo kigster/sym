@@ -87,7 +87,7 @@ module Sym
         rescue StandardError => e
           log :error, "#{e.message}" if opts
           error exception: e
-          exit 127 if stdin == STDIN
+          exit 123 if stdin == STDIN
         end
 
         self.application = ::Sym::Application.new(opts, stdin, stdout, stderr, kernel)

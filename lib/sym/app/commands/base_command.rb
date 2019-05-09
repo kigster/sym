@@ -10,6 +10,8 @@ module Sym
 
         def self.inherited(klass)
           klass.instance_eval do
+            include Sym
+
             class << self
               attr_accessor :required, :incompatible
 
@@ -25,7 +27,7 @@ module Sym
                 required
               end
 
-              def incompatible_options(*args)
+                def incompatible_options(*args)
                 self.incompatible ||= Set.new
                 incompatible.merge(args) if args
                 incompatible
@@ -46,7 +48,6 @@ module Sym
           end
         end
 
-        include Sym
         extend Forwardable
 
         attr_accessor :application

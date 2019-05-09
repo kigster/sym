@@ -1,3 +1,5 @@
+require 'sym/crypt/configuration'
+
 module Sym
   # This class encapsulates application configuration, and exports
   # a familiar method +#configure+ for defining configuration in a
@@ -19,26 +21,32 @@ module Sym
   #       config.compression_enabled = true
   #       config.compression_level = Zlib::BEST_COMPRESSION
   #     end
-  class Configuration
-    class << self
-      attr_accessor :config
+  class Configuration < ::Sym::Crypt::Configuration
 
-      def configure
-        self.config ||= Configuration.new
-        yield config if block_given?
-      end
+    attr_accessor :password_cache_default_provider,
+                  :password_cache_timeout,
+                  :password_cache_arguments,
+                  :default_key_file,
+                  :encrypted_file_extension
 
-      def property(name)
-        self.config.send(name)
-      end
+    def initialize
+      super
+      self.encrypted_file_extension = 'enc'
+      self.default_key_file         = ::Sym::Constants::SYM_KEY_FILE
+      self.password_cache_timeout   = ::Sym::Constants::DEFAULT_CACHE_TTL
+
+      # When nil is selected, providers are auto-detected.
+      self.password_cache_default_provider = nil
+      self.password_cache_arguments        = {
+        memcached: {
+          args: %w(127.0.0.1:11211),
+          opts: { namespace:  'sym',
+                  compress:   true,
+                  expires_in: password_cache_timeout
+          }
+
+        }
+      }
     end
-
-    # See file +lib/sym.rb+ where these values are defined.
-
-    attr_accessor :data_cipher, :password_cipher, :private_key_cipher
-    attr_accessor :compression_enabled, :compression_level
-    attr_accessor :password_cache_default_provider, :password_cache_timeout
-    attr_accessor :password_cache_arguments
-    attr_accessor :default_key_file, :encrypted_file_extension
   end
 end

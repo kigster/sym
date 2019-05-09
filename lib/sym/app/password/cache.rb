@@ -14,6 +14,8 @@ module Sym
       # +Provider+ is the primary implementation of the underlying cache.
       # It should support the following API:
       #
+      # @example Provider implementation
+      #
       #        def initialize(*args, **opts, &block)
       #        end
       #
@@ -23,7 +25,7 @@ module Sym
       #        def write(key, value, expire_timeout_seconds)
       #        end
       #
-      # it must be intantiatable via #new
+      # it must be instantiatable via #new
       class Cache
 
         include Singleton
