@@ -18,14 +18,13 @@ module Sym
     class << self
       attr_accessor :exit_code
       attr_accessor :stdin, :stdout, :stderr
-
     end
 
     self.exit_code = 0
 
-    self.stdin     = STDIN
-    self.stdout    = STDOUT
-    self.stderr    = STDERR
+    self.stdin  = STDIN
+    self.stdout = STDOUT
+    self.stderr = STDERR
 
     def self.out
       self.stderr
@@ -56,7 +55,7 @@ module Sym
         lines << exception.backtrace.join("\n").red.bold if config[:trace]
         lines << "\n"
       else
-        lines << " ✖ Sym Error #{operation}:".bold.red + (reason ? " #{reason} ".red.italic: " #{error_details}")[0..70] + ' '.normal + "\n"
+        lines << " ✖ Sym Error #{operation}:".bold.red + (reason ? " #{reason} ".red.italic : " #{error_details}")[0..70] + ' '.normal + "\n"
         lines << "#{comments}" if comments
       end
 

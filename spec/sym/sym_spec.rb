@@ -23,8 +23,8 @@ module Sym
   describe 'Sym#private_key' do
     include_context :encryption
     it '#create_private_key' do
-      expect(::Base64.urlsafe_decode64(instance.class.create_private_key).size).to be(32)
-      expect(instance.class.create_private_key).not_to eql(instance.class.create_private_key)
+      expect(::Base64.urlsafe_decode64(test_instance.class.create_private_key).size).to be(32)
+      expect(test_instance.class.create_private_key).not_to eql(test_instance.class.create_private_key)
     end
 
     context '#private_key' do

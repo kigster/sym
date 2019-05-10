@@ -73,9 +73,7 @@ require 'sym/extensions/stdlib'
 
 module Sym
   def self.included(klass)
-    klass.instance_eval do
-      include ::Sym::Crypt
-    end
+    klass.include ::Sym::Crypt
   end
 
   class << self

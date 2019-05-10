@@ -1,50 +1,65 @@
 require 'singleton'
+
 module Sym
   module App
     class FakeTerminal
-      def self.appender(console)
-        ->(argument) { console.append(argument) }
+
+      include Singleton
+
+      class << self
+
+        def console
+          instance.tap do |c|
+            c.mutex
+            if ENV['DEBUG']
+
+            end
+          end
+        end
+
+        def appender(console = instance)
+          ->(argument) { console.append(argument) }
+        end
+
+        def new_password
+          instance.clear!
+          instance
+        end
       end
 
-      attr_accessor :lines, :mutex
+      attr_reader :lines
 
-      def self.new_password
-        self.instance.clear!
-        self.instance
+      def clear!
+        mutex.synchronize do
+          @lines = []
+        end
       end
 
       def output_proc
         self.class.appender(self)
       end
 
-      def append(arg)
+      def append(arg = nil)
         return unless arg
-        self.mutex ||= Mutex.new
-        terminal = self
+
         mutex.synchronize do
-          terminal.lines ||= []
-          terminal.lines << arg.split("\n")
-          terminal.lines.flatten!.compact!
+          @lines ||= []
+          @lines << arg.split("\n")
+          @lines.flatten!.compact!
         end
       end
+
+      alias :<< :append
 
       def puts(*args)
         append(args.join)
       end
 
-      alias_method :<<, :append
-
-      def clear!
-        self.lines = []
-      end
-
       private
 
-      def new
-        self.mutex = Mutex.new
-        super
+      def mutex
+        @mutex ||= Mutex.new
       end
     end
   end
 end
-

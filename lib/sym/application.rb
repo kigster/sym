@@ -32,6 +32,7 @@ module Sym
                   :stdin, :stdout, :stderr, :kernel
 
     def initialize(opts, stdin = STDIN, stdout = STDOUT, stderr = STDERR, kernel = nil)
+      raise ArgumentError, "opts must not be nil when creating Application!" if opts.nil?
 
       self.stdin  = stdin
       self.stdout = stdout
@@ -39,7 +40,7 @@ module Sym
       self.kernel = kernel
 
       self.opts_slop = opts.clone
-      self.opts      = opts.is_a?(Hash) ? opts : opts.to_hash
+      self.opts      = opts.is_a?(Hash) ? opts : opts.to_h
 
       process_negated_option(opts[:negate]) if opts[:negate]
       process_edit_option
@@ -185,7 +186,7 @@ module Sym
 
       if opts[:cache_passwords] && !password_cache.enabled
         stderr.puts "Warning: password cache is not available.".magenta.bold
-        stderr.puts "   Hint: start a local memcached instance.\n".magenta
+        stderr.puts "   Hint: start a local memcached instance to utilize the cache...\n".magenta
       end
     end
 

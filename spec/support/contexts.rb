@@ -6,17 +6,15 @@ require_relative 'fake_terminal'
 TEST_KEY = 'LxRV7pqW5XY5DDcuh128byukvsr3JLGX54v6eKNl8a0='
 
 class TestClass
-  attr_accessor :secure_value
-
   include Sym
   private_key TEST_KEY
 
-  def secure_value=(value)
-    super(encr(value))
+  def sensitive_value=(value)
+    @encrypted_value = encr(value)
   end
 
-  def secure_value
-    decr(super)
+  def decrypted_sensitive_value
+    decr(@encrypted_value)
   end
 end
 
@@ -28,42 +26,47 @@ def verify_program_argument(argument, program_output_line)
   end
 end
 
-def expect_some_output(args = [])
-  expect(program_output_lines).not_to be_nil
-  expect(program_output_lines).to be_a_kind_of(Array)
-  expect(program_output_lines.size).to be > 0
+def expect_some_output(output_lines, args = [])
+  expect(output_lines).not_to be_nil
+  expect(output_lines).to be_a_kind_of(Array)
+  expect(output_lines.size).to be > 0
   if args
     args.each_with_index do |argument, index|
-      verify_program_argument(argument, program_output_lines[index])
+      verify_program_argument(argument, output_lines[index])
     end
   end
 end
 
-unless Sym::App::CLI.instance_methods.include?(:old_execute)
-  class Sym::App::CLI
-    attr_accessor :already_ran
-    alias_method :old_execute, :execute
-
-    def execute
-      raise ArgumentError.new('CLI already ran this example') if already_ran
-      self.already_ran = true
-      self.old_execute
-    end
-  end
-end
+#
+# unless Sym::App::CLI.instance_methods.include?(:old_execute)
+#   class Sym::App::CLI
+#     attr_accessor :already_ran
+#     alias_method :old_execute, :execute
+#
+#     def execute
+#       raise ArgumentError.new('CLI already ran this example') if already_ran
+#       self.already_ran = true
+#       self.old_execute
+#     end
+#   end
+# end
 
 RSpec.shared_context :test_instance do
-  let(:instance) { TestClass.new }
   let(:test_class) { TestClass }
-  let(:test_instance) { instance }
-  let(:key) { TestClass.create_private_key }
+  let(:test_instance) { TestClass.new }
+  let(:key) { TEST_KEY }
+
+  before { TestClass.private_key(TEST_KEY) }
 end
 
 RSpec.shared_context :console do
-  let(:console) { Sym::App::FakeTerminal.new }
+  let(:console) { Sym::App::FakeTerminal.instance }
+
+  before { console.clear! }
+  after { console.clear! }
+
   let(:program_output_lines) { console.lines }
   let(:program_output) { program_output_lines.join("\n") }
-  before { console.clear! }
 end
 
 RSpec.shared_context :encryption do
@@ -71,34 +74,43 @@ RSpec.shared_context :encryption do
   include_context :console
 end
 
-RSpec.shared_context :run_command do
+RSpec.shared_context :cli do
   include_context :encryption
 
+  let(:cli) { Sym::App::CLI.new(argv || %w(-h)) }
+  let(:cli_class) { cli.class }
   let(:key) { TEST_KEY }
-  let(:cli) { Sym::App::CLI.new(argv) }
   let(:opts) { cli.opts }
-  let(:run_cli) { true }
   let(:application) { cli.application }
+
+  before { expect(opts).to_not be_empty }
+end
+
+RSpec.shared_context :run_command do
+  include_context :cli
 
   after { console.clear! }
 
   before do
     console.clear!
+
     self.before_cli_run if self.respond_to?(:before_cli_run)
-    # overwrite output proc on CLI so that we can collect and test the output
+    # overwrite output proc on CLI so that we can collect and test the output\
     cli.output_proc console.output_proc unless opts[:quiet]
-    if run_cli
-      begin
-        cli.execute
-      rescue StandardError => e
-        cli.stderr.puts "Error at cli.execute(): #{e.inspect.bold.red}"
-      end
+    begin
+      cli.execute
+    rescue StandardError => e
+      STDERR.puts "ERROR at cli.execute():\n#{e.inspect.bold.red}"
     end
   end
 
-  def expect_command_to_have(klass:, output: [], option: nil, value: nil, lines: nil)
+  def expect_command_to_have(klass:,
+                             output: [],
+                             option: nil,
+                             value: nil,
+                             lines: nil,
+                             program_output: [])
     expect(opts[option]).to eql(value) if value && option
-    expect(cli.already_ran).to be_truthy
 
     if klass
       klass.is_a?(Symbol) ?
@@ -106,8 +118,8 @@ RSpec.shared_context :run_command do
         expect(application.command.class).to(eql(klass))
     end
 
-    expect_some_output output.is_a?(Array) ? output : [output]
-    expect(program_output_lines.size).to eql(lines) if lines
+    expect_some_output program_output, (output.is_a?(Array) ? output : [output])
+    expect(program_output.size).to eql(lines) if lines
   end
 end
 

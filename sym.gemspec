@@ -32,7 +32,7 @@ Gem::Specification.new do |spec|
 EOF
   spec.add_dependency 'colored2'
   spec.add_dependency 'slop', '~> 4.3'
-  spec.add_dependency 'sym-crypt'
+  spec.add_dependency 'sym-crypt', '>= 1.2.0'
   spec.add_dependency 'activesupport'
   spec.add_dependency 'highline'
   spec.add_dependency 'dalli'

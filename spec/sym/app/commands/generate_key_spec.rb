@@ -11,10 +11,12 @@ module Sym
 
           let(:argv) { %w(-g -T) }
           it 'should be generated' do
-            expect_command_to_have klass: GenerateKey,
-                                   output: [ %r([a-zA-Z0-9\-_=]{44,45}) ],
-                                   option: :generate,
-                                   value: true
+            expect_command_to_have klass:          GenerateKey,
+                                   output:         [%r([a-zA-Z0-9\-_=]{44,45})],
+                                   option:         :generate,
+                                   value:          true,
+                                   program_output: program_output_lines
+
           end
 
           let(:key) { program_output }

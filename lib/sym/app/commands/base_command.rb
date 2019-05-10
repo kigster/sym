@@ -9,9 +9,8 @@ module Sym
       class BaseCommand
 
         def self.inherited(klass)
+          klass.include(Sym)
           klass.instance_eval do
-            include Sym
-
             class << self
               attr_accessor :required, :incompatible
 
@@ -27,7 +26,7 @@ module Sym
                 required
               end
 
-                def incompatible_options(*args)
+              def incompatible_options(*args)
                 self.incompatible ||= Set.new
                 incompatible.merge(args) if args
                 incompatible
@@ -51,6 +50,7 @@ module Sym
         extend Forwardable
 
         attr_accessor :application
+
         def_delegators :@application, :opts, :opts_slop, :key, :stdin, :stdout, :stderr, :kernel
 
         def initialize(application)
@@ -70,7 +70,7 @@ module Sym
         end
 
         def create_key
-          self.class.create_private_key
+          self.class.create_private_key if self.class.private_key.nil?
         end
 
         def add_to_keychain_if_needed(key)
@@ -82,13 +82,17 @@ module Sym
         end
 
         def encrypt_with_password(key)
-          password = application.input_handler.new_password
-          return encr_password(key, password), password
+          password = application.input_handler.new_password if password.nil?
+
+          raise ArgumentError, "password provided is nil" if password.nil?
+
+          EncryptedKeyStruct.new(key:           key,
+                                 key_encrypted: encr_password(key, password),
+                                 password:      password)
         end
 
-
-        def add_password_to_the_cache(encrypted_key, password)
-          self.application.password_cache[encrypted_key] = password
+        def add_password_to_the_cache(encrypted_key_struct)
+          self.application.password_cache[encrypted_key_struct.key_encrypted] = encrypted_key_struct.password
         end
       end
     end

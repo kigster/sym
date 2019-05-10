@@ -4,6 +4,7 @@ require 'colored2'
 require 'yaml'
 require 'openssl'
 require 'highline'
+require 'forwardable'
 
 require 'sym/application'
 require 'sym/errors'
@@ -56,15 +57,18 @@ module Sym
       # brings in #parse(Array[String] args)
       include CLISlop
 
-      attr_accessor :opts, :application, :outputs, :stdin, :stdout, :stderr, :kernel
+      attr_accessor :opts, :application, :outputs, :stdin, :stdout, :stderr, :kernel, :argv
 
+      extend Forwardable
+
+      def_delegators :@application, :command
 
       def initialize(argv, stdin = STDIN, stdout = STDOUT, stderr = STDERR, kernel = nil)
-
         self.stdin  = stdin
         self.stdout = stdout
         self.stderr = stderr
         self.kernel = kernel
+        self.argv   = argv
 
         Sym::App.stdin  = stdin
         Sym::App.stdout = stdout
@@ -73,8 +77,9 @@ module Sym
         begin
           # Re-map any legacy options to the new options
           self.opts = parse(argv)
+
           if opts[:sym_args]
-            append_sym_args(argv)
+            self.argv << append_sym_args
             self.opts = parse(argv)
           end
 
@@ -87,26 +92,36 @@ module Sym
         rescue StandardError => e
           log :error, "#{e.message}" if opts
           error exception: e
-          exit 123 if stdin == STDIN
+          exit_program!
         end
 
         self.application = ::Sym::Application.new(opts, stdin, stdout, stderr, kernel)
       end
 
-      def append_sym_args(argv)
-        if env_args = sym_args
-          argv << env_args.split(' ')
-          argv.flatten!
-          argv.compact!
-        end
+      def exit_program!
+        exit 123 if stdin == STDIN
+      end
+
+      def append_sym_args
+        env_args = sym_args
+        env_args.split(' ').flatten.compact if env_args
       end
 
       def sym_args
-        ENV[Sym::Constants::ENV_ARGS_VARIABLE_NAME]
+        ENV[Sym::Constants::ENV_ARGS_VARIABLE_NAME] { nil }
       end
 
       def execute!
         execute
+      end
+
+      def output_proc(proc = nil)
+        if application
+          application.output = proc if proc
+          application.output
+        else
+          nil
+        end
       end
 
       def execute
@@ -119,25 +134,13 @@ module Sym
         Sym::App.exit_code
       end
 
-      def command
-        @command ||= self.application.command if self.application
-      end
-
-      def output_proc(proc = nil)
-        if self.application
-          self.application.output = proc if proc
-          return self.application.output
-        end
-        nil
-      end
+      private
 
       def opts_present
-        o = opts.to_hash
-        o.keys.map { |k| opts[k] ? nil : k }.compact.each { |k| o.delete(k) }
+        o = opts.dup
+        o.keys.map { |k| o[k] ? nil : k }.compact.each { |k| o.delete(k) }
         o
       end
-
-      private
 
       def log(*args)
         Sym::App.log(*args, **(opts.to_hash))
