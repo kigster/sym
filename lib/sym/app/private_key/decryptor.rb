@@ -31,10 +31,10 @@ module Sym
             rescue ::OpenSSL::Cipher::CipherError => e
               input_handler.puts 'Invalid password. Please try again.'
 
-              if ((retries += 1) < 3)
+              if (retries += 1) < 3
                 retry
               else
-                raise(Sym::Errors::InvalidPasswordProvidedForThePrivateKey.new('Invalid password.'))
+                raise(Sym::Errors::WrongPasswordForKey.new('Invalid password.'))
               end
             end
           else

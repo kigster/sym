@@ -55,7 +55,7 @@ module Sym
           o.separator 'Create a new private key:'.yellow
           o.bool      '-g', '--generate',           '           generate a new private key'
           o.bool      '-p', '--password',           '           encrypt the key with a password'
-          if Sym::App.is_osx?
+          if Sym::App.osx?
             o.string '-x', '--keychain',            '[key-name] '.blue + 'write the key to OS-X Keychain'
           end
 

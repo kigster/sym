@@ -7,7 +7,8 @@ module Sym
         required_option :quiet
 
         def output_proc
-          ->(*) { ; }
+          ->(*) do
+          end
         end
       end
     end

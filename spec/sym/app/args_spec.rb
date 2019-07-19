@@ -44,8 +44,7 @@ module Sym
 
       { nil     => Sym::App::Output::Stdout,
         :output => Sym::App::Output::File,
-        :quiet  => Sym::App::Output::Noop
-      }.each_pair do |option, klass|
+        :quiet  => Sym::App::Output::Noop}.each_pair do |option, klass|
         context klass.name do
           let(:opts) { { option => true } }
 

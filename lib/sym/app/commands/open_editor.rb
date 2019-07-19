@@ -48,7 +48,7 @@ module Sym
         end
 
         def timestamp
-          @timestamp ||= Time.now.to_a.select { |d| d.is_a?(Fixnum) }.map { |d| '%02d' % d }[0..-3].reverse.join
+          @timestamp ||= Time.now.to_a.select { |d| d.is_a?(Integer) }.map { |d| '%02d' % d }[0..-3].reverse.join
         end
 
         def process(code)

@@ -43,7 +43,7 @@ module Sym
 
       before do
         FileUtils.rm(temp_encrypted) rescue nil
-        expect(File.exists?(temp_encrypted)).to eq false
+        expect(File.exist?(temp_encrypted)).to eq false
         magic_file_decrypted.encrypt_to(temp_encrypted)
       end
 
@@ -54,7 +54,7 @@ module Sym
       context 'decrypting and comparing' do
         before do
           FileUtils.rm(temp_decrypted) rescue nil
-          expect(File.exists?(temp_decrypted)).to eq false
+          expect(File.exist?(temp_decrypted)).to eq false
           magic_file_encrypted.decrypt_to(temp_decrypted)
         end
 

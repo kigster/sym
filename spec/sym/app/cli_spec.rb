@@ -138,7 +138,7 @@ module Sym
         end
       end
 
-      #–––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––
+      # –––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––
 
       context 'perform decryption' do
         SAVE_TO_TEMPFILE = ->(content) {
@@ -214,8 +214,8 @@ module Sym
               expect(File.read(tempfile.path)).not_to eql(key)
               expect(input_handler).to receive(:puts).and_return(nil).exactly(attempts).times
               expect(cli).to receive(:error).
-                with(reason:    'invalid password provided for the private key',
-                     exception: Sym::Errors::InvalidPasswordProvidedForThePrivateKey)
+                with(reason:    'wrong password for key',
+                     exception: Sym::Errors::WrongPasswordForKey)
               cli.execute
             end
           end

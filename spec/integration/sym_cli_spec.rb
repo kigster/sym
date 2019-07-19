@@ -31,13 +31,13 @@ RSpec.describe 'CLI execution', :type => :aruba do
       end
 
       it 'should have two files to install' do
-        expect(::Sym::Constants::Bash::Config.size).to eq(2)
+        expect(::Sym::Constants::Bash::CONFIG.size).to eq(2)
       end
 
       it 'should run command' do
         expect(File.exist?(TEMP_FILE)).to be(true)
-        expect(File.read(TEMP_FILE)).to include(::Sym::Constants::Bash::Config[:completion][:script])
-        expect(File.read(TEMP_FILE)).to include(::Sym::Constants::Bash::Config[:symit][:script])
+        expect(File.read(TEMP_FILE)).to include(::Sym::Constants::Bash::CONFIG[:completion][:script])
+        expect(File.read(TEMP_FILE)).to include(::Sym::Constants::Bash::CONFIG[:symit][:script])
       end
     end
 
@@ -85,7 +85,7 @@ RSpec.describe 'CLI execution', :type => :aruba do
         end
       end
 
-      if Sym::App.is_osx?
+      if Sym::App.osx?
         context 'import a key into keychain' do
           let(:args) { "-k #{KEY_PLAIN} -x MOO" }
           it 'should add to keychain' do

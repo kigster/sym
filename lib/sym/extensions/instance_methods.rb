@@ -71,7 +71,7 @@ module Sym
       def make_password_key(cipher, password, salt = nil)
         key_len = cipher.key_len
         salt    ||= OpenSSL::Random.random_bytes 16
-        iter    = 20000
+        iter    = 20_000
         digest  = OpenSSL::Digest::SHA256.new
         key     = OpenSSL::PKCS5.pbkdf2_hmac(password, salt, iter, key_len, digest)
         return key, salt

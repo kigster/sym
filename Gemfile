@@ -9,3 +9,4 @@ if RUBY_PLATFORM == 'x86_64-darwin16'
   gem 'coin', git: 'https://github.com/kigster/coin'
 end
 
+

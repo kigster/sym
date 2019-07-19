@@ -80,7 +80,7 @@ module Sym
         out << extras if extras
         out = out.join
         # Do not actually ever run these commands on non MacOSX
-        out = "echo Run this –\"#{out}\", on #{Sym::App.this_os}?\nAre you sure?" unless Sym::App.is_osx?
+        out = "echo Run this –\"#{out}\", on #{Sym::App.this_os}?\nAre you sure?" unless Sym::App.osx?
         out
       end
 

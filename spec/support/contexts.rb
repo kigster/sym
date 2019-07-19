@@ -18,15 +18,19 @@ class TestClass
 end
 
 
-unless Sym::App::CLI.instance_methods.include?(:old_execute)
-  class Sym::App::CLI
-    attr_accessor :already_ran
-    alias_method :old_execute, :execute
+module Sym
+  module App
+    unless CLI.instance_methods.include?(:old_execute)
+      class CLI
+        attr_accessor :already_ran
+        alias_method :old_execute, :execute
 
-    def execute
-      raise ArgumentError.new('CLI already ran this example') if already_ran
-      self.already_ran = true
-      self.old_execute
+        def execute
+          raise ArgumentError.new('CLI already ran this example') if already_ran
+          self.already_ran = true
+          self.old_execute
+        end
+      end
     end
   end
 end
@@ -37,7 +41,6 @@ RSpec.shared_context :test_instance do
   let(:test_instance) { instance }
   let(:key) { TestClass.create_private_key }
 end
-
 
 RSpec.shared_context :console do
   let(:console) { Sym::App::FakeTerminal.new }
@@ -54,7 +57,8 @@ RSpec.shared_context :console do
     expect(program_output_lines.size).to be > 0
     if args
       args.each_with_index do |argument, index|
-        expect(program_output_lines[index]).to (argument.is_a?(Regexp) ? match(argument) : include(argument))
+        verb = argument.is_a?(Regexp) ? :match : :include
+        expect(program_output_lines[index]).to(send(verb, argument))
       end
     end
   end

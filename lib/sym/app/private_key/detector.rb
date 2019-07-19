@@ -23,11 +23,10 @@ module Sym
         # procs on a given string.
         def read!
           KeySourceCheck::CHECKS.each do |source_check|
-            if result = source_check.detect(self) rescue nil
-              if key_ = normalize_key(result.key)
-                key_source_ = result.to_s
-                return key_, key_source_
-              end
+            next unless result = source_check.detect(self) rescue nil
+            if key_ = normalize_key(result.key)
+              key_source_ = result.to_s
+              return key_, key_source_
             end
           end
           nil
@@ -51,8 +50,6 @@ module Sym
             rescue
               nil
             end
-          else
-            nil
           end
         end
       end

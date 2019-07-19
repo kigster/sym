@@ -12,7 +12,7 @@ module Sym
 
       def initialize(opts)
         self.opts             = opts
-        self.selected_options = opts.keys.reject { |k| !opts[k] }
+        self.selected_options = opts.keys.select { |k| opts[k] }
       end
 
       def specify_key?
@@ -33,10 +33,11 @@ module Sym
       end
 
       def provided_options
-        opts.to_hash.keys.reject { |k| !opts[k] }
+        opts.to_hash.keys.select { |k| opts[k] }
       end
 
       private
+
       def do?(list)
         !(list & selected_options).empty?
       end

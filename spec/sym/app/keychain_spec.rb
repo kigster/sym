@@ -5,7 +5,7 @@ module Sym
   module App
     RSpec.describe 'Sym::App::KeyChain' do
       let(:opts) { { verbose: false } }
-      let(:key_name) { 'silky-smooth-chocolate'}
+      let(:key_name) { 'silky-smooth-chocolate' }
       let(:keychain) { Sym::App::KeyChain.new(key_name, opts) }
       let(:commands) { %w(add find delete) }
       let(:password) { 'Sup4r!Secur3' }
@@ -33,7 +33,7 @@ module Sym
         end
       end
 
-      if Sym::App.is_osx?
+      if Sym::App.osx?
         context 'integration tests' do
           before do
             keychain.stderr_off

@@ -32,7 +32,6 @@ module Sym
                   :stdin, :stdout, :stderr, :kernel
 
     def initialize(opts, stdin = STDIN, stdout = STDOUT, stderr = STDERR, kernel = nil)
-
       self.stdin  = stdin
       self.stdout = stdout
       self.stderr = stderr
@@ -115,12 +114,8 @@ module Sym
     end
 
     def process_output(result)
-      unless result.is_a?(Hash)
-        self.output.call(result)
-        result
-      else
-        result
-      end
+      self.output.call(result) unless result.is_a?(Hash)
+      result
     end
 
     private
@@ -207,7 +202,7 @@ module Sym
     end
 
     def initialize_action
-      self.action = if opts[:encrypt] then
+      self.action = if opts[:encrypt]
                       :encr
                     elsif opts[:decrypt]
                       :decr
@@ -217,7 +212,7 @@ module Sym
     # If we are encrypting or decrypting, and no data has been provided, check if we
     # should read from STDIN
     def initialize_data_source
-      if self.action && opts[:string].nil? && opts[:file].nil? && !(self.stdin.tty?)
+      if self.action && opts[:string].nil? && opts[:file].nil? && !self.stdin.tty?
         opts[:file] = '-'
       end
     end
