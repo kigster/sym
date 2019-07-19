@@ -7,7 +7,7 @@ module Sym
 
       RSpec.describe Providers do
         its(:providers) { should_not be_empty }
-        its(:providers) { should include *[Providers::MemcachedProvider] }
+        its(:providers) { should include Providers::MemcachedProvider }
 
         before :each do
           Providers.detected = nil

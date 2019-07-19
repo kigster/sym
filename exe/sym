@@ -1,4 +1,5 @@
 #!/usr/bin/env ruby
+# vim:filetype=ruby
 
 lib_path = File.expand_path(File.dirname(__FILE__) + '/../lib')
 $LOAD_PATH << lib_path if File.exist?(lib_path) && !$LOAD_PATH.include?(lib_path)
@@ -6,12 +7,12 @@ $LOAD_PATH << lib_path if File.exist?(lib_path) && !$LOAD_PATH.include?(lib_path
 require 'sym'
 require 'sym/app'
 
-#ARGV.any?{ |a| a =~ /^-/ } ?
+# ARGV.any?{ |a| a =~ /^-/ } ?
 begin
   exit ::Sym::App::CLI.new(ARGV.dup).execute
 rescue Interrupt => e
   STDERR.flush
-  STDERR.puts "Interrupt, #{e.message}, exiting."
+  warn "Interrupt, #{e.message}, exiting."
   STDERR.flush
   exit 1
 end

@@ -5,11 +5,10 @@ env:
 services:
 - memcached
 rvm:
-- 2.2.10
 - 2.3.8
 - 2.4.6
 - 2.5.5
-- 2.6.2
+- 2.6.3
 notifications:
   email:
     recipients:
@@ -31,4 +30,4 @@ before_script:
 after_script:
   - ./cc-test-reporter after-build --exit-code $TRAVIS_TEST_RESULT
 script:
-  - USER=travis bundle exec rspec --format documentation --order random 
+  - USER=travis bundle exec rspec --format documentation --order random && bundle exec rubocop

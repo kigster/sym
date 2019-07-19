@@ -60,7 +60,6 @@ module Sym
 
 
       def initialize(argv, stdin = STDIN, stdout = STDOUT, stderr = STDERR, kernel = nil)
-
         self.stdin  = stdin
         self.stdout = stdout
         self.stderr = stderr
@@ -140,7 +139,7 @@ module Sym
       private
 
       def log(*args)
-        Sym::App.log(*args, **(opts.to_hash))
+        Sym::App.log(*args, **opts.to_hash)
       end
 
       def error(hash)

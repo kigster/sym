@@ -73,7 +73,7 @@ module Sym
         end
 
         def add_to_keychain_if_needed(key)
-          if opts[:keychain] && Sym::App.is_osx?
+          if opts[:keychain] && Sym::App.osx?
             Sym::App::KeyChain.new(opts[:keychain], opts).add(key)
           else
             key

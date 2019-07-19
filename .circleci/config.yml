@@ -38,18 +38,22 @@ jobs:
             DOCKERIZE_VERSION: v0.3.0
 
       - run:
-          name: Wait for memcached
+          name: Wait for the memcached
           command: dockerize -wait tcp://localhost:11211 -timeout 1m
 
       - run:
-          name: run tests
+          name: run specs
           command: |
             bundle exec rspec --version
             bundle exec exe/sym --version
-            if [[ -t 1 ]]; then echo "this is a TTY!"; else echo "this is NOT a tty"; fi
-            if [[ -p /dev/stdout ]]; then echo "this is a PIPE!"; else echo "this is NOT a pipe"; fi
-            if [[ ! -t 1 && ! -p /dev/stdout ]]; then echo "this is a REDIRECT!"; else echo "this is NOT a redirect"; fi
-            echo "Flushing MemCached...."
+            # flush memcached
             echo flush_all | timeout -k 2 -s HUP 10 nc -G 4 127.0.0.1 11211 || true
             timeout -k 2 -s HUP 30 bundle exec rspec --order random --backtrace
+
+      - run:
+          name: run rubocop
+          command: |
+            bundle exec rubocop --version
+            bundle exec rubocop
+
 

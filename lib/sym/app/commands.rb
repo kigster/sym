@@ -37,7 +37,7 @@ module Sym
         # Sort commands based on the #dependencies array, which itself is sorted
         # based on command dependencies.
         def sorted_commands
-          @sorted_commands ||= self.commands.to_a.sort_by{|klass| dependencies.index(klass.short_name) }
+          @sorted_commands ||= self.commands.to_a.sort_by{ |klass| dependencies.index(klass.short_name) }
           @sorted_commands
         end
 

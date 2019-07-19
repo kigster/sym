@@ -1,4 +1,3 @@
-
 module Kernel
   def require_dir(___dir)
     @___dir ||= File.dirname(__FILE__)

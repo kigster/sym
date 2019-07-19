@@ -32,7 +32,7 @@ puts data ? \
   Sym::App::KeyChain.new(key_name).send(action.to_sym, data) :
   Sym::App::KeyChain.new(key_name).send(action.to_sym)
 rescue StandardError => e
-  STDERR.puts "#{e.message.red}"
+  warn "#{e.message.red}"
 end
 
 

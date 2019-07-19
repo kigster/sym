@@ -15,7 +15,7 @@ module Sym
           file = opts[:bash_support]
 
           out = ''
-          Sym::Constants::Bash::Config.each_pair do |key, config|
+          Sym::Constants::Bash::CONFIG.each_pair do |key, config|
             script_name = key.to_s
 
             # This removes the old version of this file.
@@ -43,7 +43,7 @@ module Sym
           out << "\nPlease reload your terminal session to activate bash completion\n"
           out << "and other installed BASH utilities.\n"
           out << "\nAlternatively, just type #{"source #{file}".bold.green} to reload BASH.\n"
-          out << "Also — go ahead and try running #{"sym -h".bold.blue} and #{"symit -h".bold.blue}.\n"
+          out << "Also — go ahead and try running #{'sym -h'.bold.blue} and #{'symit -h'.bold.blue}.\n"
         end
 
         private

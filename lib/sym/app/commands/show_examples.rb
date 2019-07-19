@@ -56,7 +56,7 @@ Diff:
 # (c) 2016 Konstantin Gredeskoul.  All rights reserved.'.green.bold)
 
 
-          if Sym::App.is_osx?
+          if Sym::App.osx?
           output << example(comment: 'generate a new password-encrypted key, save it to your Keychain:',
                             command: 'sym -gpcx staging.key')
 

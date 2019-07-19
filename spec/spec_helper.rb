@@ -9,6 +9,13 @@ require 'openssl'
 require 'aruba'
 require 'rspec/its'
 
+if File.exist?(Sym::Constants::SYM_KEY_FILE)
+  FileUtils.mv(Sym::Constants::SYM_KEY_FILE, Sym::Constants::SYM_KEY_FILE + '.bak')
+  Kernel.at_exit do
+    FileUtils.mv(Sym::Constants::SYM_KEY_FILE + '.bak', Sym::Constants::SYM_KEY_FILE)
+  end
+end
+
 require_relative 'support/contexts'
 require_relative 'support/shared_examples'
 
@@ -24,6 +31,7 @@ end
 Kernel.class_eval do
   def clear_memcached!
     `echo flush_all | nc -G 2 127.0.0.1 11211 2>/dev/null`
+    $?.exitstatus == 0
   end
 end
 

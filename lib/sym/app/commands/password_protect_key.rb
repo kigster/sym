@@ -16,10 +16,10 @@ module Sym
           the_key = self.key
 
           if opts[:password]
-             encrypted_key, password = encrypt_with_password(the_key)
-             add_password_to_the_cache(encrypted_key, password)
-             the_key = encrypted_key
-           end
+            encrypted_key, password = encrypt_with_password(the_key)
+            add_password_to_the_cache(encrypted_key, password)
+            the_key = encrypted_key
+          end
 
           add_to_keychain_if_needed(the_key)
 

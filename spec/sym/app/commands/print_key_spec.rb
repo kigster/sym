@@ -4,7 +4,7 @@ require 'digest'
 module Sym
   module App
     module Commands
-      if Sym::App.is_osx?
+      if Sym::App.osx?
         RSpec.describe PrintKey do
           let(:key_name) { 'boochen-topolski' }
           let(:command_class) { PrintKey }

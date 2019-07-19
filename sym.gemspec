@@ -1,4 +1,3 @@
-# coding: utf-8
 lib = File.expand_path('../lib', __FILE__)
 $LOAD_PATH.unshift(lib) unless $LOAD_PATH.include?(lib)
 require 'sym/version'
@@ -19,47 +18,48 @@ Gem::Specification.new do |spec|
   spec.bindir        = 'exe'
   spec.executables   = spec.files.grep(%r{^exe/}) { |f| File.basename(f) }
   spec.require_paths = ['lib']
-  spec.required_ruby_version = '>= 2.2'
-  spec.post_install_message = <<-EOF
-
-Thank you for installing Sym! 
-
-BLOG POST
-=========
-http://kig.re/2017/03/10/dead-simple-encryption-with-sym.html
-
-BASH COMPLETION
-===============
-To enable bash command line completion and install highly useful
-command line BASH wrapper 'symit', please run the following 
-command after installing the gem. It appends sym's shell completion 
-wrapper to the file specified in arguments to -B flag.
-
-  sym -B ~/.bash_profile
-  source ~/.bash_profile
-  # then:
-  sym --help
-  symit --help
- 
-Thank you for using Sym and happy encrypting :)
-
-@kigster on Github, 
-    @kig on Twitter.
-
-EOF
+  spec.required_ruby_version = '>= 2.3'
+  spec.post_install_message = <<~EOF
+    
+    Thank you for installing Sym! 
+    
+    BLOG POST
+    =========
+    http://kig.re/2017/03/10/dead-simple-encryption-with-sym.html
+    
+    BASH COMPLETION
+    ===============
+    To enable bash command line completion and install highly useful
+    command line BASH wrapper 'symit', please run the following 
+    command after installing the gem. It appends sym's shell completion 
+    wrapper to the file specified in arguments to -B flag.
+    
+      sym -B ~/.bash_profile
+      source ~/.bash_profile
+      # then:
+      sym --help
+      symit --help
+     
+    Thank you for using Sym and happy encrypting :)
+    
+    @kigster on Github, 
+        @kig on Twitter.
+    
+  EOF
   spec.add_dependency 'colored2', '~> 3'
   spec.add_dependency 'slop', '~> 4.3'
   spec.add_dependency 'activesupport'
   spec.add_dependency 'highline'
   spec.add_dependency 'dalli'
 
-  spec.add_development_dependency 'codeclimate-test-reporter', '~> 1.0'
-  spec.add_development_dependency 'simplecov'
-  spec.add_development_dependency 'irbtools'
   spec.add_development_dependency 'aruba'
   spec.add_development_dependency 'bundler'
+  spec.add_development_dependency 'irbtools'
   spec.add_development_dependency 'rake'
+  spec.add_development_dependency 'relaxed-rubocop'
   spec.add_development_dependency 'rspec', '~> 3'
   spec.add_development_dependency 'rspec-its'
+  spec.add_development_dependency 'rubocop'
+  spec.add_development_dependency 'simplecov'
   spec.add_development_dependency 'yard'
 end

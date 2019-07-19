@@ -66,7 +66,7 @@ module Sym
       self.exit_code = 1
     end
 
-    def self.is_osx?
+    def self.osx?
       Gem::Platform.local.os.eql?('darwin')
     end
 

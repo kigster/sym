@@ -38,7 +38,7 @@ module Sym
 
           def provider_from_argument(p, **opts, &block)
             case p
-              when String, Symbol
+            when String, Symbol
                 provider_class_name = "#{p.to_s.capitalize}Provider"
                 Sym::App::Password::Providers.const_defined?(provider_class_name) ?
                   Sym::App::Password::Providers.const_get(provider_class_name).new(**opts, &block) :
