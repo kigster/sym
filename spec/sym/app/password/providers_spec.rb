@@ -1,13 +1,14 @@
+# frozen_string_literal: true
+
 require 'spec_helper'
 require 'sym/app/password/providers'
 
 module Sym
   module App
     module Password
-
       RSpec.describe Providers do
         its(:providers) { should_not be_empty }
-        its(:providers) { should include *[Providers::MemcachedProvider] }
+        its(:providers) { should include Providers::MemcachedProvider }
 
         before :each do
           Providers.detected = nil
@@ -55,9 +56,6 @@ module Sym
           end
         end
       end
-
-
     end
   end
 end
-

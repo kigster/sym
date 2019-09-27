@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require 'sym/app/output/base'
 
 module Sym
@@ -7,7 +9,7 @@ module Sym
         required_option :quiet
 
         def output_proc
-          ->(*) { ; }
+          ->(*) {}
         end
       end
     end

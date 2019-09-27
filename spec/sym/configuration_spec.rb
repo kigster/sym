@@ -1,10 +1,10 @@
-# coding: utf-8
 # frozen_string_literal: true
+
 #
 # © 2018 Konstantin Gredeskoul (twitter.com/kig)
 # https://github.com/kigster
 #
-#—————————————————————————————————————————————————————————————————————————————require 'rspec'
+# —————————————————————————————————————————————————————————————————————————————require 'rspec'
 #
 require 'spec_helper'
 

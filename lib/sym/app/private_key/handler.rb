@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require 'sym/app/private_key/base64_decoder'
 require 'sym/app/private_key/decryptor'
 require 'sym/app/private_key/detector'
@@ -31,7 +33,7 @@ module Sym
             end
           end
           key = Decryptor.new(Base64Decoder.new(key).key, input_handler, password_cache).key if key && key.length > 45
-          return key ? [key, key_source] : [nil, nil]
+          key ? [key, key_source] : [nil, nil]
         end
       end
     end

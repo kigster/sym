@@ -1,17 +1,18 @@
+# frozen_string_literal: true
+
 module Sym
   module App
     module Password
       module Providers
-
         class << self
           attr_accessor :registry
           attr_accessor :providers
           attr_accessor :detected
 
           def register(provider_class)
-            self.registry                        ||= {}
+            self.registry ||= {}
             registry[short_name(provider_class)] = provider_class
-            self.providers                       ||= []
+            self.providers ||= []
             self.providers << provider_class
           end
 

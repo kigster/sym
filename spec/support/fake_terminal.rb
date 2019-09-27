@@ -1,13 +1,13 @@
+# frozen_string_literal: true
+
 require 'singleton'
 
 module Sym
   module App
     class FakeTerminal
-
       include Singleton
 
       class << self
-
         def console
           instance.tap do |c|
             c.mutex

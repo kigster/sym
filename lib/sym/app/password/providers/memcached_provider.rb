@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require 'forwardable'
 require 'dalli'
 
@@ -35,7 +37,6 @@ module Sym
           def clear
             dalli.flush
           end
-
         end
 
         register MemcachedProvider

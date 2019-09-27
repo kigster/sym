@@ -1,9 +1,10 @@
+# frozen_string_literal: true
+
 require 'spec_helper'
 
 module Sym
   module App
     RSpec.describe Sym::Application do
-
       context 'basic initialization' do
         let(:opts) { { generate: true } }
         let(:application) { Sym::Application.new(opts) }

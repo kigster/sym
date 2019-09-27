@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require 'digest'
 require 'fileutils'
 require 'tempfile'
@@ -10,9 +12,9 @@ module Sym
       class OpenEditor < BaseCommand
         include Sym
 
-        required_options [ :key, :interactive ],
-                           :edit,
-                           :file
+        required_options [:key, :interactive],
+                         :edit,
+                         :file
 
         try_after :generate_key, :encrypt, :decrypt
 
@@ -21,12 +23,16 @@ module Sym
         def execute
           begin
             self.tempfile = ::Tempfile.new(::Base64.urlsafe_encode64(opts[:file]))
-            decrypt_content(self.tempfile)
+            decrypt_content(tempfile)
 
             result = process launch_editor
           ensure
-            self.tempfile.close if tempfile
-            self.tempfile.unlink rescue nil
+            tempfile&.close
+            begin
+              tempfile.unlink
+            rescue StandardError
+              nil
+            end
           end
           result
         end
@@ -66,14 +72,14 @@ module Sym
 
             out = ''
             if opts[:verbose]
-              out << "Saved encrypted/compressed content to #{opts[:file].bold.blue}" +
-                      " (#{File.size(opts[:file]) / 1024}Kb), unencrypted size #{content.length / 1024}Kb."
+              out << "Saved encrypted/compressed content to #{opts[:file].bold.blue}" \
+                     " (#{File.size(opts[:file]) / 1024}Kb), unencrypted size #{content.length / 1024}Kb."
               out << (opts[:backup] ? ",\nbacked up the last version to #{backup_file.bold.blue}." : '.')
             end
             out << "\n\nDiff:\n#{diff}"
             out
           else
-            raise Sym::Errors::EditorExitedAbnormally.new("#{application.editor} exited with #{$<}")
+            raise Sym::Errors::EditorExitedAbnormally, "#{application.editor} exited with #{$<}"
           end
         end
 

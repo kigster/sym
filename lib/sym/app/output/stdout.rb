@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require 'sym/app/output/file'
 module Sym
   module App
@@ -6,8 +8,8 @@ module Sym
         required_option nil
         def output_proc
           ->(argument) do
-            self.stdout.printf '%s', argument
-            self.stdout.printf "\n" if self.stdout.tty?
+            stdout.printf '%s', argument
+            stdout.printf "\n" if stdout.tty?
           end
         end
       end

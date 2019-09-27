@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require 'spec_helper'
 require 'sym/app/password/providers'
 
@@ -6,8 +8,8 @@ RSpec.describe Sym::App::Password::Cache do
   let(:cache) do
     described_class.instance.configure(
       provider: :memcached,
-      timeout:  200,
-      enabled:  enabled
+      timeout: 200,
+      enabled: enabled
     )
   end
 
@@ -53,4 +55,3 @@ RSpec.describe Sym::App::Password::Cache do
     end
   end
 end
-

@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require 'active_support/inflector'
 require 'tsort'
 require 'pp'
@@ -20,29 +22,29 @@ module Sym
         attr_accessor :commands, :dependency
 
         def register(command_class)
-          self.commands << command_class
-          self.dependency[command_class.short_name] ||= []
+          commands << command_class
+          dependency[command_class.short_name] ||= []
         end
 
         def order(command_class, after)
-          self.dependency[command_class.short_name].unshift(after) if after
-          self.dependency[command_class.short_name].flatten!
+          dependency[command_class.short_name].unshift(after) if after
+          dependency[command_class.short_name].flatten!
         end
 
         def dependencies
-          @dependencies ||= self.dependency.tsort
+          @dependencies ||= dependency.tsort
           @dependencies
         end
 
         # Sort commands based on the #dependencies array, which itself is sorted
         # based on command dependencies.
         def sorted_commands
-          @sorted_commands ||= self.commands.to_a.sort_by{|klass| dependencies.index(klass.short_name) }
+          @sorted_commands ||= commands.to_a.sort_by{ |klass| dependencies.index(klass.short_name) }
           @sorted_commands
         end
 
         def find_command_class(opts)
-          self.sorted_commands.each do |command_class|
+          sorted_commands.each do |command_class|
             return command_class if command_class.options_satisfied_by?(opts)
           end
           nil

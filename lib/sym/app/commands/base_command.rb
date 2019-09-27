@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require 'sym'
 require 'sym/app'
 require 'forwardable'
@@ -7,7 +9,6 @@ module Sym
   module App
     module Commands
       class BaseCommand
-
         def self.inherited(klass)
           klass.include(Sym)
           klass.instance_eval do
@@ -34,8 +35,9 @@ module Sym
 
               def options_satisfied_by?(opts_hash)
                 proc = required_options.find { |option| option.is_a?(Proc) }
-                return true if proc && proc.call(opts_hash)
+                return true if proc&.call(opts_hash)
                 return false if incompatible_options.any? { |option| opts_hash[option] }
+
                 required_options.to_a.delete_if { |o| o.is_a?(Proc) }.all? { |o|
                   o.is_a?(Array) ? o.any? { |opt| opts_hash[opt] } : opts_hash[o]
                 }
@@ -58,7 +60,7 @@ module Sym
         end
 
         def execute
-          raise Sym::Errors::AbstractMethodCalled.new(:run)
+          raise Sym::Errors::AbstractMethodCalled, :run
         end
 
         def content
@@ -86,13 +88,13 @@ module Sym
 
           raise ArgumentError, "password provided is nil" if password.nil?
 
-          EncryptedKeyStruct.new(key:           key,
+          EncryptedKeyStruct.new(key: key,
                                  key_encrypted: encr_password(key, password),
-                                 password:      password)
+                                 password: password)
         end
 
         def add_password_to_the_cache(encrypted_key_struct)
-          self.application.password_cache[encrypted_key_struct.key_encrypted] = encrypted_key_struct.password
+          application.password_cache[encrypted_key_struct.key_encrypted] = encrypted_key_struct.password
         end
       end
     end

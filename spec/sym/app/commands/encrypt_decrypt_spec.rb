@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require 'spec_helper'
 require 'digest'
 module Sym
@@ -12,12 +14,11 @@ module Sym
           let(:encrypted_data) { program_output }
 
           it 'should invoke the Encrypt command' do
-            expect_command_to_have klass:          Commands::Encrypt,
-                                   output:         [/[a-zA-Z0-9\-_=]{44}/],
-                                   value:          true,
-                                   lines:          1,
+            expect_command_to_have klass: Commands::Encrypt,
+                                   output: [/[a-zA-Z0-9\-_=]{44}/],
+                                   value: true,
+                                   lines: 1,
                                    program_output: program_output_lines
-
           end
 
           it 'should encrypt data' do
@@ -26,7 +27,7 @@ module Sym
 
           context 'decrypt' do
             let(:options) { %i(key decrypt string verbose trace) }
-            let(:options_hash) { h = Hash.new; options.each { |k| h[k] = true }; h }
+            let(:options_hash) { h = {}; options.each { |k| h[k] = true }; h }
             let(:decrypted_data) { TestClass.new.decr(program_output, key) }
 
             it 'should match the command with options' do

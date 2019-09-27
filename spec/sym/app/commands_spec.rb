@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require 'spec_helper'
 require 'singleton'
 
@@ -33,45 +35,45 @@ module Sym
             expect(fake.required_options.to_a).to include(:fake)
           end
           it 'should select the command based on required options with OR' do
-            expect(Sym::App::Commands.find_command_class({ fake: true, one: true })).to eq(FakeCommand)
+            expect(Sym::App::Commands.find_command_class(fake: true, one: true)).to eq(FakeCommand)
           end
           it 'should select the command based on required options with OR' do
-            expect(Sym::App::Commands.find_command_class({ fake: true, other: true })).to eq(FakeCommand)
+            expect(Sym::App::Commands.find_command_class(fake: true, other: true)).to eq(FakeCommand)
           end
           it 'should not select the command without all options satisfied' do
-            expect(Sym::App::Commands.find_command_class({ fake: true })).to be_nil
+            expect(Sym::App::Commands.find_command_class(fake: true)).to be_nil
           end
           it 'should not select the command without all options satisfied' do
-            expect(Sym::App::Commands.find_command_class({ help: true, trace: true })).to eq(ShowHelp)
+            expect(Sym::App::Commands.find_command_class(help: true, trace: true)).to eq(ShowHelp)
           end
           it 'should not select the command without all options satisfied' do
-            expect(Sym::App::Commands.find_command_class({ decrypt: false,
-                                                           edit: false,
-                                                           generate: false,
-                                                           password: false,
-                                                           keychain: nil,
-                                                           key: nil,
-                                                           interactive: false,
-                                                           cache_passwords: false,
-                                                           cache_timeout: nil,
-                                                           cache_provider: nil,
-                                                           string: nil,
-                                                           file: nil,
-                                                           output: nil,
-                                                           backup: false,
-                                                           verbose: false,
-                                                           quiet: false,
-                                                           trace: true,
-                                                           debug: false,
-                                                           version: true,
-                                                           no_color: false,
-                                                           no_environment: false,
-                                                           bash_support: nil,
-                                                           examples: false,
-                                                           help: false })).to eq(ShowVersion)
+            expect(Sym::App::Commands.find_command_class( decrypt: false,
+                                                          edit: false,
+                                                          generate: false,
+                                                          password: false,
+                                                          keychain: nil,
+                                                          key: nil,
+                                                          interactive: false,
+                                                          cache_passwords: false,
+                                                          cache_timeout: nil,
+                                                          cache_provider: nil,
+                                                          string: nil,
+                                                          file: nil,
+                                                          output: nil,
+                                                          backup: false,
+                                                          verbose: false,
+                                                          quiet: false,
+                                                          trace: true,
+                                                          debug: false,
+                                                          version: true,
+                                                          no_color: false,
+                                                          no_environment: false,
+                                                          bash_support: nil,
+                                                          examples: false,
+                                                          help: false )).to eq(ShowVersion)
           end
           it 'should select a command based on a proc' do
-            expect(Sym::App::Commands.find_command_class({ booboo: :doodoo })).to eq(FakeCommand)
+            expect(Sym::App::Commands.find_command_class(booboo: :doodoo)).to eq(FakeCommand)
           end
         end
 

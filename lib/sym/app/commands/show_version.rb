@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require 'sym/app/commands/base_command'
 module Sym
   module App

@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require 'spec_helper'
 require 'singleton'
 require 'sym/app/keychain'
@@ -5,16 +7,16 @@ module Sym
   module App
     RSpec.describe 'Sym::App::KeyChain' do
       let(:opts) { { verbose: false } }
-      let(:key_name) { 'silky-smooth-chocolate'}
+      let(:key_name) { 'silky-smooth-chocolate' }
       let(:keychain) { Sym::App::KeyChain.new(key_name, opts) }
       let(:commands) { %w(add find delete) }
       let(:password) { 'Sup4r!Secur3' }
 
       BASE_VARS = {
-        user:        ENV['USER'],
-        kind:        'sym',
+        user: ENV['USER'],
+        kind: 'sym',
         sub_section: 'generic-password'
-      }
+      }.freeze
 
       context 'class variables' do
         BASE_VARS.each_pair do |variable, value|
@@ -37,7 +39,11 @@ module Sym
         context 'integration tests' do
           before do
             keychain.stderr_off
-            keychain.delete rescue nil  # delete in case it's already there
+            begin
+              keychain.delete
+            rescue StandardError
+              nil
+            end # delete in case it's already there
           end
           after do
             keychain.stderr_on
@@ -52,4 +58,3 @@ module Sym
     end
   end
 end
-

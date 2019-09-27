@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require 'spec_helper'
 require 'sym/magic_file'
 
@@ -42,8 +44,12 @@ module Sym
       let(:key) { TEST_KEY }
 
       before do
-        FileUtils.rm(temp_encrypted) rescue nil
-        expect(File.exists?(temp_encrypted)).to eq false
+        begin
+          FileUtils.rm(temp_encrypted)
+        rescue StandardError
+          nil
+        end
+        expect(File.exist?(temp_encrypted)).to eq false
         magic_file_decrypted.encrypt_to(temp_encrypted)
       end
 
@@ -53,8 +59,12 @@ module Sym
 
       context 'decrypting and comparing' do
         before do
-          FileUtils.rm(temp_decrypted) rescue nil
-          expect(File.exists?(temp_decrypted)).to eq false
+          begin
+            FileUtils.rm(temp_decrypted)
+          rescue StandardError
+            nil
+          end
+          expect(File.exist?(temp_decrypted)).to eq false
           magic_file_encrypted.decrypt_to(temp_decrypted)
         end
 
@@ -65,5 +75,3 @@ module Sym
     end
   end
 end
-
-

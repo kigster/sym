@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require 'colored2'
 require 'base64'
 require 'openssl'
@@ -8,7 +10,7 @@ require 'rspec/its'
 require 'simplecov'
 SimpleCov.start
 
-$LOAD_PATH.unshift File.expand_path('../../lib', __FILE__)
+$LOAD_PATH.unshift File.expand_path('../lib', __dir__)
 
 require 'sym'
 
@@ -17,7 +19,6 @@ RSpec.configure do |spec|
   spec.filter_run :focus
 
   spec.mock_with :rspec do |mocks|
-
     # This option should be set when all dependencies are being loaded
     # before a spec run, as is the case in a typical spec helper. It will
     # cause any verifying double instantiation for a class that does not

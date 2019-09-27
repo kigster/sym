@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require 'spec_helper'
 require 'sym/crypt/errors'
 module Sym
@@ -14,7 +16,6 @@ module Sym
         end
 
         context 'encrypting and decrypting a short strings' do
-
           let(:key) { test_instance.class.create_private_key }
           let(:data) { 'My girlfriend brings all the boys to the yard' }
 

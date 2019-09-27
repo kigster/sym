@@ -1,15 +1,15 @@
+# frozen_string_literal: true
+
 require 'spec_helper'
 require 'sym/app/output/base'
 
 RSpec.describe Sym::App::CLI do
-
   before do
     allow(ENV).to receive(:[]).and_return(nil)
   end
 
   describe '-A: using SYM_ARGS' do
     shared_examples :cli_expectations do
-
       include_examples :cli
 
       before do
@@ -19,15 +19,13 @@ RSpec.describe Sym::App::CLI do
       end
     end
 
-
     context '#sym_args' do
       let(:argv) { %w(-e -s hello -A) }
       let(:sym_args) { "-ck #{TEST_KEY} -v -D" }
       let(:env_args) { sym_args.split(/\s+/) }
-      let(:expected_options) { %i(encrypt string key debug verbose cache_passwords ).sort }
+      let(:expected_options) { %i(encrypt string key debug verbose cache_passwords).sort }
 
       include_examples :cli_expectations
-
 
       context 'cli' do
         subject { cli }
@@ -98,13 +96,12 @@ RSpec.describe Sym::App::CLI do
     include_context :run_command
 
     it 'should output the generated key' do
-      expect_command_to_have klass:          Sym::App::Commands::GenerateKey,
-                             output:         [/[a-zA-Z0-9\-_=]{44}/],
-                             option:         :generate,
-                             value:          true,
-                             lines:          1,
+      expect_command_to_have klass: Sym::App::Commands::GenerateKey,
+                             output: [/[a-zA-Z0-9\-_=]{44}/],
+                             option: :generate,
+                             value: true,
+                             lines: 1,
                              program_output: program_output_lines
-
     end
   end
 
@@ -120,13 +117,12 @@ RSpec.describe Sym::App::CLI do
     end
 
     it 'should output the version number' do
-      expect_command_to_have klass:          Sym::App::Commands::ShowVersion,
-                             output:         ["sym (version #{Sym::VERSION})"],
-                             option:         :version,
-                             value:          true,
-                             lines:          1,
+      expect_command_to_have klass: Sym::App::Commands::ShowVersion,
+                             output: ["sym (version #{Sym::VERSION})"],
+                             option: :version,
+                             value: true,
+                             lines: 1,
                              program_output: program_output_lines
-
     end
   end
 
@@ -136,12 +132,11 @@ RSpec.describe Sym::App::CLI do
     include_context :run_command
 
     it 'should output the examples' do
-      expect_command_to_have klass:          Sym::App::Commands::ShowExamples,
-                             output:         [/generate a new private key/],
-                             option:         :examples,
-                             value:          true,
+      expect_command_to_have klass: Sym::App::Commands::ShowExamples,
+                             output: [/generate a new private key/],
+                             option: :examples,
+                             value: true,
                              program_output: program_output_lines
-
     end
   end
   #
@@ -269,5 +264,5 @@ RSpec.describe Sym::App::CLI do
   #       end
   #    end
   #  end
-  #end
+  # end
 end

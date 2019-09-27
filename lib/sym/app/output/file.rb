@@ -1,9 +1,10 @@
+# frozen_string_literal: true
+
 require 'sym/app/output/base'
 module Sym
   module App
     module Output
       class File < ::Sym::App::Output::Base
-
         required_option :output
 
         def output_proc

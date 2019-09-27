@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require 'sym/version'
 require 'sym/app/password/providers'
 
@@ -6,7 +8,6 @@ module Sym
     module CLISlop
       def parse(arguments)
         Slop.parse(arguments) do |o|
-
           o.banner = "Sym (#{Sym::VERSION}) – encrypt/decrypt data with a private key\n".bold.white
           o.separator 'Usage:'.yellow
           o.separator '   Generate a new key, optionally password protected, and save it'.dark
@@ -49,14 +50,14 @@ module Sym
           o.bool      '-e', '--encrypt',            '           encrypt mode'
           o.bool      '-d', '--decrypt',            '           decrypt mode'
           o.string    '-t', '--edit',               '[file]  '.blue + '   edit encrypted file in an $EDITOR', default: nil
-          o.string    '-n', '--negate',             '[file]  '.blue + "   encrypts any regular #{'file'.green} into #{'file.enc'.green}" + "\n" +
-                                     "                                    conversely decrypts #{'file.enc'.green} into #{'file'.green}."
+          o.string    '-n', '--negate',             '[file]  '.blue + "   encrypts any regular #{'file'.green} into #{'file.enc'.green}" + "\n" \
+                                                    "                                    conversely decrypts #{'file.enc'.green} into #{'file'.green}."
           o.separator ' '
           o.separator 'Create a new private key:'.yellow
           o.bool      '-g', '--generate',           '           generate a new private key'
           o.bool      '-p', '--password',           '           encrypt the key with a password'
           if Sym::App.is_osx?
-            o.string '-x', '--keychain',            '[key-name] '.blue + 'write the key to OS-X Keychain'
+            o.string '-x', '--keychain', '[key-name] '.blue + 'write the key to OS-X Keychain'
           end
 
           o.separator ' '
@@ -68,7 +69,7 @@ module Sym
           o.separator 'Password Cache:'.yellow
           o.bool      '-c', '--cache-passwords',     '           enable password cache'
           o.integer   '-u', '--cache-timeout',       '[seconds]'.blue + '  expire passwords after'
-          o.string    '-r', '--cache-provider',      '[provider]'.blue + ' cache provider, one of ' + "#{Sym::App::Password::Providers.provider_list}"
+          o.string    '-r', '--cache-provider',      '[provider]'.blue + ' cache provider, one of ' + Sym::App::Password::Providers.provider_list.to_s
 
           o.separator ' '
           o.separator 'Data to Encrypt/Decrypt:'.yellow
@@ -89,8 +90,8 @@ module Sym
 
           o.separator ' '
           o.separator 'Utility:'.yellow
-          o.string    '-B', '--bash-support',       '[file]'.blue + '     append bash completion & utils to a file'+ "\n" +
-            '                                    such as ~/.bash_profile or ~/.bashrc'
+          o.string    '-B', '--bash-support', '[file]'.blue + '     append bash completion & utils to a file' + "\n" \
+                                                    '                                    such as ~/.bash_profile or ~/.bashrc'
 
           o.separator ' '
           o.separator 'Help & Examples:'.yellow

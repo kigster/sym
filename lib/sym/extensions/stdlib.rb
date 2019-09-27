@@ -1,3 +1,4 @@
+# frozen_string_literal: true
 
 module Kernel
   def require_dir(___dir)
@@ -11,14 +12,14 @@ module Kernel
 end
 
 class Object
-  unless self.methods.include?(:present?)
+  unless methods.include?(:present?)
     def present?
-      return false if self.nil?
-      if self.is_a?(String)
+      return false if nil?
+
+      if is_a?(String)
         return false if self == ''
       end
       true
     end
   end
 end
-

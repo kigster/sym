@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require 'sym/app/output/base'
 require 'sym/app/output/file'
 require 'sym/app/output/stdout'
@@ -12,4 +14,3 @@ module Sym
     end
   end
 end
-

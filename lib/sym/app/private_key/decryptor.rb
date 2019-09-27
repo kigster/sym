@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require 'sym/app/private_key/decryptor'
 require 'sym/app/password/cache'
 require 'sym/errors'
@@ -21,20 +23,19 @@ module Sym
 
           if should_decrypt?
             begin
-              retries                                   ||= 0
-              p                                         = determine_key_password
-              decrypted_key                             = decrypt(p)
+              retries ||= 0
+              p = determine_key_password
+              decrypted_key = decrypt(p)
 
               # if the password is valid, let's add it to the cache.
               password_cache[encrypted_key] = p
-
             rescue ::OpenSSL::Cipher::CipherError => e
               input_handler.output 'Invalid password. Please try again.'
 
               if (retries += 1) < 3
                 retry
               else
-                raise(Sym::Errors::InvalidPasswordProvidedForThePrivateKey.new('Invalid password.'))
+                raise Sym::Errors::InvalidPasswordProvidedForThePrivateKey, 'Invalid password.'
               end
             end
           else
@@ -63,6 +64,7 @@ module Sym
 
         def check_cache
           return nil if @cache_checked
+
           @cache_checked = true
           password_cache[encrypted_key]
         end

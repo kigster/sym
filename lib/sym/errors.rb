@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module Sym
   # All public exceptions of this library are here.
   module Errors
@@ -17,7 +19,7 @@ module Sym
 
     class FileNotFound < Sym::Errors::Error; end
 
-    class DataEncodingVersionMismatch< Sym::Errors::Error; end
+    class DataEncodingVersionMismatch < Sym::Errors::Error; end
 
     class KeyError < Sym::Errors::Error; end
     class InvalidEncodingPrivateKey < Sym::Errors::KeyError; end
@@ -37,5 +39,3 @@ module Sym
     end
   end
 end
-
-

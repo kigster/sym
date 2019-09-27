@@ -1,4 +1,5 @@
 #!/usr/bin/env ruby
+# frozen_string_literal: true
 
 lib_path = File.expand_path(File.dirname(__FILE__) + '/../lib')
 $LOAD_PATH << lib_path if File.exist?(lib_path) && !$LOAD_PATH.include?(lib_path)
@@ -28,11 +29,9 @@ if action.eql?('add') && data.nil?
 end
 
 begin
-puts data ? \
-  Sym::App::KeyChain.new(key_name).send(action.to_sym, data) :
-  Sym::App::KeyChain.new(key_name).send(action.to_sym)
+  puts data ? \
+    Sym::App::KeyChain.new(key_name).send(action.to_sym, data) :
+    Sym::App::KeyChain.new(key_name).send(action.to_sym)
 rescue StandardError => e
-  STDERR.puts "#{e.message.red}"
+  warn e.message.red.to_s
 end
-
-

@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require 'spec_helper'
 require 'singleton'
 
@@ -37,17 +39,17 @@ module Sym
         context 'password is too short' do
           it 'should raise an exception' do
             setup_handler [
-                            { message: 'New Password     :  ', color: :blue, password: 'short' },
-                          ]
+              { message: 'New Password     :  ', color: :blue, password: 'short' },
+            ]
             expect { handler.new_password }.to raise_error(Sym::Errors::PasswordTooShort)
           end
         end
         context 'passwords match and are long enough' do
           it 'should raise an exception' do
             setup_handler [
-                            { message: 'New Password     :  ', color: :blue, password: 'WhatsUpYo' },
-                            { message: 'Confirm Password :  ', color: :blue, password: 'WhatsUpYo' }
-                          ]
+              { message: 'New Password     :  ', color: :blue, password: 'WhatsUpYo' },
+              { message: 'Confirm Password :  ', color: :blue, password: 'WhatsUpYo' }
+            ]
             password = nil
             expect { password = handler.new_password }.not_to raise_error
             expect(password).to eql('WhatsUpYo')

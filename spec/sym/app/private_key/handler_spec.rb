@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require 'spec_helper'
 require 'singleton'
 module Sym
@@ -33,8 +35,6 @@ module Sym
           end
         end
       end
-
     end
   end
 end
-

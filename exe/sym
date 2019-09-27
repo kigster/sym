@@ -1,6 +1,7 @@
 #!/usr/bin/env ruby
+# frozen_string_literal: true
 
-lib_path = File.expand_path(File.dirname "#{(__FILE__)}/../lib")
+lib_path = File.expand_path(File.dirname("#{__FILE__}/../lib"))
 if File.exist?(lib_path) && !$LOAD_PATH.include?(lib_path)
   $LOAD_PATH << lib_path
 end
@@ -13,8 +14,7 @@ begin
   exit ::Sym::App::CLI.new(ARGV.dup).execute
 rescue Interrupt => e
   STDERR.flush
-  STDERR.puts "Interrupt, #{e.message}, exiting."
+  warn "Interrupt, #{e.message}, exiting."
   STDERR.flush
   exit 1
 end
-

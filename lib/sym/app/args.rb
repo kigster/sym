@@ -1,17 +1,18 @@
+# frozen_string_literal: true
+
 module Sym
   module App
     class Args
-
-      OPTIONS_REQUIRE_KEY    = %i(encrypt decrypt edit)
-      OPTIONS_KEY_CREATED    = %i(generate)
-      OPTIONS_SPECIFY_KEY    = %i(key interactive keychain)
-      OPTIONS_SPECIFY_OUTPUT = %i(output quiet)
+      OPTIONS_REQUIRE_KEY    = %i(encrypt decrypt edit).freeze
+      OPTIONS_KEY_CREATED    = %i(generate).freeze
+      OPTIONS_SPECIFY_KEY    = %i(key interactive keychain).freeze
+      OPTIONS_SPECIFY_OUTPUT = %i(output quiet).freeze
 
       attr_accessor :opts, :selected_options
 
       def initialize(opts)
         self.opts             = opts
-        self.selected_options = opts.keys.reject { |k| !opts[k] }
+        self.selected_options = opts.keys.select { |k| opts[k] }
       end
 
       def specify_key?
@@ -32,14 +33,14 @@ module Sym
       end
 
       def provided_options
-        opts.to_hash.keys.reject { |k| !opts[k] }
+        opts.to_hash.keys.select { |k| opts[k] }
       end
 
       private
+
       def do?(list)
         !(list & selected_options).empty?
       end
-
     end
   end
 end

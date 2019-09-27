@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require 'sym'
 require 'sym/app'
 
@@ -30,10 +32,8 @@ def expect_some_output(output_lines, args = [])
   expect(output_lines).not_to be_nil
   expect(output_lines).to be_a_kind_of(Array)
   expect(output_lines.size).to be > 0
-  if args
-    args.each_with_index do |argument, index|
-      verify_program_argument(argument, output_lines[index])
-    end
+  args&.each_with_index do |argument, index|
+    verify_program_argument(argument, output_lines[index])
   end
 end
 
@@ -111,16 +111,15 @@ RSpec.shared_context :run_command do
   before do
     console.clear!
 
-    self.before_cli_run if self.respond_to?(:before_cli_run)
+    before_cli_run if respond_to?(:before_cli_run)
     # overwrite output proc on CLI so that we can collect and test the output\
     cli.output_proc console.output_proc unless opts[:quiet]
     begin
       cli.execute
     rescue StandardError => e
-      STDERR.puts "ERROR at cli.execute():\n#{e.inspect.bold.red}"
+      warn "ERROR at cli.execute():\n#{e.inspect.bold.red}"
     end
   end
-
 end
 
 RSpec.shared_context :commands do

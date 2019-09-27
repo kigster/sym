@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require 'sym/errors'
 require 'colored2'
 module Sym
@@ -41,13 +43,15 @@ module Sym
         def new_password
           password = prompt('New Password     :  ', :blue)
 
-          raise Sym::Errors::PasswordTooShort.new(
-            'Minimum length is 7 characters.') if password.length < 7
+          if password.length < 7
+            raise Sym::Errors::PasswordTooShort, 'Minimum length is 7 characters.'
+          end
 
           password_confirm = prompt('Confirm Password :  ', :blue)
 
-          raise Sym::Errors::PasswordsDontMatch.new(
-            'The passwords you entered do not match.') if password != password_confirm
+          if password != password_confirm
+            raise Sym::Errors::PasswordsDontMatch, 'The passwords you entered do not match.'
+          end
 
           password
         end

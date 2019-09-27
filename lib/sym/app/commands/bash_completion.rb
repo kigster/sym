@@ -1,9 +1,10 @@
+# frozen_string_literal: true
+
 require 'sym/app/commands/base_command'
 module Sym
   module App
     module Commands
       class BashCompletion < BaseCommand
-
         required_options [:bash_support]
         try_after :generate_key, :open_editor, :encrypt, :decrypt
 
@@ -22,10 +23,10 @@ module Sym
             remove_old_version(out, config[:dest])
 
             if File.exist?(config[:dest]) && File.read(config[:source]) == File.read(config[:dest])
-              out << "#{ok} file #{config[:dest].bold.blue } exists, and is up to date.\n"
+              out << "#{ok} file #{config[:dest].bold.blue} exists, and is up to date.\n"
             else
               FileUtils.cp(config[:source], config[:dest])
-              out << "#{ok} installing #{config[:dest].bold.blue }...\n"
+              out << "#{ok} installing #{config[:dest].bold.blue}...\n"
             end
 
             out << if File.exist?(file)
@@ -43,7 +44,7 @@ module Sym
           out << "\nPlease reload your terminal session to activate bash completion\n"
           out << "and other installed BASH utilities.\n"
           out << "\nAlternatively, just type #{"source #{file}".bold.green} to reload BASH.\n"
-          out << "Also — go ahead and try running #{"sym -h".bold.blue} and #{"symit -h".bold.blue}.\n"
+          out << "Also — go ahead and try running #{'sym -h'.bold.blue} and #{'symit -h'.bold.blue}.\n"
         end
 
         private

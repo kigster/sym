@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require 'sym/app/commands/base_command'
 require 'sym/app/keychain'
 require 'sym/app/encrypted_key_struct'
@@ -6,7 +8,6 @@ module Sym
   module App
     module Commands
       class GenerateKey < BaseCommand
-
         required_options :generate
 
         try_after :show_help
@@ -25,7 +26,6 @@ module Sym
           add_to_keychain_if_needed(new_key)
 
           new_key
-
         rescue Sym::Errors::PasswordsDontMatch, Sym::Errors::PasswordTooShort => e
           stderr.puts e.message.bold
           retry if (retries += 1) < 3

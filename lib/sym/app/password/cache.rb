@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require 'digest'
 require 'singleton'
 require 'colored2'
@@ -10,7 +12,6 @@ require 'sym/app/password/providers'
 module Sym
   module App
     module Password
-
       # +Provider+ is the primary implementation of the underlying cache.
       # It should support the following API:
       #
@@ -27,7 +28,6 @@ module Sym
       #
       # it must be instantiatable via #new
       class Cache
-
         include Singleton
         include Sym::Extensions::WithRetry
         include Sym::Extensions::WithTimeout
@@ -39,7 +39,7 @@ module Sym
           self.verbose = opts[:verbose]
           self.timeout = opts[:timeout] || ::Sym::Configuration.config.password_cache_timeout
           self.provider = Providers.provider(opts[:provider], opts[:provider_opts] || {})
-          self.enabled = false unless self.provider
+          self.enabled = false unless provider
           self
         end
 
@@ -60,7 +60,8 @@ module Sym
         private
 
         def operation
-          return nil unless self.enabled
+          return nil unless enabled
+
           with_timeout(1) do
             with_retry do
               yield if block_given?
@@ -73,7 +74,7 @@ module Sym
         end
 
         def error(exception = nil, message = nil)
-          if self.verbose
+          if verbose
             print 'WARNING: '
             print message ? message.yellow : ''
             print exception ? exception.message.red : ''

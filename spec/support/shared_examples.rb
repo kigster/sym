@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require 'spec_helper'
 require 'base64'
 # Requires:
@@ -6,7 +8,7 @@ require 'base64'
 shared_examples 'a private key' do
   subject { key }
   context 'base62 encoded key' do
-    its(:length) { should be_between(42,44) }
+    its(:length) { should be_between(42, 44) }
   end
 
   context 'base62 decoded key' do

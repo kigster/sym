@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require 'sym/application'
 module Sym
   # This class provides a very simple API for loading/reading encrypted files
@@ -38,25 +40,25 @@ module Sym
 
     # Encrypts +pathname+ to a +filename+
     def encrypt_to(filename)
-      self.opts.merge!({output: filename})
+      opts.merge!(output: filename)
       encrypt
     end
 
     # Decrypts +pathname+ to a +filename+
     def decrypt_to(filename)
-      self.opts.merge!({output: filename})
+      opts.merge!(output: filename)
       decrypt
     end
 
     # Returns encrypted string
     def encrypt
-      self.opts.merge!({ encrypt: true })
+      opts.merge!(encrypt: true)
       action
     end
 
     # Returns decrypted string
     def decrypt
-      self.opts.merge!({ decrypt: true })
+      opts.merge!(decrypt: true)
       action
     end
 
@@ -64,10 +66,11 @@ module Sym
 
     def init(key_value, opts, pathname)
       raise ArgumentError, 'pathname does not exist' unless ::File.exist?(pathname)
+
       self.pathname  = pathname
       self.opts      = opts || {}
       self.key_value = key_value
-      self.opts.merge!({ file: pathname, key: key_value, quiet: true})
+      self.opts.merge!(file: pathname, key: key_value, quiet: true)
     end
 
     def action

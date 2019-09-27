@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require 'spec_helper'
 require 'sym/app/commands/generate_key'
 require 'sym'
@@ -5,8 +7,7 @@ require 'sym/constants'
 require 'sym/application'
 
 RSpec.describe 'CLI execution', type: :aruba do
-
-  let(:base62_regex) { %r{^[a-zA-Z0-9=.\-_]+=$} }
+  let(:base62_regex) { /^[a-zA-Z0-9=.\-_]+=$/ }
   let(:key_plain) { 'm4G6b7Lb-0bom5l8uxog_cL1x08mvH1ASsv1Svl3UGQ=' }
   let(:encrypted_string) { 'BAhTOh1TeW06OkRhdGE6OldyYXBwZXJTdHJ1Y3QLOhNlbmNyeXB0ZWRfZGF0YSIluUtFV4ibk5B65MTjQMXvphsSi7pKPVXt9B2atfMD7cg6B2l2IhWp0jYYSo0CHrm0gWh57mDPOhBjaXBoZXJfbmFtZSIQQUVTLTI1Ni1DQkM6CXNhbHQwOgx2ZXJzaW9uaQY6DWNvbXByZXNzVA==' }
   let(:tempfile) { "#{Dir.pwd}/temp/sym.test.output" }
@@ -57,7 +58,7 @@ RSpec.describe 'CLI execution', type: :aruba do
       context 'help' do
         let(:args) { '-h' }
         it 'should show help' do
-          expect(output).to match(/encrypt\/decrypt data with a private key/)
+          expect(output).to match(%r{encrypt/decrypt data with a private key})
         end
       end
 
@@ -71,7 +72,7 @@ RSpec.describe 'CLI execution', type: :aruba do
 
       context 'encrypt a string' do
         let(:string) { 'Hello, Dolly!' }
-        let(:args) { %Q{-e -k #{key_plain} -s "#{string}"} }
+        let(:args) { %{-e -k #{key_plain} -s "#{string}"} }
         it 'should run command' do
           expect(output).to match(base62_regex)
         end
@@ -108,7 +109,7 @@ RSpec.describe 'CLI execution', type: :aruba do
 
       context 'using a temporary file' do
         context 'encrypt with redirect' do
-          let(:args) { %Q[-e -k #{key_plain} -s "hello\n" -o #{tempfile} ] }
+          let(:args) { %[-e -k #{key_plain} -s "hello\n" -o #{tempfile} ] }
 
           it 'should run command' do
             save_to_a_tempfile_proc.call
@@ -129,4 +130,3 @@ RSpec.describe 'CLI execution', type: :aruba do
     end
   end
 end
-

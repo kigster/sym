@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require 'sym/app/output/base'
 require 'spec_helper'
 require 'singleton'
@@ -10,7 +12,7 @@ module Sym
 
       %i(specify_key?
          require_key?).each do |type|
-        context "##{type.to_s}" do
+        context "##{type}" do
           subject { args.send(type) }
           it { is_expected.to be_truthy }
         end
@@ -25,7 +27,7 @@ module Sym
         context '--generate' do
           let(:opts) { { generate: true } }
           %i(generate_key?).each do |type|
-            context "##{type.to_s}" do
+            context "##{type}" do
               subject { args.send(type) }
               it { is_expected.to be_truthy }
             end
@@ -42,10 +44,9 @@ module Sym
         end
       end
 
-      { nil     => Sym::App::Output::Stdout,
+      { nil => Sym::App::Output::Stdout,
         :output => Sym::App::Output::File,
-        :quiet  => Sym::App::Output::Noop
-      }.each_pair do |option, klass|
+        :quiet => Sym::App::Output::Noop }.each_pair do |option, klass|
         context klass.name do
           let(:opts) { { option => true } }
 
@@ -60,7 +61,7 @@ module Sym
             expect(Sym::App::Output.outputs.key?(option)).to be_truthy
           end
 
-          it "should be invoked by option [#{option.to_s}]" do
+          it "should be invoked by option [#{option}]" do
             expect(Sym::App::Output.outputs[option]).to eql(klass)
           end
 

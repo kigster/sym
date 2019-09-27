@@ -1,7 +1,8 @@
+# frozen_string_literal: true
+
 require 'sym'
 require 'sym/app'
 require 'sym/errors'
-
 
 module Sym
   module App
@@ -14,7 +15,7 @@ module Sym
         attr_accessor :user, :kind, :sub_section
 
         def get(value)
-          self.new(value).find
+          new(value).find
         end
 
         def configure
@@ -22,8 +23,9 @@ module Sym
         end
 
         def validate!
-          raise ArgumentError.new(
-            'User is not defined. Either set $USER in environment, or directly on the class.') unless self.user
+          unless user
+            raise ArgumentError, 'User is not defined. Either set $USER in environment, or directly on the class.'
+          end
         end
       end
 
@@ -59,10 +61,11 @@ module Sym
         puts "> #{command.yellow.green}" if opts[:verbose]
         output = `#{command}`
         result = $?
-        raise Sym::Errors::KeyChainCommandError.new("Command error: #{result}, command: #{command}") unless result.success?
+        raise Sym::Errors::KeyChainCommandError, "Command error: #{result}, command: #{command}" unless result.success?
+
         output.chomp
       rescue Errno::ENOENT => e
-        raise Sym::Errors::KeyChainCommandError.new("Command error: #{e.message}, command: #{command}")
+        raise Sym::Errors::KeyChainCommandError, "Command error: #{e.message}, command: #{command}"
       end
 
       def stderr_off
@@ -89,13 +92,12 @@ module Sym
           "security #{action}-#{self.class.sub_section} ",
           "-a '#{self.class.user}' ",
           "-D '#{self.class.kind}' ",
-          "-s '#{self.key_name}' "
+          "-s '#{key_name}' "
         ]
       end
     end
   end
 end
-
 
 #
 # Usage: add-generic-password [-a account] [-s service] [-w password] [options...] [-A|--trace appPath] [keychain]

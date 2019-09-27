@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require 'sym/crypt/configuration'
 
 module Sym
@@ -22,7 +24,6 @@ module Sym
   #       config.compression_level = Zlib::BEST_COMPRESSION
   #     end
   class Configuration < ::Sym::Crypt::Configuration
-
     attr_accessor :password_cache_default_provider,
                   :password_cache_timeout,
                   :password_cache_arguments,
@@ -46,10 +47,9 @@ module Sym
       self.password_cache_arguments        = {
         memcached: {
           args: %w(127.0.0.1:11211),
-          opts: { namespace:  'sym',
-                  compress:   true,
-                  expires_in: password_cache_timeout
-          }
+          opts: { namespace: 'sym',
+                  compress: true,
+                  expires_in: password_cache_timeout }
 
         }
       }

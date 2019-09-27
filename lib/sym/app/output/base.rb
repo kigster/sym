@@ -1,9 +1,10 @@
+# frozen_string_literal: true
+
 require 'sym/app/short_name'
 module Sym
   module App
     module Output
       class Base
-
         attr_accessor :opts, :stdin, :stdout, :stderr, :kernel
 
         def initialize(opts, stdin = STDIN, stdout = STDOUT, stderr = STDERR, kernel = nil)
@@ -25,9 +26,9 @@ module Sym
           end
 
           def map_outputs!
-            klasses      = self.outputs
-            self.outputs = Hash.new
-            klasses.each { |k| self.outputs[k.required_option] = k }
+            klasses      = outputs
+            self.outputs = ({})
+            klasses.each { |k| outputs[k.required_option] = k }
             outputs
           end
 

@@ -1,8 +1,9 @@
+# frozen_string_literal: true
+
 require 'sym'
 require 'active_support/inflector'
 require 'colored2'
 module Sym
-
   # The {Sym::App} Module is responsible for handing user input and executing commands.
   # Central class in this module is the {Sym::App::CLI} class. However, it is
   # recommended that ruby integration with the {Sym::App} module functionality
@@ -27,7 +28,7 @@ module Sym
     self.stderr = STDERR
 
     def self.out
-      self.stderr
+      stderr
     end
 
     def self.log(level, *args, **opts)
@@ -35,16 +36,16 @@ module Sym
     end
 
     def self.error(config: {},
-      exception: nil,
-      type: nil,
-      details: nil,
-      reason: nil,
-      comments: nil,
-      command: nil)
+                   exception: nil,
+                   type: nil,
+                   details: nil,
+                   reason: nil,
+                   comments: nil,
+                   command: nil)
 
       lines = []
 
-      error_type    = "#{(type || exception.class.name)}"
+      error_type    = ((type || exception.class.name)).to_s
       error_details = (details || exception.message)
 
       operation = command ? "to #{command.class.short_name.to_s.humanize.downcase}" : ''
@@ -56,12 +57,12 @@ module Sym
         lines << "\n"
       else
         lines << " ✖ Sym Error #{operation}:".bold.red + (reason ? " #{reason} ".red.italic : " #{error_details}")[0..70] + ' '.normal + "\n"
-        lines << "#{comments}" if comments
+        lines << comments.to_s if comments
       end
 
       error_report = lines.compact.join("\n") || 'Undefined error'
 
-      self.out.puts(error_report) if error_report.present?
+      out.puts(error_report) if error_report.present?
       self.exit_code = 1
     end
 

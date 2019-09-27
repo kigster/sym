@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require 'colored2'
 require 'sym'
 require 'sym/app'
@@ -17,7 +19,6 @@ module Sym
   #
   #
   class Application
-
     attr_accessor :opts,
                   :opts_slop,
                   :args,
@@ -32,7 +33,7 @@ module Sym
                   :password_cache,
                   :stdin, :stdout, :stderr, :kernel
 
-    def initialize(opts, stdin = STDIN, stdout = STDOUT, stderr = STDERR, kernel = nil, argv = ARGV)
+    def initialize(opts, stdin = STDIN, stdout = STDOUT, stderr = STDERR, kernel = nil, _argv = ARGV)
       raise ArgumentError, "opts must not be nil when creating Application!" if opts.nil?
 
       self.stdin  = stdin
@@ -46,7 +47,7 @@ module Sym
       process_negated_option(opts[:negate]) if opts[:negate]
       process_edit_option
 
-      self.args = ::Sym::App::Args.new(self.provided_options)
+      self.args = ::Sym::App::Args.new(provided_options)
 
       initialize_output_stream
       initialize_action
@@ -59,23 +60,19 @@ module Sym
     # various exception conditions into meaningful error messages.
     def execute
       process_output(execute!)
-
     rescue ::OpenSSL::Cipher::CipherError => e
-      { reason:    'Invalid key provided',
+      { reason: 'Invalid key provided',
         exception: e }
-
     rescue Sym::Errors::Error => e
-      { reason:    e.class.name.gsub(/.*::/, '').underscore.humanize.downcase,
+      { reason: e.class.name.gsub(/.*::/, '').underscore.humanize.downcase,
         exception: e }
-
     rescue TypeError => e
       if e.message =~ /marshal/m
-        { reason:    'Corrupt source data or invalid/corrupt key provided',
+        { reason: 'Corrupt source data or invalid/corrupt key provided',
           exception: e }
       else
         { exception: e }
       end
-
     rescue StandardError => e
       { exception: e }
     end
@@ -88,19 +85,19 @@ module Sym
 
     def provided_flags
       provided_flags = provided_options
-      provided_flags.delete_if { |k, v| ![false, true].include?(v) }
+      provided_flags.delete_if { |_k, v| ![false, true].include?(v) }
       provided_flags.keys
     end
 
     def provided_value_options
       provided = provided_options(safe: true)
-      provided.delete_if { |k, v| [false, true].include?(v) }
+      provided.delete_if { |_k, v| [false, true].include?(v) }
       provided
     end
 
     def provided_options(**opts)
       provided_opts = self.opts.clone
-      provided_opts.delete_if { |k, v| !v }
+      provided_opts.delete_if { |_k, v| !v }
       if opts[:safe]
         provided_options.map do |k, v|
           k == :key && [44, 45].include?(v.size) ?
@@ -117,10 +114,10 @@ module Sym
     end
 
     def process_output(result)
-      unless result.is_a?(Hash)
-        self.output.call(result)
+      if result.is_a?(Hash)
         result
       else
+        output.call(result)
         result
       end
     end
@@ -131,13 +128,13 @@ module Sym
       initialize_key_source
       unless command
         raise Sym::Errors::InsufficientOptionsError,
-              " Can not determine what to do from the options: \n " +
-                " #{self.provided_options.inspect.green.bold}\n" +
-                "and flags #{self.provided_flags.to_s.green.bold}"
+              " Can not determine what to do from the options: \n " \
+              " #{provided_options.inspect.green.bold}\n" \
+              "and flags #{provided_flags.to_s.green.bold}"
       end
       log :info, "command located is #{command.class.name.blue.bold}"
       self.result = command.execute.tap do |result|
-        log :info, "result is  #{result.nil? ? 'nil' : result[0..10].to_s.blue.bold }..." if opts[:trace]
+        log :info, "result is  #{result.nil? ? 'nil' : result[0..10].to_s.blue.bold}..." if opts[:trace]
       end
     end
 
@@ -162,9 +159,10 @@ module Sym
 
     def initialize_output_stream
       output_klass = args.output_class
-      unless output_klass && output_klass.is_a?(Class)
+      unless output_klass&.is_a?(Class)
         raise "Can not determine output type from arguments #{provided_options}"
       end
+
       self.output = output_klass.new(opts, stdin, stdout, stderr, kernel).output_proc
     end
 
@@ -192,7 +190,7 @@ module Sym
     end
 
     def process_edit_option
-      if opts[:edit] && opts[:edit].is_a?(String) && opts[:file].nil?
+      if opts[:edit]&.is_a?(String) && opts[:file].nil?
         opts[:file] = opts[:edit]
         opts[:edit] = true
       end
@@ -213,7 +211,7 @@ module Sym
     end
 
     def initialize_action
-      self.action = if opts[:encrypt] then
+      self.action = if opts[:encrypt]
                       :encr
                     elsif opts[:decrypt]
                       :decr
@@ -223,7 +221,7 @@ module Sym
     # If we are encrypting or decrypting, and no data has been provided, check if we
     # should read from STDIN
     def initialize_data_source
-      if self.action && opts[:string].nil? && opts[:file].nil? && !(self.stdin.tty?)
+      if action && opts[:string].nil? && opts[:file].nil? && !stdin.tty?
         opts[:file] = '-'
       end
     end
@@ -233,22 +231,22 @@ module Sym
     # In any case, attempt to initialize the key one way or another.
     def initialize_key_source
       detect_key_source
-      if args.require_key? && !self.key
+      if args.require_key? && !key
         log :error, 'Unable to determine the key, which appears to be required with current args'
-        raise Sym::Errors::NoPrivateKeyFound, 'Private key is required when ' + (self.action ? self.action.to_s + 'ypting' : provided_flags.join(', '))
+        raise Sym::Errors::NoPrivateKeyFound, 'Private key is required when ' + (action ? action.to_s + 'ypting' : provided_flags.join(', '))
       end
       log :debug, "initialize_key_source: detected key ends with [...#{(key ? key[-5..-1] : 'nil').bold.magenta}]"
-      log :debug, "opts: #{self.provided_value_options.to_s.green.bold}"
-      log :debug, "flags: #{self.provided_flags.to_s.green.bold}"
+      log :debug, "opts: #{provided_value_options.to_s.green.bold}"
+      log :debug, "flags: #{provided_flags.to_s.green.bold}"
     end
 
     def detect_key_source
       initialize_key_handler
-      self.key = self.key_handler.key
-      if self.key
+      self.key = key_handler.key
+      if key
         self.key_source = key_handler.key_source
         if key_source =~ /^default_file/
-          opts[:key] = self.key
+          opts[:key] = key
         end
         log :info, "key was detected from source #{key_source.to_s.bold.green}"
       end

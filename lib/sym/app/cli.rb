@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require 'slop'
 require 'sym'
 require 'colored2'
@@ -83,22 +85,21 @@ module Sym
 
           if opts[:sym_args]
             self.argv = normalize_env_args
-            self.opts = parse(self.argv).to_hash
+            self.opts = parse(argv).to_hash
           end
 
           # Disable coloring if requested, or if piping STDOUT
           if opts[:no_color] || !self.stdout.tty?
             Colored2.disable! # reparse options without the colors to create new help msg
-            self.opts = parse(self.argv).to_hash
+            self.opts = parse(argv).to_hash
           end
-
         rescue StandardError => e
-          log :error, "#{e.message}" if opts
+          log :error, e.message.to_s if opts
           error exception: e
           exit_program!
         end
 
-        self.opts = opts_present(self.opts)
+        self.opts = opts_present(opts)
         self.application = ::Sym::Application.new(opts, stdin, stdout, stderr, kernel, argv)
       end
 
@@ -108,9 +109,10 @@ module Sym
 
       def normalize_env_args
         self.env_args = (fetch_env_args || '').split(' ').compact
-        return argv if (env_args.nil? || env_args.empty?)
+        return argv if env_args.nil? || env_args.empty?
+
         puts env_args.inspect.bold.yellow
-        return (argv + env_args).flatten.uniq
+        (argv + env_args).flatten.uniq
       end
 
       def fetch_env_args
@@ -125,16 +127,15 @@ module Sym
         if application
           application.output = proc if proc
           application.output
-        else
-          nil
         end
       end
 
       def execute
         return Sym::App.exit_code if Sym::App.exit_code != 0
+
         result = application.execute
         if result.is_a?(Hash)
-          self.output_proc ::Sym::App::Args.new({}).output_class
+          output_proc ::Sym::App::Args.new({}).output_class
           error(result)
         end
         Sym::App.exit_code
@@ -148,9 +149,8 @@ module Sym
 
       private
 
-
       def log(*args)
-        Sym::App.log(*args, **(opts.to_hash))
+        Sym::App.log(*args, **opts.to_hash)
       end
 
       def error(hash)
@@ -158,7 +158,6 @@ module Sym
         hash.merge!(command: @command) if @command
         Sym::App.error(**hash)
       end
-
     end
   end
 end
