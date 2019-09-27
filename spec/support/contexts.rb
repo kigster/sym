@@ -37,6 +37,24 @@ def expect_some_output(output_lines, args = [])
   end
 end
 
+def expect_command_to_have(klass:,
+                           output: [],
+                           option: nil,
+                           value: nil,
+                           lines: nil,
+                           program_output: [])
+  expect(opts[option]).to eql(value) if value && option
+  puts output
+  puts program_output
+  if klass
+    klass.is_a?(Symbol) ?
+      expect(application.command.send(klass)).to(be_truthy) :
+      expect(application.command.class).to(eql(klass))
+  end
+
+  expect_some_output program_output, (output.is_a?(Array) ? output : [output])
+  expect(program_output.size).to eql(lines) if lines
+end
 #
 # unless Sym::App::CLI.instance_methods.include?(:old_execute)
 #   class Sym::App::CLI
@@ -77,9 +95,8 @@ end
 RSpec.shared_context :cli do
   include_context :encryption
 
-  let(:cli) { Sym::App::CLI.new(argv || %w(-h)) }
-  let(:cli_class) { cli.class }
-  let(:key) { TEST_KEY }
+  let(:cli_class) { Sym::App::CLI }
+  let(:cli) { cli_class.new(argv) }
   let(:opts) { cli.opts }
   let(:application) { cli.application }
 
@@ -104,23 +121,6 @@ RSpec.shared_context :run_command do
     end
   end
 
-  def expect_command_to_have(klass:,
-                             output: [],
-                             option: nil,
-                             value: nil,
-                             lines: nil,
-                             program_output: [])
-    expect(opts[option]).to eql(value) if value && option
-
-    if klass
-      klass.is_a?(Symbol) ?
-        expect(application.command.send(klass)).to(be_truthy) :
-        expect(application.command.class).to(eql(klass))
-    end
-
-    expect_some_output program_output, (output.is_a?(Array) ? output : [output])
-    expect(program_output.size).to eql(lines) if lines
-  end
 end
 
 RSpec.shared_context :commands do

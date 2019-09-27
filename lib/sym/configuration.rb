@@ -31,6 +31,12 @@ module Sym
 
     def initialize
       super
+      reset_to_defaults!
+    end
+
+    def reset_to_defaults!
+      super
+
       self.encrypted_file_extension = 'enc'
       self.default_key_file         = ::Sym::Constants::SYM_KEY_FILE
       self.password_cache_timeout   = ::Sym::Constants::DEFAULT_CACHE_TTL

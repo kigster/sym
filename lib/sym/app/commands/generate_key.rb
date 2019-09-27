@@ -18,8 +18,8 @@ module Sym
 
           if opts[:password]
             encrypted_key_struct = encrypt_with_password(new_key)
-            add_password_to_the_cache(encrypted_key_struct)
             new_key = encrypted_key_struct.key_encrypted
+            add_password_to_the_cache(new_key)
           end
 
           add_to_keychain_if_needed(new_key)

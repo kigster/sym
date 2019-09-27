@@ -13,9 +13,15 @@ RSpec.describe ::Sym::Configuration do
 
   context 'default values from this class' do
     its(:encrypted_file_extension) { should eq 'enc' }
+  end
 
-    context 'default values inherited' do
-      its(:password_cipher) { should eq 'AES-128-CBC' }
-    end
+  context 'default values inherited' do
+    its(:password_cipher) { should eq 'AES-128-CBC' }
+  end
+
+  context 'setting cipher' do
+    before { config.password_cipher = 'AES-256-CBC' }
+    its(:password_cipher) { should eq 'AES-256-CBC' }
+    after { config.reset_to_defaults! }
   end
 end

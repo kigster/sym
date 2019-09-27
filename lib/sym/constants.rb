@@ -1,8 +1,11 @@
 require 'logger'
 module Sym
   module Constants
-    module Bash
+    ENV_ARGS_VARIABLE_NAME = 'SYM_ARGS'.freeze
+    SYM_KEY_FILE           = (ENV['SYM_KEY_FILE'] || "#{Dir.home}/.sym.key").freeze
+    DEFAULT_CACHE_TTL      = 300
 
+    module Bash
       BASH_FILES = Dir.glob("#{File.expand_path('../../../bin', __FILE__)}/sym.*.bash").freeze
 
       Config = {}
@@ -35,9 +38,5 @@ module Sym
       NIL = Logger.new(nil).freeze # empty logger
       LOG = Logger.new(STDERR).freeze
     end
-
-    ENV_ARGS_VARIABLE_NAME = 'SYM_ARGS'.freeze
-    SYM_KEY_FILE           = (ENV['SYM_KEY_FILE'] || "#{Dir.home}/.sym.key").freeze
-    DEFAULT_CACHE_TTL      = 300
   end
 end

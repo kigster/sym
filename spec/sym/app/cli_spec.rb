@@ -2,47 +2,62 @@ require 'spec_helper'
 require 'sym/app/output/base'
 
 RSpec.describe Sym::App::CLI do
-  include_context :cli
+
+  before do
+    allow(ENV).to receive(:[]).and_return(nil)
+  end
 
   describe '-A: using SYM_ARGS' do
-    let(:argv) { %w(-e -s hello -A) }
-    let(:sym_args) { "-ck #{TEST_KEY} -v -D" }
-    let(:expected_options) { %i(encrypt string key sym_args debug verbose cache_passwords ).sort }
-    let(:input_handler) { Sym::App::Input::Handler.new(cli.stdin,
-                                                       cli.stdout,
-                                                       cli.stderr,
-                                                       cli.kernel) }
+    shared_examples :cli_expectations do
 
-    before do
-      allow_any_instance_of(cli_class).to receive(:sym_args).and_return(sym_args)
-      allow_any_instance_of(cli_class).to receive(:exit_program!)
-      application.input_handler = input_handler
-      allow(application.input_handler).to receive(:prompt).and_return('password')
+      include_examples :cli
+
+      before do
+        cli.env_args = []
+        allow_any_instance_of(described_class).to receive(:fetch_env_args).and_return(sym_args)
+        allow(cli).to receive(:exit_program!).and_return(nil)
+      end
     end
 
+
     context '#sym_args' do
-      before do
-        expect(ENV).to receive(:[]).with('SYM_ARGS')
+      let(:argv) { %w(-e -s hello -A) }
+      let(:sym_args) { "-ck #{TEST_KEY} -v -D" }
+      let(:env_args) { sym_args.split(/\s+/) }
+      let(:expected_options) { %i(encrypt string key debug verbose cache_passwords ).sort }
+
+      include_examples :cli_expectations
+
+
+      context 'cli' do
+        subject { cli }
+        its(:fetch_env_args) { should eq sym_args }
+        its(:argv) { should eq (argv + env_args) }
       end
 
-      subject { cli.application }
+      context 'application' do
+        subject { cli.application }
 
-      it { should_not be_nil }
-
-      its('provided_options.keys.sort') { should eq expected_options }
-      its(:command) { should be_a_kind_of(Sym::App::Commands::Encrypt) }
+        it { should_not be_nil }
+        its('provided_options.keys.sort') { should eq expected_options }
+        its(:command) { should be_a_kind_of(Sym::App::Commands::Encrypt) }
+      end
     end
 
     context '#opts' do
       let(:argv) { %w(-e -s hello -A) }
-      let(:sym_args) { "-c -k #{key} -v --debug" }
+      let(:sym_args) { "-c -k #{key} -v -D" }
+      let(:env_args) { sym_args.split(/\s+/) }
+
+      include_examples :cli_expectations
 
       subject { cli }
 
       context 'with -A' do
-        it 'should properly setup ENV' do
-          expect(cli.sym_args).to eq(sym_args)
-        end
+        its(:fetch_env_args) { should eq sym_args }
+        its(:env_args) { should include %w(-c -k -D) }
+        its('opts.to_hash.size') { should eq 26 }
+        its('opts.to_hash.keys') { should include %i(encrypt string cache_passwords verbose debug) }
 
         it 'should contain flags specified in ENV variable' do
           expect(opts[:encrypt]).to be true
@@ -55,6 +70,9 @@ RSpec.describe Sym::App::CLI do
 
       context 'without -A' do
         let(:argv) { %w(-e -s hello) }
+        its(:env_args) { should be_nil }
+        let(:opts) { cli.opts.to_hash }
+
         it 'should NOT contain flags specified in ENV variable' do
           expect(opts[:encrypt]).to be true
           expect(opts[:debug]).to be false

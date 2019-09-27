@@ -58,35 +58,38 @@ module Sym
       include CLISlop
 
       attr_accessor :opts, :application, :outputs, :stdin, :stdout, :stderr, :kernel, :argv
+      attr_accessor :env_args
 
       extend Forwardable
 
       def_delegators :@application, :command
 
-      def initialize(argv, stdin = STDIN, stdout = STDOUT, stderr = STDERR, kernel = nil)
+      def initialize(cli_argv = ARGV.dup, stdin = STDIN, stdout = STDOUT, stderr = STDERR, kernel = nil)
         self.stdin  = stdin
         self.stdout = stdout
         self.stderr = stderr
         self.kernel = kernel
-        self.argv   = argv
+        self.argv   = cli_argv
 
         Sym::App.stdin  = stdin
         Sym::App.stdout = stdout
         Sym::App.stderr = stderr
 
+        self.env_args = nil
+
         begin
           # Re-map any legacy options to the new options
-          self.opts = parse(argv)
+          self.opts = parse(argv).to_hash
 
           if opts[:sym_args]
-            self.argv << append_sym_args
-            self.opts = parse(argv)
+            self.argv = normalize_env_args
+            self.opts = parse(self.argv).to_hash
           end
 
           # Disable coloring if requested, or if piping STDOUT
           if opts[:no_color] || !self.stdout.tty?
             Colored2.disable! # reparse options without the colors to create new help msg
-            self.opts = parse(argv)
+            self.opts = parse(self.argv).to_hash
           end
 
         rescue StandardError => e
@@ -95,20 +98,23 @@ module Sym
           exit_program!
         end
 
-        self.application = ::Sym::Application.new(opts, stdin, stdout, stderr, kernel)
+        self.opts = opts_present(self.opts)
+        self.application = ::Sym::Application.new(opts, stdin, stdout, stderr, kernel, argv)
       end
 
       def exit_program!
         exit 123 if stdin == STDIN
       end
 
-      def append_sym_args
-        env_args = sym_args
-        env_args.split(' ').flatten.compact if env_args
+      def normalize_env_args
+        self.env_args = (fetch_env_args || '').split(' ').compact
+        return argv if (env_args.nil? || env_args.empty?)
+        puts env_args.inspect.bold.yellow
+        return (argv + env_args).flatten.uniq
       end
 
-      def sym_args
-        ENV[Sym::Constants::ENV_ARGS_VARIABLE_NAME] { nil }
+      def fetch_env_args
+        ENV[Sym::Constants::ENV_ARGS_VARIABLE_NAME]
       end
 
       def execute!
@@ -134,13 +140,14 @@ module Sym
         Sym::App.exit_code
       end
 
-      private
-
-      def opts_present
-        o = opts.dup
+      def opts_present(hash = opts)
+        o = hash.dup
         o.keys.map { |k| o[k] ? nil : k }.compact.each { |k| o.delete(k) }
         o
       end
+
+      private
+
 
       def log(*args)
         Sym::App.log(*args, **(opts.to_hash))

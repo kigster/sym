@@ -21,6 +21,7 @@ module Sym
     attr_accessor :opts,
                   :opts_slop,
                   :args,
+                  :argv,
                   :action,
                   :key,
                   :key_source,
@@ -31,7 +32,7 @@ module Sym
                   :password_cache,
                   :stdin, :stdout, :stderr, :kernel
 
-    def initialize(opts, stdin = STDIN, stdout = STDOUT, stderr = STDERR, kernel = nil)
+    def initialize(opts, stdin = STDIN, stdout = STDOUT, stderr = STDERR, kernel = nil, argv = ARGV)
       raise ArgumentError, "opts must not be nil when creating Application!" if opts.nil?
 
       self.stdin  = stdin

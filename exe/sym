@@ -1,12 +1,14 @@
 #!/usr/bin/env ruby
 
-lib_path = File.expand_path(File.dirname(__FILE__) + '/../lib')
-$LOAD_PATH << lib_path if File.exist?(lib_path) && !$LOAD_PATH.include?(lib_path)
+lib_path = File.expand_path(File.dirname "#{(__FILE__)}/../lib")
+if File.exist?(lib_path) && !$LOAD_PATH.include?(lib_path)
+  $LOAD_PATH << lib_path
+end
 
 require 'sym'
+require 'sym/crypt'
 require 'sym/app'
 
-#ARGV.any?{ |a| a =~ /^-/ } ?
 begin
   exit ::Sym::App::CLI.new(ARGV.dup).execute
 rescue Interrupt => e
@@ -15,5 +17,4 @@ rescue Interrupt => e
   STDERR.flush
   exit 1
 end
-
 
