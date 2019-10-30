@@ -36,12 +36,12 @@ module Sym
     end
 
     def self.error(config: {},
-      exception: nil,
-      type: nil,
-      details: nil,
-      reason: nil,
-      comments: nil,
-      command: nil)
+                   exception: nil,
+                   type: nil,
+                   details: nil,
+                   reason: nil,
+                   comments: nil,
+                   command: nil)
 
       lines = []
 
@@ -66,12 +66,20 @@ module Sym
       self.exit_code = 1
     end
 
-    def self.osx?
-      Gem::Platform.local.os.eql?('darwin')
-    end
+    class << self
+      def is_linux?
+        this_os == 'linux' 
+      end
 
-    def self.this_os
-      Gem::Platform.local.os
+      def is_osx?
+        this_os == 'darwin' 
+      end
+
+      alias osx? is_osx?
+
+      def this_os
+        @this_is ||= defined?(Gem::Platform) ? Gem::Platform.local.os : `uname -s`.chomp.downcase
+      end
     end
   end
 end

@@ -18,6 +18,7 @@ end
 
 require_relative 'support/contexts'
 require_relative 'support/shared_examples'
+require 'timeout'
 
 RSpec.configure do |spec|
   spec.include Aruba::Api
@@ -26,11 +27,20 @@ RSpec.configure do |spec|
     Sym::App::Password::Cache.instance.enabled = false
     allow(Sym).to receive(:default_key?).and_return(false)
   end
+
+
+  RSpec.configure do |c|
+    c.around(:each) do |example|
+      Timeout::timeout(2) {
+        example.run
+      }
+    end
+  end
 end
 
 Kernel.class_eval do
   def clear_memcached!
-    `echo flush_all | nc -G 2 127.0.0.1 11211 2>/dev/null`
+    `echo flush_all | nc -c -G 2 127.0.0.1 11211 2>/dev/null`
     $?.exitstatus == 0
   end
 end
