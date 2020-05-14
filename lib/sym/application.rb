@@ -177,7 +177,7 @@ module Sym
       args[:verbose]  = opts[:verbose]
       args[:provider] = opts[:cache_provider] if opts[:cache_provider]
 
-      self.password_cache = Sym::App::Password::Cache.instance.configure(args)
+      self.password_cache = Sym::App::Password::Cache.instance.configure(**args)
     end
 
     def process_edit_option
