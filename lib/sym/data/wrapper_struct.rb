@@ -9,6 +9,7 @@ module Sym
       :version,               # [Integer] Version of the cipher used
       :compress               # [Boolean] indicates if compression should be applied
       )
+      define_singleton_method(:new, Class.method(:new))
 
       VERSION = 1
 
