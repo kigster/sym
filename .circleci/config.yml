@@ -8,11 +8,11 @@ jobs:
     docker:
       # specify the version you desire here
        - image: circleci/ruby:2.6.2-node-browsers-legacy
-         environment: 
+         environment:
             TEST_DRB: false
 
        - image: memcached:latest
-      
+
     working_directory: ~/repo
 
     steps:
@@ -30,8 +30,8 @@ jobs:
           paths:
             - ./vendor/bundle
           key: v1-dependencies-{{ checksum "Gemfile" }}
-        
-      - run: 
+
+      - run:
           name: install dockerize
           command: wget https://github.com/jwilder/dockerize/releases/download/$DOCKERIZE_VERSION/dockerize-linux-amd64-$DOCKERIZE_VERSION.tar.gz && sudo tar -C /usr/local/bin -xzvf dockerize-linux-amd64-$DOCKERIZE_VERSION.tar.gz && rm dockerize-linux-amd64-$DOCKERIZE_VERSION.tar.gz
           environment:
@@ -44,6 +44,7 @@ jobs:
       - run:
           name: RSpecs
           command: |
+            export PATH=".:$PATH"
             bundle exec rspec --version
             bundle exec exe/sym --version
             # flush memcached
