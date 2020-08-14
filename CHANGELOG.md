@@ -27,7 +27,6 @@
 
 **Merged pull requests:**
 
-- Fix error when ENV\[EDITOR\] is nil [\#18](https://github.com/kigster/sym/pull/18) ([JustinNazari](https://github.com/JustinNazari))
 - README: Use SVG badge \[ci skip\] [\#16](https://github.com/kigster/sym/pull/16) ([olleolleolle](https://github.com/olleolleolle))
 
 ## [v2.8.4](https://github.com/kigster/sym/tree/v2.8.4) (2018-04-13)
@@ -185,6 +184,7 @@
 
 **Merged pull requests:**
 
+- Fix error when ENV\[EDITOR\] is nil [\#18](https://github.com/kigster/sym/pull/18) ([JustinNazari](https://github.com/JustinNazari))
 - added require to fix loading issue on ubuntu [\#4](https://github.com/kigster/sym/pull/4) ([bosswissam](https://github.com/bosswissam))
 
 ## [v1.6.4](https://github.com/kigster/sym/tree/v1.6.4) (2016-08-23)

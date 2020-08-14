@@ -15,7 +15,7 @@ coverage:
   status:
     project:
       default: off
-      kitchen:
+      sym:
         target: 70%
         threshold: 10%
         informational: true
@@ -24,6 +24,6 @@ coverage:
         paths:
           - lib/
 flags:
-  kitchen:
+  sym:
     paths:
       - lib/

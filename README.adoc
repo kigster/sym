@@ -9,11 +9,11 @@ image:https://travis-ci.org/kigster/sym.svg?branch=master[Build Status,link=http
 image:https://circleci.com/gh/kigster/sym.svg?style=shield[CircleCI,link=https://circleci.com/gh/kigster/sym?style=shield]
 image:https://api.codeclimate.com/v1/badges/4f1d1614ccaa61c974dd/maintainability[Maintainability,link=https://codeclimate.com/github/kigster/sym/maintainability]
 
-image:https://codecov.io/gh/kigster/sym/branch/kig/codecov/graph/badge.svg?style=shield[Coverage,link="https://codecov.io/gh/kigster/sym"]
+image:https://codecov.io/gh/kigster/sym/branch/master/graph/badge.svg?style=shield[Coverage,link="https://codecov.io/gh/kigster/sym"]
 image:https://img.shields.io/gitter/room/gitterHQ/gitter.svg[Gitter,link=https://gitter.im/kigster/sym]
 image:https://ruby-gem-downloads-badge.herokuapp.com/sym?extension=svg[Sym Downloads,link=https://rubygems.org/gems/sym]
 
-image:https://codecov.io/gh/kigster/sym/branch/kig/codecov/graphs/sunburst.svg[Coverage Map]
+image:https://codecov.io/gh/kigster/sym/branch/master/graphs/sunburst.svg[Coverage Map,link=https://codecov.io/gh/kigster/sym]
 ====
 
 Please checkout the following post — _http://kig.re/2017/03/10/dead-simple-encryption-with-sym.html[Dead Simple Encryption with Sym]_ — that announced the initial release of this library, and provides further in-depth discussion. Your donation of absolutely any amount is very much appreciated but never required.
