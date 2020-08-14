@@ -1,6 +1,9 @@
 inherit_gem:
   relaxed-rubocop: .rubocop.yml
 
+AllCops:
+  TargetRubyVersion: 2.3
+
 Style/Alias:
   Enabled: false
   StyleGuide: https://relaxed.ruby.style/#stylealias
@@ -163,7 +166,7 @@ Metrics/ModuleLength:
 Metrics/CyclomaticComplexity:
   Enabled: false
 
-Metrics/LineLength:
+Layout/LineLength:
   Enabled: false
 
 Metrics/MethodLength:
@@ -181,7 +184,7 @@ Style/GuardClause:
 Metrics/BlockLength:
   Enabled: false
 
-Naming/UncommunicativeMethodParamName:
+Naming/MethodParameterName:
   Enabled: false
 
 Style/FrozenStringLiteralComment:
@@ -229,19 +232,19 @@ Style/MissingRespondToMissing:
 Style/MultilineTernaryOperator:
   Enabled: false
 
-Style/UnneededPercentQ:
+Style/RedundantPercentQ:
   Enabled: false
 
 Style/RedundantSelf:
   Enabled: false
 
-Layout/AlignHash:
+Layout/HashAlignment:
   Enabled: false
 
 Layout/EmptyLineAfterGuardClause:
   Enabled: false
 
-Layout/TrailingBlankLines:
+Layout/TrailingEmptyLines:
   Enabled: false
 
 Layout/EmptyLinesAroundClassBody:
@@ -262,9 +265,6 @@ Style/RaiseArgs:
 Layout/SpaceAroundOperators:
   Enabled: false
 
-Style/BracesAroundHashParameters:
-  Enabled: false
-
 Layout/EmptyLines:
   Enabled: false
 
@@ -277,7 +277,7 @@ Layout/ExtraSpacing:
 Style/SafeNavigation:
   Enabled: false
 
-Layout/AlignParameters:
+Layout/ParameterAlignment:
   Enabled: false
 
 Layout/EmptyLinesAroundExceptionHandlingKeywords:
@@ -304,10 +304,10 @@ Style/LineEndConcatenation:
 Style/StructInheritance:
   Enabled: false
 
-Style/UnneededInterpolation:
+Style/RedundantInterpolation:
   Enabled: false
 
-Layout/IndentFirstArrayElement:
+Layout/FirstArrayElementIndentation:
   Enabled: false
 
 Style/ExpandPathArguments:
@@ -325,7 +325,7 @@ Layout/RescueEnsureAlignment:
 Layout/SpaceInsideStringInterpolation:
   Enabled: false
 
-Lint/StringConversionInInterpolation:
+Lint/RedundantStringCoercion:
   Enabled: false
 
 Lint/UnderscorePrefixedVariableName:
@@ -352,7 +352,7 @@ Style/RegexpLiteral:
 Gemspec/OrderedDependencies:
   Enabled: false
 
-Layout/AlignArguments:
+Layout/ArgumentAlignment:
   Enabled: false
 
 Layout/ClosingParenthesisIndentation:
@@ -360,4 +360,19 @@ Layout/ClosingParenthesisIndentation:
 
 Layout/EmptyLineBetweenDefs:
   Enabled: false
+
+Lint/RaiseException:
+  Enabled: true
+
+Lint/StructNewOverride:
+  Enabled: true
+
+Style/HashEachMethods:
+  Enabled: true
+
+Style/HashTransformKeys:
+  Enabled: true
+
+Style/HashTransformValues:
+  Enabled: true
 

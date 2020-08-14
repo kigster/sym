@@ -1,5 +1,7 @@
 #!/usr/bin/env ruby
-# vim:filetype=ruby
+# vim: ft=ruby
+
+require_relative '../lib/ruby_warnings'
 
 lib_path = File.expand_path(File.dirname(__FILE__) + '/../lib')
 $LOAD_PATH << lib_path if File.exist?(lib_path) && !$LOAD_PATH.include?(lib_path)

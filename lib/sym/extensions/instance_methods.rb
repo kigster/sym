@@ -87,12 +87,12 @@ module Sym
         block.call(cipher_struct) if block
 
         encrypted_data = update_cipher(cipher_struct.cipher, data)
-        wrapper_struct = WrapperStruct.new(
-          encrypted_data: encrypted_data,
-          iv:             cipher_struct.iv,
-          cipher_name:    cipher_struct.cipher.name,
-          salt:           cipher_struct.salt,
-          compress:       !compression_enabled)
+        arguments      = { encrypted_data: encrypted_data,
+                           iv:             cipher_struct.iv,
+                           cipher_name:    cipher_struct.cipher.name,
+                           salt:           cipher_struct.salt,
+                           compress:       !compression_enabled }
+        wrapper_struct = WrapperStruct.new(arguments)
         encode(wrapper_struct, false)
       end
 
@@ -106,7 +106,6 @@ module Sym
         block.call(cipher_struct) if block
         decode(update_cipher(cipher_struct.cipher, wrapper_struct.encrypted_data))
       end
-
 
       def encode_incoming_data(data)
         compression_enabled = !data.respond_to?(:size) || (data.size > 100 && encryption_config.compression_enabled)
