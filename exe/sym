@@ -1,6 +1,5 @@
-#!/usr/bin/env ruby -W0
+#!/usr/bin/env ruby
 # vim: ft=ruby
-#
 
 require_relative '../lib/ruby_warnings'
 

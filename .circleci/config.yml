@@ -42,16 +42,16 @@ jobs:
           command: dockerize -wait tcp://localhost:11211 -timeout 1m
 
       - run:
-          name: run specs
+          name: RSpecs
           command: |
             bundle exec rspec --version
             bundle exec exe/sym --version
             # flush memcached
-            echo flush_all | timeout -k 2 -s HUP 10 nc -G 4 127.0.0.1 11211 || true
+            printf "flush_all\r\nquit\r\n" | timeout -k 2 -s HUP 10 nc -G 4 127.0.0.1 11211 || true
             timeout -k 2 -s HUP 30 bundle exec rspec --order random --backtrace
 
       - run:
-          name: run rubocop
+          name: Rubocop
           command: |
             bundle exec rubocop --version
             bundle exec rubocop

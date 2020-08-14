@@ -43,7 +43,7 @@ module Sym
       end
 
       def add(password)
-        delete
+        delete rescue nil
         execute command(:add, " -T /usr/bin/security -w '#{password}' ")
       end
 
@@ -61,7 +61,7 @@ module Sym
         output = `#{command}`
         result = $?
         unless result.success?
-          STDERR.puts "> ERROR running command:\n> #{output.red}" if !stderr_disabled && opts[:verbose]
+          warn "> ERROR running command:\n>   $ #{output.red}" if !stderr_disabled && opts[:verbose]
           raise Sym::Errors::KeyChainCommandError.new("Command error: #{result}, command: #{command}")
         end
 
