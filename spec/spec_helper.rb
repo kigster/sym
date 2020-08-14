@@ -1,3 +1,4 @@
+require_relative '../lib/ruby_warnings'
 require 'simplecov'
 SimpleCov.start
 
@@ -30,7 +31,7 @@ end
 
 Kernel.class_eval do
   def clear_memcached!
-    `echo flush_all | nc -G 2 127.0.0.1 11211 2>/dev/null`
+    `printf "flush_all\\r\\nquit\\r\\n" | nc -G 2 127.0.0.1 11211 2>/dev/null`
     $?.exitstatus == 0
   end
 end

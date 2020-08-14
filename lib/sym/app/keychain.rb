@@ -39,11 +39,12 @@ module Sym
         self.key_name = key_name
         self.opts     = opts
         self.class.validate!
-        stderr_off
+        opts[:trace] ? stderr_on : stderr_off
       end
 
       def add(password)
-        execute command(:add, "-U -w '#{password}' ")
+        delete
+        execute command(:add, " -T /usr/bin/security -w '#{password}' ")
       end
 
       def find
@@ -56,10 +57,14 @@ module Sym
 
       def execute(command)
         command += ' 2>/dev/null' if stderr_disabled
-        puts "> #{command.yellow.green}" if opts[:verbose]
+        puts "> #{command.yellow}" if opts[:verbose]
         output = `#{command}`
         result = $?
-        raise Sym::Errors::KeyChainCommandError.new("Command error: #{result}, command: #{command}") unless result.success?
+        unless result.success?
+          STDERR.puts "> ERROR running command:\n> #{output.red}" if !stderr_disabled && opts[:verbose]
+          raise Sym::Errors::KeyChainCommandError.new("Command error: #{result}, command: #{command}")
+        end
+
         output.chomp
       rescue Errno::ENOENT => e
         raise Sym::Errors::KeyChainCommandError.new("Command error: #{e.message}, command: #{command}")
@@ -86,10 +91,10 @@ module Sym
 
       def base_command(action)
         [
-          "security #{action}-#{self.class.sub_section} ",
-          "-a '#{self.class.user}' ",
-          "-D '#{self.class.kind}' ",
-          "-s '#{self.key_name}' "
+          "/usr/bin/security #{action}-#{self.class.sub_section} ",
+          "-a #{self.class.user} ",
+          "-D #{self.class.kind} ",
+          "-s #{self.key_name} "
         ]
       end
     end

@@ -37,15 +37,18 @@ module Sym
         context 'integration tests' do
           before do
             keychain.stderr_off
-            keychain.delete rescue nil  # delete in case it's already there
+            keychain.delete rescue nil
+            sleep 0.1
+            keychain.add(password)
           end
+
           after do
             keychain.stderr_on
           end
+
           it 'should add a new key' do
-            keychain.add(password)
+            sleep 0.1
             expect(keychain.find).to eql(password)
-            keychain.delete
           end
         end
       end
