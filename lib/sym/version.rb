@@ -1,5 +1,5 @@
 module Sym
-  VERSION     = '2.9.0'.freeze
+  VERSION     = '2.9.1'.freeze
   DESCRIPTION = <<~eof
     Sym is a ruby library (gem) that offers both the command line interface (CLI) and a set of rich Ruby APIs, which make it rather trivial to add encryption and decryption of sensitive data to your development or deployment workflow.
     
