@@ -1,0 +1,34 @@
+#!/usr/bin/env bash
+# vim: ft=bash
+unset DEBUG
+
+[[ -d ~/.bashmatic ]] || bash -c "$(curl -fsSL http://bit.ly/bashmatic-1-2-0)"
+source "${HOME}/.bashmatic/init.sh" 1>/dev/null
+
+function chlog() {
+  run.set-all abort-on-error show-output-on
+  
+  command -v github_changelog_generator >/dev/null || {
+    h1 'Installing changelog ruby gem...'
+    gem.install github_changelog_generator
+  }
+
+  if [[ -z "${GITHUB_TOKEN}" ]]; then
+    error "Please set GITHUB_TOKEN environment variable."
+    return 1
+  else
+    info "GitHub token found, starting CHANGELOG generation..."
+  fi
+
+  run "github_changelog_generator --no-verbose -u kigster -p sym -t ${GITHUB_TOKEN}"
+} 
+    
+chlog "$@"
+    
+    
+    
+    
+    
+    
+    
+

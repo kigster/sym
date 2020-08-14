@@ -1,16 +1,18 @@
 # Changelog
 
-## [Unreleased](https://github.com/kigster/sym/tree/HEAD)
+## [v2.10.0](https://github.com/kigster/sym/tree/v2.10.0) (2020-08-14)
 
-[Full Changelog](https://github.com/kigster/sym/compare/v2.8.5...HEAD)
+[Full Changelog](https://github.com/kigster/sym/compare/v2.8.5...v2.10.0)
 
 **Closed issues:**
 
+- Switch to Codecov for test coverage [\#29](https://github.com/kigster/sym/issues/29)
 - Ruby 2.7 warnings [\#24](https://github.com/kigster/sym/issues/24)
 - Error and process hang on Windows [\#17](https://github.com/kigster/sym/issues/17)
 
 **Merged pull requests:**
 
+- Switch to Codecov for test coverage; version bump 2.10.0 [\#28](https://github.com/kigster/sym/pull/28) ([kigster](https://github.com/kigster))
 - Fix remaining 2.7 warnings; memcached & keychain [\#27](https://github.com/kigster/sym/pull/27) ([kigster](https://github.com/kigster))
 - Adding Rubocop, and fixing minor issues. [\#21](https://github.com/kigster/sym/pull/21) ([kigster](https://github.com/kigster))
 - First pass on Version 2.9.0 — dropping the coin gem [\#20](https://github.com/kigster/sym/pull/20) ([kigster](https://github.com/kigster))
@@ -27,6 +29,7 @@
 
 **Merged pull requests:**
 
+- Fix error when ENV\[EDITOR\] is nil [\#18](https://github.com/kigster/sym/pull/18) ([JustinNazari](https://github.com/JustinNazari))
 - README: Use SVG badge \[ci skip\] [\#16](https://github.com/kigster/sym/pull/16) ([olleolleolle](https://github.com/olleolleolle))
 
 ## [v2.8.4](https://github.com/kigster/sym/tree/v2.8.4) (2018-04-13)
@@ -184,7 +187,6 @@
 
 **Merged pull requests:**
 
-- Fix error when ENV\[EDITOR\] is nil [\#18](https://github.com/kigster/sym/pull/18) ([JustinNazari](https://github.com/JustinNazari))
 - added require to fix loading issue on ubuntu [\#4](https://github.com/kigster/sym/pull/4) ([bosswissam](https://github.com/bosswissam))
 
 ## [v1.6.4](https://github.com/kigster/sym/tree/v1.6.4) (2016-08-23)
