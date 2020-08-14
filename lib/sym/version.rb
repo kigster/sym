@@ -1,5 +1,5 @@
 module Sym
-  VERSION     = '2.9.0'.freeze
+  VERSION     = '2.10.0'.freeze
   DESCRIPTION = <<~eof
     Sym is a ruby library (gem) that offers both the command line interface (CLI) and a set of rich Ruby APIs, which make it rather trivial to add encryption and decryption of sensitive data to your development or deployment workflow.
     
@@ -17,7 +17,7 @@ module Sym
      
       2. By utilizing OS-X Keychain on a Mac, Sym offers truly secure way of storing the key on a local machine, much more secure then storing it on a file system,
      
-      3. By using a local password cache (activated with -c) via an in-memory provider such as memcached or drb, sym invocations take advantage of password cache, and only ask for a password once per a configurable time period, 
+      3. By using a local password cache (activated with -c) via an in-memory provider such as memcached, sym invocations take advantage of password cache, and only ask for a password once per a configurable time period, 
     
       4. By using SYM_ARGS environment variable, where common flags can be saved. This is activated with sym -A,
      

@@ -1,34 +1,21 @@
 language: ruby
-env:
-  global:
-    secure: TQeUpdDH/j5AefVh2NRvU8t/ftxXQqaIO5m0ir7vzJgEBuP8twTqx/CFeZWogd/u0McMgL48NHgQZGXz1n04ZZasovcrk4wd7kMwSyNTtyAa/0D5u6k1JyiynNV26MWvxXGBw4OCCfVCa4WXIM0s7YI2S/q9ZYKSWWYtw/Lo+MDHjJEIaM4EdL+b9SxF94y8DcDXy2qt7H58nUJV/RVz9uG++kuDbpoobwO8mEGGuUIcxubgFoKqOCjXkX1Qe2vY2LgJGb7OZsVDj7QhARwm1NwspxTZDgfQzeSHM5uCW5JJ40Ur4bAb4bFXDPV2yF64cagYWcQow20To1qO17UR+xIFMMV+pxnhTiiRtGzyDCoYLCc5ldXyrnVskQYtXLwrY92Na4avdWCalL8fBO7IfBVHHADowED2AW8thExf4ljVR1wzjs0vIeVmVz9ApJr25sgZjKawaosv7BHt9MDKruK7tQBY8HIAjEsP50cb42VOucY+vabWtTG6QzX+//tjsDlM0rOhSiMlqxpbrwpWxpnhc+kn3TeMPr1oU0j9gDCRMghcaCVD18JKwZMx45LEX7LZY2lQcnLmJJOwnwamuReLc/w6cMO1ORjBgRsDkyz0Jila90cTUSJq21I41srDauprolfrqT1igZ3rB/C++vA/SiG+hz7WzvMWXBv/fzs=
 services:
 - memcached
 rvm:
 - 2.3.8
-- 2.4.6
-- 2.5.5
-- 2.6.3
+- 2.4.10
+- 2.5.8
+- 2.6.6
 - 2.7.1
-notifications:
-  email:
-    recipients:
-    - kigster@gmail.com
-    on_success: change
-    on_failure: always
-  slack:
-    rooms:
-      secure: GcACCHmcmo99lYE5dgt2TmY4YIPMWr75q0Bkm4Lddegq/1eMXgcZDz00j8iHWtnveyJSjEUpZFQ9uyx+P7dvxT7D5gl43arKZEylS4vMRg9QRgZu7/ROrXbJtrUyKulFRUTdFrmOiK9nDKpAzlvLvMKC4kaQnn88Xtu9pYMU8y4n5fCtl29gZM9ZjVbrBBvV/SumnTDLla2oQ7oFgUZdZhQZ1qsevYknxNq4eIcvPDjbon+bovfsIISEVRSNo2C3yjO+mqWKed3jfuCA4taAZ8/aVVFEKURMH10HFms1CiC3lE/gF4YfBXsqKpjnB+bKjBcWox2FQrp96FulMEIfkKQrnuncO96o7MGHX9oNqKSMoycf3+SZFwNa+5Mfq7SBepbHYCoU7/ow31UTyStrc5idG19XzYgI85yjQHdzQN299Xf0O8cGf9q9qAu7rS7JlM3ekR+3rZYO+OxNYTF8rcW1fYIj6GKcbsV8BvuhAVQRFOsk/ibcIb2N7rGVd/ZbU4HAk3RE1ywt+XowinpIHktu2PQUPDNpgRQwM6xqZHO/7s9r7oW0ULmZCMLZ9CMKNjKzrQ9wfh90+v+FiEiUKsaVj4cCwF3PvhVYvxU2AKbCeHtSEb7K6to86+DYNoIKnGH1ryKoyCtyOTZpNMLGFt34Msv7WfEylhG+DpVMvkM=
-before_script:
-  - curl -L https://codeclimate.com/downloads/test-reporter/test-reporter-latest-linux-amd64 > ./cc-test-reporter
-  - chmod +x ./cc-test-reporter
-  - ./cc-test-reporter before-build
-  - bundle exec exe/sym -B ~/.bash_profile -vTD
-  - source ~/.sym.symit.bash
-  - ls -alF ~/.sym*
-  - ls -alF .
-  - mkdir -p temp
-after_script:
-  - ./cc-test-reporter after-build --exit-code $TRAVIS_TEST_RESULT
+- jruby-9.1.17.0
+- jruby-9.2.13.0
 script:
-  - USER=travis bundle exec rspec --format documentation --order random && bundle exec rubocop
+- bundle exec sym -B ~/.bash_profile -vTD
+- export PATH="${PWD}/exe:${PATH}"
+- export RUBY_MAJOR_VERSION="$(ruby -e 'puts RUBY_VERSION.split(".")[0..1].join')"
+- export USER=travis
+- bundle exec rspec --format documentation --order random
+- if [[ "${RUBY_MAJOR_VERSION}" == "27" ]]; then bundle exec rubocop; fi
+env:
+  global:
+    secure: TEh5UdrREBCXNNxMvk+kl7PcokyIgm0JXoIQI90ZMHx75yLcSdK15zt4rTvH4FzNUmnEGQnGaEJmJMqkjy9oT1BwKedqvG6eb0BFgay8ajz+eesFKH0Vu7MrHZuKrO3mfO+llr+av4K7iQPQrHJ6+7TZKu4cysFuP+szgE1blyrSgv2NaMmb2UL0HPLn0H2vxqVGn+xfc8VWGNn0IzDBLVAeUMOKyn51PMK1zupjcS+wz3uMzTWXyuB+RvIGOcYnXNZAtIQbYnVHqohrG6iOtNtDSJIVETeybghob7dRk3NTlFQ7qbYspJCflMaGQmwVc18CCO0Sa9qCVKS+z+WAeprfGrG2lIXnTxa/76OwKbEstjOdLmovDKst5dlZnH9Osg9g0US750wndKNrRFIB1A66QTxxbHWYX8JpOTYg2asSnPLptaxF3H4l85xspoiZ6LeI4z7mH9fLr5UJnU5INDDuZ+JW7pUeSri5bTLIzMkGGPj7AHEubUiKY0ldeNfskAwkNob/+nPWTtI30ex909EHu6eSQV7JR8Ng394MOmot9xKHszOJXRltv4cRQ5k0IWW+gLpc110vtqHfe/xBuL3nXWBQnaZHzVGM2E6ctKnDdN/7zamVJEFDHevj4hO6h0WWhUINp+k3QWJvj2bNrsDttpGgw5NM85OLrthGew8=
