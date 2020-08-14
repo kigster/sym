@@ -85,12 +85,16 @@ RSpec.describe 'CLI execution', :type => :aruba do
         end
       end
 
-      if Sym::App.osx?
+      if Sym::App.osx? && ENV['SKIP_KEYCHAIN'].nil?
         context 'import a key into keychain' do
-          let(:args) { "-k #{KEY_PLAIN} -x MOO" }
+          let(:keychain_name) { 'mykey' }
+          before { (Sym::App::KeyChain.new(keychain_name).delete rescue nil) }
+
+          let(:args) { "-k #{KEY_PLAIN} -x #{keychain_name} " }
+
           it 'should add to keychain' do
-            expect(Sym::App::KeyChain.get('MOO')).to eq(KEY_PLAIN)
             expect(output).to eq(KEY_PLAIN)
+            expect(Sym::App::KeyChain.get(keychain_name)).to eq(KEY_PLAIN)
           end
         end
       end

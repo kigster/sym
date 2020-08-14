@@ -44,6 +44,7 @@ module Sym
 
       def add(password)
         delete rescue nil
+        sleep 0.1
         execute command(:add, " -T /usr/bin/security -w '#{password}' ")
       end
 

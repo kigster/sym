@@ -1,0 +1,29 @@
+codecov:
+  require_ci_to_pass: no
+
+  notify:
+    wait_for_ci: yes
+
+parsers:
+  v1:
+    include_full_missed_files: true # To use with Ruby so we see files that have NO tests written
+
+coverage:
+  range: 50..75
+  round: down
+  precision: 1
+  status:
+    project:
+      default: off
+      kitchen:
+        target: 70%
+        threshold: 10%
+        informational: true
+        if_not_found: success
+        if_ci_failed: error
+        paths:
+          - lib/
+flags:
+  kitchen:
+    paths:
+      - lib/

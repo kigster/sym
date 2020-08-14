@@ -1,6 +1,17 @@
 require_relative '../lib/ruby_warnings'
 require 'simplecov'
-SimpleCov.start
+
+SimpleCov.start do
+  add_filter %r{^/(spec)/}
+end
+
+if ENV['CODECOV_TOKEN'] && !(ARGV.last && File.exist?(ARGV.last))
+  require 'codecov'
+  SimpleCov.formatters = SimpleCov::Formatter::MultiFormatter.new([
+    SimpleCov::Formatter::HTMLFormatter,
+    SimpleCov::Formatter::Codecov
+  ])
+end
 
 $LOAD_PATH.unshift File.expand_path('../../lib', __FILE__)
 

@@ -61,5 +61,6 @@ Gem::Specification.new do |spec|
   spec.add_development_dependency 'rspec-its'
   spec.add_development_dependency 'rubocop', '0.81.0'
   spec.add_development_dependency 'simplecov'
+  spec.add_development_dependency 'codecov'
   spec.add_development_dependency 'yard'
 end
