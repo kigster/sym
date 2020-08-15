@@ -16,17 +16,16 @@ image:https://ruby-gem-downloads-badge.herokuapp.com/sym?extension=svg[Sym Downl
 image:https://codecov.io/gh/kigster/sym/branch/master/graphs/sunburst.svg[Coverage Map,link=https://codecov.io/gh/kigster/sym]
 ====
 
-Please checkout the following post — _http://kig.re/2017/03/10/dead-simple-encryption-with-sym.html[Dead Simple Encryption with Sym]_ — that announced the initial release of this library, and provides further in-depth discussion. Your donation of absolutely any amount is very much appreciated but never required.
+Please checkout the following post — _http://kig.re/2017/03/10/dead-simple-encryption-with-sym.html[Dead Simple Encryption with Sym]_ — that announced the initial release of this library, and provides further in-depth discussion. Your donation of absolutely any amount is much appreciated but never required.
 
-image::https://www.paypalobjects.com/en_US/i/btn/btn_donate_SM.gif[Donate,link=https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_id=FSFYYNEQ8RKWU]
+image:https://www.paypalobjects.com/en_US/i/btn/btn_donate_SM.gif[Donate,link=https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_id=FSFYYNEQ8RKWU]
 
 == Introduction
 
-====
-*sym* is an open source command line utility and Ruby API which makes it very _easy to add reliable encryption and decryption_ of sensitive data to an application or a project written in any language.
-====
+NOTE: *SYM* is an open source command line utility and a Ruby library, which makes it _trivial to encrypt your application secrets with mathematically proven models and ciphers offered in a much larger project — Open SSL.
 
-* Unlike many existing encryption tools, *sym* focuses on narrowing the gap between convenience and security, by offering enhanced usability and a streamlined ruby API and a CLI. The primary goal of the library is to make encryption very easy and transparent. +
+
+Unlike many existing encryption tools, *sym* focuses on narrowing the gap between convenience and security, by offering enhanced usability and a streamlined ruby API and a CLI. The primary goal of the library is to make encryption very easy and transparent. +
 
 * *sym* uses the _https://en.wikipedia.org/wiki/Symmetric-key_algorithm[Symmetric Encryption]_ algorithm. This means that the same key is used to encrypt and decrypt data. In addition to the key, the encryption uses a randomized IV vector, which is automatically generated per each encryption and serialized with the data. Result of encryption is zlib-compressed, and base64 encoded, to be suitable for storage as string. The generated keys are also base64-encoded for convenience. +
 
@@ -85,7 +84,6 @@ Most common use-cases include:
 This gem includes two primary components:
 
 . *<<cli,Rich command line interface CLI>>* with many features to streamline encryption/decryption, and to be integrated into the deployment flow. +
- +
 . Ruby APIs:
  ** *<<rubyapi,Key Generation, Encryption & Decryption API>>*
   *** is activated by including `Sym` module in a class, it adds easy to use `encr`/`decr` methods.
@@ -235,6 +233,11 @@ Example: here we edit an encrypted file in `vim`, while using interactive mode t
  # # (c) 2016 Konstantin Gredeskoul.  All rights reserved.
 
 Note the `diff` shown after save.
+
+==== CLI Help Reference
+
+image::design/sym-help.png[Sym Help,width=651]
+
 
 +++<a name="rubyapi">++++++</a>+++
 
@@ -622,7 +625,23 @@ To release a new version, update the version number in `version.rb`, and then ru
 [discrete]
 ==== Contributing
 
-Bug reports and pull requests are welcome on GitHub at https://github.com/kigster/sym
+Bug reports and pull requests are welcome on GitHub at https://github.com/kigster/sym.
+
+===== UML
+
+Here are a couple of UML diagrams depicting the current, and possibly future state of the codebase.
+
+''''
+
+===== Current Design 
+
+image::design/sym-class-dependency-vertical.png[UML Vertical]
+
+''''
+
+===== Future  Design 
+
+image::design/sym-class-dependency-future-refactor.png[UML Refactor]
 
 === License
 

@@ -5,7 +5,7 @@ module Sym
   #
   module Constants
 
-    BASH_FILES = Dir.glob("#{File.expand_path('../../../bin', __FILE__)}/sym.*.bash").freeze
+    BASH_FILES = Dir.glob("#{File.expand_path('../../bin', __dir__)}/sym.*.bash").freeze
 
     class << self
       attr_reader :user_home

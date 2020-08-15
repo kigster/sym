@@ -25,9 +25,9 @@ end
 task :build => :permissions
 
 YARD::Rake::YardocTask.new(:doc) do |t|
-  t.files = %w(lib/**/*.rb exe/*.rb - README.md LICENSE)
-  t.options.unshift('--title', '"Sym – Symmetric Key Encryption for Your Data"')
-  t.after = -> { exec('open doc/index.html') }
+  t.files = %w(lib/**/*.rb exe/*.rb - README.adoc CHANGELOG.md LICENSE)
+  t.options.unshift('--title', '"Sym – Symmetric Encryption for Humins"')
+  t.after = -> { Thread.new { sleep 5; exec('open doc/index.html') }  }
 end
 
 RSpec::Core::RakeTask.new(:spec)
