@@ -1,5 +1,17 @@
 # Changelog
 
+## [v2.10.1](https://github.com/kigster/sym/tree/v2.10.1) (2020-08-15)
+
+[Full Changelog](https://github.com/kigster/sym/compare/v2.10.0...v2.10.1)
+
+**Closed issues:**
+
+- This gem is failing on environment without HOME \(like AWS Lambda\) [\#25](https://github.com/kigster/sym/issues/25)
+
+**Merged pull requests:**
+
+- Refactor and changes to support custom user\_home. [\#30](https://github.com/kigster/sym/pull/30) ([kigster](https://github.com/kigster))
+
 ## [v2.10.0](https://github.com/kigster/sym/tree/v2.10.0) (2020-08-14)
 
 [Full Changelog](https://github.com/kigster/sym/compare/v2.8.5...v2.10.0)
