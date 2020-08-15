@@ -15,7 +15,7 @@ module Sym
           file = opts[:bash_support]
 
           out = ''
-          Sym::Constants::Bash::CONFIG.each_pair do |key, config|
+          Sym::Constants.config.each_pair do |key, config|
             script_name = key.to_s
 
             # This removes the old version of this file.

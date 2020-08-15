@@ -10,6 +10,8 @@ module Sym
 
     class PasswordError < Sym::Errors::Error; end
 
+    class InvalidSymHomeDirectory < Sym::Errors::Error; end
+
     class NoPasswordProvided < Sym::Errors::PasswordError; end
 
     class PasswordsDontMatch < Sym::Errors::PasswordError; end

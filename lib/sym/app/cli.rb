@@ -56,10 +56,10 @@ module Sym
       # brings in #parse(Array[String] args)
       include CLISlop
 
-      attr_accessor :opts, :application, :outputs, :stdin, :stdout, :stderr, :kernel
-
+      attr_accessor :opts, :application, :outputs, :stdin, :stdout, :stderr, :kernel, :args
 
       def initialize(argv, stdin = STDIN, stdout = STDOUT, stderr = STDERR, kernel = nil)
+        self.args   = argv
         self.stdin  = stdin
         self.stdout = stdout
         self.stderr = stderr
@@ -71,37 +71,46 @@ module Sym
 
         begin
           # Re-map any legacy options to the new options
-          self.opts = parse(argv)
+          self.opts = parse(args)
+
+          if opts[:user_home]
+            Constants.user_home = opts[:user_home]
+            raise InvalidSymHomeDirectory, "#{opts[:user_home]} does not exist!" unless Dir.exist?(Constants.user_home)
+          end
+
+          # Deal with SYM_ARGS and -A
           if opts[:sym_args]
-            append_sym_args(argv)
-            self.opts = parse(argv)
+            if non_empty_array?(sym_args)
+              args << sym_args
+              args.flatten!
+              args.compact!
+              args.delete('-A')
+              args.delete('--sym-args')
+              self.opts = parse(args)
+            end
           end
 
           # Disable coloring if requested, or if piping STDOUT
           if opts[:no_color] || !self.stdout.tty?
             Colored2.disable! # reparse options without the colors to create new help msg
-            self.opts = parse(argv)
+            self.opts = parse(args)
           end
 
         rescue StandardError => e
           log :error, "#{e.message}" if opts
           error exception: e
-          exit 127 if stdin == STDIN
+          quit!(127) if stdin == STDIN
         end
 
-        self.application = ::Sym::Application.new(opts, stdin, stdout, stderr, kernel)
+        self.application = ::Sym::Application.new(self.opts, stdin, stdout, stderr, kernel)
       end
 
-      def append_sym_args(argv)
-        if env_args = sym_args
-          argv << env_args.split(' ')
-          argv.flatten!
-          argv.compact!
-        end
+      def quit!(code = 0)
+        exit(code)
       end
 
       def sym_args
-        ENV[Sym::Constants::ENV_ARGS_VARIABLE_NAME]
+        (ENV['SYM_ARGS']&.split(/\s+/) || [])
       end
 
       def execute!
@@ -131,15 +140,20 @@ module Sym
       end
 
       def opts_present
-        o = opts.to_hash
-        o.keys.map { |k| opts[k] ? nil : k }.compact.each { |k| o.delete(k) }
-        o
+        opts.to_hash.tap do |o|
+          o.keys.map { |k| opts[k] ? nil : k }.compact.each { |k| o.delete(k) }
+        end
       end
-
-      private
 
       def log(*args)
         Sym::App.log(*args, **opts.to_hash)
+      end
+
+
+      private
+
+      def non_empty_array?(object)
+        object.is_a?(Array) && !object.empty?
       end
 
       def error(hash)

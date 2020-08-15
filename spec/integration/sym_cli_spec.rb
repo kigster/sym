@@ -18,34 +18,36 @@ RSpec.describe 'CLI execution', :type => :aruba do
   RESET_TEMP_FILE.call
 
   context 'using Aruba framework' do
-    let(:command) { "./exe/sym #{args}" }
+    let(:command) { "exe/sym #{args}" }
     let(:output) { last_command_started.stdout.chomp }
 
     context 'install bash completion' do
       let(:args) { "-B #{TEMP_FILE}" }
 
       before { RESET_TEMP_FILE.call }
+
       before do
         File.open(TEMP_FILE, 'w') { |f| f.write("#!/usr/bin/env bash\n") }
         run_command_and_stop command, fail_on_error: true
       end
 
       it 'should have two files to install' do
-        expect(::Sym::Constants::Bash::CONFIG.size).to eq(2)
+        expect(::Sym::Constants.config.size).to eq(2)
       end
 
       it 'should run command' do
         expect(File.exist?(TEMP_FILE)).to be(true)
-        expect(File.read(TEMP_FILE)).to include(::Sym::Constants::Bash::CONFIG[:completion][:script])
-        expect(File.read(TEMP_FILE)).to include(::Sym::Constants::Bash::CONFIG[:symit][:script])
+        expect(File.read(TEMP_FILE)).to include(::Sym::Constants.config[:completion][:script])
+        expect(File.read(TEMP_FILE)).to include(::Sym::Constants.config[:symit][:script])
       end
     end
 
     context 'while running commands' do
-      before { run_command_and_stop command }
+      before { run_command_and_stop command, fail_on_error: true }
 
       context 'examples' do
         let(:args) { '-E' }
+
         it 'should print examples' do
           expect(output).to match(/generate a new private key into an environment variable:/)
         end
@@ -53,6 +55,7 @@ RSpec.describe 'CLI execution', :type => :aruba do
 
       context 'help' do
         let(:args) { '-h' }
+
         it 'should show help' do
           expect(output).to match(/encrypt\/decrypt data with a private key/)
         end
@@ -69,9 +72,11 @@ RSpec.describe 'CLI execution', :type => :aruba do
       context 'encrypt a string' do
         let(:string) { 'Hello, Dolly!' }
         let(:args) { %Q{-e -k #{KEY_PLAIN} -s "#{string}"} }
+
         it 'should run command' do
           expect(output).to match(BASE62_REGEX)
         end
+
         it 'should decrypt back' do
           run_command_and_stop "exe/sym -d -k #{KEY_PLAIN} -s #{output}"
           expect(last_command_started.stdout.chomp).to eq(string)
@@ -85,7 +90,7 @@ RSpec.describe 'CLI execution', :type => :aruba do
         end
       end
 
-      if Sym::App.osx? && ENV['SKIP_KEYCHAIN'].nil?
+      if Sym::App.osx? && ENV['KEYCHAIN_SPECS']
         context 'import a key into keychain' do
           let(:keychain_name) { 'mykey' }
           before { (Sym::App::KeyChain.new(keychain_name).delete rescue nil) }

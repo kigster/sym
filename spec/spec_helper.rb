@@ -21,10 +21,10 @@ require 'openssl'
 require 'aruba'
 require 'rspec/its'
 
-if File.exist?(Sym::Constants::SYM_KEY_FILE)
-  FileUtils.mv(Sym::Constants::SYM_KEY_FILE, Sym::Constants::SYM_KEY_FILE + '.bak')
+if File.exist?(Sym::Constants.sym_key_file)
+  FileUtils.mv(Sym::Constants.sym_key_file, Sym::Constants.sym_key_file + '.bak')
   Kernel.at_exit do
-    FileUtils.mv(Sym::Constants::SYM_KEY_FILE + '.bak', Sym::Constants::SYM_KEY_FILE)
+    FileUtils.mv(Sym::Constants.sym_key_file + '.bak', Sym::Constants.sym_key_file)
   end
 end
 
