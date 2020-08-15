@@ -18,7 +18,6 @@ module Sym
     class << self
       attr_accessor :exit_code
       attr_accessor :stdin, :stdout, :stderr
-
     end
 
     self.exit_code = 0

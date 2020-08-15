@@ -14,7 +14,7 @@ Sym::Configuration.configure do |config|
   config.compression_enabled      = true
   config.compression_level        = Zlib::BEST_COMPRESSION
   config.encrypted_file_extension = 'enc'
-  config.default_key_file         = Sym::Constants::SYM_KEY_FILE
+  config.default_key_file         = Sym::Constants.sym_key_file
 
   config.password_cache_timeout          = 300
 

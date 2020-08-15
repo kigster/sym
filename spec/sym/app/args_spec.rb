@@ -4,9 +4,9 @@ require 'singleton'
 
 module Sym
   module App
-    RSpec.describe Sym::App::Args do
+    RSpec.describe Args do
       let(:opts) { { key: true, edit: true } }
-      let(:args) { Args.new(opts) }
+      let(:args) { described_class.new(opts) }
 
       %i(specify_key?
          require_key?).each do |type|

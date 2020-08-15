@@ -33,7 +33,7 @@ module Sym
         end
       end
 
-      if Sym::App.osx? && ENV['SKIP_KEYCHAIN'].nil?
+      if Sym::App.osx? && ENV['KEYCHAIN_SPECS']
         context 'integration tests' do
           before do
             keychain.stderr_off

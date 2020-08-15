@@ -55,6 +55,7 @@ module Sym
           o.separator 'Create a new private key:'.yellow
           o.bool      '-g', '--generate',           '           generate a new private key'
           o.bool      '-p', '--password',           '           encrypt the key with a password'
+
           if Sym::App.osx?
             o.string '-x', '--keychain',            '[key-name] '.blue + 'write the key to OS-X Keychain'
           end
@@ -67,7 +68,7 @@ module Sym
           o.separator ' '
           o.separator 'Password Cache:'.yellow
           o.bool      '-c', '--cache-passwords',     '           enable password cache'
-          o.integer   '-u', '--cache-timeout',       '[seconds]'.blue + '  expire passwords after'
+          o.integer   '-z', '--cache-timeout',       '[seconds]'.blue + '  expire passwords after'
           o.string    '-r', '--cache-provider',      '[provider]'.blue + ' cache provider, one of ' + "#{Sym::App::Password::Providers.provider_list}"
 
           o.separator ' '
@@ -89,8 +90,14 @@ module Sym
 
           o.separator ' '
           o.separator 'Utility:'.yellow
+          o.separator   "   The following flag helps with Sym installation by hooking to \n" +
+                        "   your #{'~/.bashrc'.bold.yellow}. If you are running Sym on an environment without \n" +
+                        "   user home available, you may need to force set user's home to any existing\n" +
+                        "   directory using the #{'--user-home'.bold.blue} flag.\n"
+
           o.string    '-B', '--bash-support',       '[file]'.blue + '     append bash completion & utils to a file'+ "\n" +
             '                                    such as ~/.bash_profile or ~/.bashrc'
+          o.string    '-u', '--user-home',       '[DIR]'.blue + "      Overrides #{'${HOME}'.green} ==> supports AWS Lambda\n"
 
           o.separator ' '
           o.separator 'Help & Examples:'.yellow

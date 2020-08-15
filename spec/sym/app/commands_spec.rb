@@ -41,9 +41,11 @@ module Sym
           it 'should not select the command without all options satisfied' do
             expect(Sym::App::Commands.find_command_class({ fake: true })).to be_nil
           end
+
           it 'should not select the command without all options satisfied' do
             expect(Sym::App::Commands.find_command_class({ help: true, trace: true })).to eq(ShowHelp)
           end
+
           it 'should not select the command without all options satisfied' do
             expect(Sym::App::Commands.find_command_class({ decrypt: false,
                                                            edit: false,
@@ -68,8 +70,10 @@ module Sym
                                                            no_environment: false,
                                                            bash_support: nil,
                                                            examples: false,
+                                                           sym_args: false,
                                                            help: false })).to eq(ShowVersion)
           end
+
           it 'should select a command based on a proc' do
             expect(Sym::App::Commands.find_command_class({ booboo: :doodoo })).to eq(FakeCommand)
           end

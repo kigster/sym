@@ -9,43 +9,75 @@ RSpec.describe 'CLI execution', :type => :aruba do
   BASE62_REGEX    = %r{^[a-zA-Z0-9=.\-_]+=$}
   KEY_PLAIN       = 'm4G6b7Lb-0bom5l8uxog_cL1x08mvH1ASsv1Svl3UGQ='
   HELLO_ENCRYPTED = 'BAhTOh1TeW06OkRhdGE6OldyYXBwZXJTdHJ1Y3QLOhNlbmNyeXB0ZWRfZGF0YSIluUtFV4ibk5B65MTjQMXvphsSi7pKPVXt9B2atfMD7cg6B2l2IhWp0jYYSo0CHrm0gWh57mDPOhBjaXBoZXJfbmFtZSIQQUVTLTI1Ni1DQkM6CXNhbHQwOgx2ZXJzaW9uaQY6DWNvbXByZXNzVA=='
-  TEMP_FILE       = "#{Dir.pwd}/temp/sym.test.output"
-  RESET_TEMP_FILE = ->(*) do
-    FileUtils.rm_rf(File.dirname(TEMP_FILE))
-    FileUtils.mkdir_p(File.dirname(TEMP_FILE))
+  USER_HOME       = "#{Dir.pwd}/temp"
+  TEMP_FILE       = "#{USER_HOME}/sym.test.output"
+  RESET_TEMP_FILE = ->(file = TEMP_FILE) do
+    FileUtils.rm_rf(File.dirname(file))
+    FileUtils.mkdir_p(File.dirname(file))
   end
 
   RESET_TEMP_FILE.call
 
   context 'using Aruba framework' do
-    let(:command) { "./exe/sym #{args}" }
+    let(:command) { "exe/sym #{args}" }
     let(:output) { last_command_started.stdout.chomp }
 
     context 'install bash completion' do
       let(:args) { "-B #{TEMP_FILE}" }
 
       before { RESET_TEMP_FILE.call }
+
       before do
         File.open(TEMP_FILE, 'w') { |f| f.write("#!/usr/bin/env bash\n") }
         run_command_and_stop command, fail_on_error: true
       end
 
       it 'should have two files to install' do
-        expect(::Sym::Constants::Bash::CONFIG.size).to eq(2)
+        expect(::Sym::Constants.config.size).to eq(2)
       end
 
       it 'should run command' do
         expect(File.exist?(TEMP_FILE)).to be(true)
-        expect(File.read(TEMP_FILE)).to include(::Sym::Constants::Bash::CONFIG[:completion][:script])
-        expect(File.read(TEMP_FILE)).to include(::Sym::Constants::Bash::CONFIG[:symit][:script])
+        expect(File.read(TEMP_FILE)).to include(::Sym::Constants.config[:completion][:script])
+        expect(File.read(TEMP_FILE)).to include(::Sym::Constants.config[:symit][:script])
+      end
+    end
+
+    # TODO: collapse these two into a single shared example.
+    context 'install bash completion with custom home dir' do
+      let(:bashrc) { File.basename(TEMP_FILE) }
+      let(:user_home) { '/tmp/user_home' }
+      let(:outfile) { "#{user_home}/#{bashrc}" }
+      let(:args) { "-B #{outfile} -u #{user_home} " }
+
+      before do
+        RESET_TEMP_FILE[outfile]
+        FileUtils.mkdir_p(user_home)
+        File.open(outfile, 'w') { |f| f.write("#!/usr/bin/env bash\n") }
+        run_command_and_stop command, fail_on_error: true
+      end
+
+      it 'should have two files to install' do
+        expect(::Sym::Constants.config.size).to eq(2)
+      end
+
+      it 'should have two files to install and they are the bash files from bin' do
+        expect(::Sym::Constants::BASH_FILES.map { |f| File.basename(f) }.sort).to eq %w[sym.completion.bash sym.symit.bash]
+      end
+
+      context 'file contents' do
+        subject { File.read(outfile) }
+        it { is_expected.to_not be_nil  }
+        it { is_expected.to include 'sym.completion.bash' }
       end
     end
 
     context 'while running commands' do
-      before { run_command_and_stop command }
+      before { run_command_and_stop command, fail_on_error: true }
 
       context 'examples' do
         let(:args) { '-E' }
+
         it 'should print examples' do
           expect(output).to match(/generate a new private key into an environment variable:/)
         end
@@ -53,6 +85,7 @@ RSpec.describe 'CLI execution', :type => :aruba do
 
       context 'help' do
         let(:args) { '-h' }
+
         it 'should show help' do
           expect(output).to match(/encrypt\/decrypt data with a private key/)
         end
@@ -69,9 +102,11 @@ RSpec.describe 'CLI execution', :type => :aruba do
       context 'encrypt a string' do
         let(:string) { 'Hello, Dolly!' }
         let(:args) { %Q{-e -k #{KEY_PLAIN} -s "#{string}"} }
+
         it 'should run command' do
           expect(output).to match(BASE62_REGEX)
         end
+
         it 'should decrypt back' do
           run_command_and_stop "exe/sym -d -k #{KEY_PLAIN} -s #{output}"
           expect(last_command_started.stdout.chomp).to eq(string)
@@ -85,7 +120,7 @@ RSpec.describe 'CLI execution', :type => :aruba do
         end
       end
 
-      if Sym::App.osx? && ENV['SKIP_KEYCHAIN'].nil?
+      if Sym::App.osx? && ENV['KEYCHAIN_SPECS']
         context 'import a key into keychain' do
           let(:keychain_name) { 'mykey' }
           before { (Sym::App::KeyChain.new(keychain_name).delete rescue nil) }

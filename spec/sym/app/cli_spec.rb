@@ -3,11 +3,17 @@ require 'sym/app/output/base'
 
 module Sym
   module App
-    RSpec.describe 'Sym::App::CLI' do
+    RSpec.describe CLI do
+      before do
+        allow(Kernel).to receive(:exit)
+        allow_any_instance_of(described_class).to receive(:quit!).and_return(nil)
+        allow_any_instance_of(described_class).to receive(:log).and_return(nil)
+      end
 
       context 'basic initialization' do
         let(:argv) { %w(-g) }
-        let(:cli) { Sym::App::CLI.new(argv) }
+
+        include_context :run_command
 
         it 'should properly initialize' do
           expect(cli).to_not be_nil
@@ -20,16 +26,18 @@ module Sym
       context 'basic initialization from SYM_ARGS' do
         let(:argv) { %w(-e -s hello -A) }
         let(:key) { 'YJOkFraX1JDuQWEbV1JpeYvwUpt0h9tbuSO4XAZ8Asc=' }
-        let(:cli) { Sym::App::CLI.new(argv) }
+        let(:sym_args) { "-k #{key} -v ".split(/\s+/) }
 
         context '#sym_args' do
           before do
-            expect_any_instance_of(Sym::App::CLI).to receive(:sym_args).and_return("-k #{key} -v -D")
+            allow_any_instance_of(described_class).to receive(:sym_args).and_return(sym_args)
           end
+
+          include_context :run_command
 
           it 'should properly initialize' do
             expect(cli.application).to_not be_nil
-            expect(cli.application.provided_options.keys.sort).to eq %i(encrypt string key verbose debug sym_args).sort
+            expect(cli.application.provided_options.keys.sort).to eq %i(encrypt string key verbose).sort
             expect(cli.command).to be_a_kind_of(Sym::App::Commands::Encrypt)
           end
         end
@@ -38,26 +46,29 @@ module Sym
           before do
             allow(ENV).to receive(:[]).with('SYM_CACHE_TTL')
             allow(ENV).to receive(:[]).with('MEMCACHE_USERNAME')
-            allow(ENV).to receive(:[]).with(Sym::Constants::ENV_ARGS_VARIABLE_NAME).and_return("-k #{key} -v -D")
+            allow(ENV).to receive(:[]).with('SYM_ARGS').and_return(sym_args.join(' '))
           end
 
-          let!(:opts) { cli.opts }
+          include_context :run_command
 
           context 'with -A' do
+            let(:argv) { %w(-e -s hello -A) }
             it 'should contain flags specified in ENV variable' do
               expect(opts[:encrypt]).to be true
               expect(opts[:string]).to eq('hello')
-              expect(opts[:debug]).to be true
+              expect(opts[:debug]).to be false
               expect(opts[:verbose]).to be true
               expect(opts[:key]).to eq(key)
             end
           end
+
           context 'without -A' do
-            let(:argv) { %w(-e -s hello) }
+            let(:argv) { %W(-k #{TEST_KEY} -e -s hello) }
             it 'should NOT contain flags specified in ENV variable' do
               expect(opts[:encrypt]).to be true
               expect(opts[:debug]).to be false
-              expect(opts[:key]).to be_nil
+              expect(opts[:key]).to_not be_nil
+              expect(opts[:verbose]).to be false
             end
           end
         end
@@ -65,13 +76,16 @@ module Sym
 
       context 'generate private key' do
         let(:argv) { %w(-g) }
+
         before do
           expect(cli).not_to be_nil
           expect(cli.command).not_to be_nil
           expect(cli.command.class).to eq(Commands::GenerateKey)
           expect(cli.command).to receive(:create_key).and_return(TEST_KEY)
         end
+
         include_context :run_command
+
         it 'should output the generated key' do
           expect_command_to_have klass:  Commands::GenerateKey,
                                  output: [/[a-zA-Z0-9\-_=]{44}/],
@@ -83,11 +97,14 @@ module Sym
 
       context 'show version' do
         let(:argv) { %w(--version --trace) }
-        before { allow_any_instance_of(Sym::App::CLI).to receive(:args_from_environment).and_return(nil) }
+        before { allow(cli).to receive(:args_from_environment).and_return(nil) }
+
         include_context :run_command
+
         it 'should correctly define opts' do
           expect(cli.application.provided_options.keys.sort).to eq %i(version trace).sort
         end
+
         it 'should output the version number' do
           expect_command_to_have klass:  Commands::ShowVersion,
                                  output: ["sym (version #{Sym::VERSION})"],
