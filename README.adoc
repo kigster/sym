@@ -192,7 +192,8 @@ My secret data
 
 # Lets now save common flags in the SYM_ARGS bash variable:
 ❯ export SYM_ARGS="-ck my-new-key"
-❯ sym -df secret.enc
+# To have sym parse the SYM_ARGS variable, we must activate this feature with -A
+❯ sym -Adf secret.enc
 My secret data
 ----
 
