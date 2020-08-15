@@ -62,7 +62,7 @@ RSpec.describe 'CLI execution', :type => :aruba do
       end
 
       it 'should have two files to install and they are the bash files from bin' do
-        expect(::Sym::Constants::BASH_FILES.map { |f| File.basename(f) }).to eq %w[sym.symit.bash sym.completion.bash]
+        expect(::Sym::Constants::BASH_FILES.map { |f| File.basename(f) }.sort).to eq %w[sym.completion.bash sym.symit.bash]
       end
 
       context 'file contents' do
