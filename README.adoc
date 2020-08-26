@@ -167,6 +167,8 @@ A sample session that uses Mac OS-X Keychain to store the password-protected key
 [source,bash]
 ----
 # Gen a new key, password-encrypt it, cache the password, save
+[![FOSSA Status](https://app.fossa.com/api/projects/git%2Bgithub.com%2Fkigster%2Fsym.svg?type=shield)](https://app.fossa.com/projects/git%2Bgithub.com%2Fkigster%2Fsym?ref=badge_shield)
+
 # result in the key chain entry 'my-new-key' (but don't print it '-q')
 ❯ sym -gpqcx my-new-key
 New Password     :  •••••••••
@@ -668,3 +670,7 @@ Please submit feature requests, bugs, or donations :)
 * https://github.com/meganmmathews[Megan Mathews] (UX, CLI suggestions)
 * https://twitter.com/z3ndrag0n[Barry Anderson] (sanity checking, review)
 * https://github.com/JustinNazari[Justin Nazari] (bug fixes)
+
+
+## License
+[![FOSSA Status](https://app.fossa.com/api/projects/git%2Bgithub.com%2Fkigster%2Fsym.svg?type=large)](https://app.fossa.com/projects/git%2Bgithub.com%2Fkigster%2Fsym?ref=badge_large)
