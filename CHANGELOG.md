@@ -1,8 +1,24 @@
 # Changelog
 
+## [v3.0.1](https://github.com/kigster/sym/tree/v3.0.1) (2021-02-12)
+
+[Full Changelog](https://github.com/kigster/sym/compare/v3.0.0...v3.0.1)
+
+**Merged pull requests:**
+
+- Fixing args expansion for Ruby 3.0.0 [\#32](https://github.com/kigster/sym/pull/32) ([kigster](https://github.com/kigster))
+
+## [v3.0.0](https://github.com/kigster/sym/tree/v3.0.0) (2020-08-15)
+
+[Full Changelog](https://github.com/kigster/sym/compare/v2.10.1...v3.0.0)
+
 ## [v2.10.1](https://github.com/kigster/sym/tree/v2.10.1) (2020-08-15)
 
-[Full Changelog](https://github.com/kigster/sym/compare/v2.10.0...v2.10.1)
+[Full Changelog](https://github.com/kigster/sym/compare/list...v2.10.1)
+
+## [list](https://github.com/kigster/sym/tree/list) (2020-08-15)
+
+[Full Changelog](https://github.com/kigster/sym/compare/v2.10.0...list)
 
 **Closed issues:**
 
@@ -16,6 +32,10 @@
 
 [Full Changelog](https://github.com/kigster/sym/compare/v2.8.5...v2.10.0)
 
+**Fixed bugs:**
+
+- First pass on Version 2.9.0 — dropping the coin gem [\#20](https://github.com/kigster/sym/pull/20) ([kigster](https://github.com/kigster))
+
 **Closed issues:**
 
 - Switch to Codecov for test coverage [\#29](https://github.com/kigster/sym/issues/29)
@@ -27,7 +47,6 @@
 - Switch to Codecov for test coverage; version bump 2.10.0 [\#28](https://github.com/kigster/sym/pull/28) ([kigster](https://github.com/kigster))
 - Fix remaining 2.7 warnings; memcached & keychain [\#27](https://github.com/kigster/sym/pull/27) ([kigster](https://github.com/kigster))
 - Adding Rubocop, and fixing minor issues. [\#21](https://github.com/kigster/sym/pull/21) ([kigster](https://github.com/kigster))
-- First pass on Version 2.9.0 — dropping the coin gem [\#20](https://github.com/kigster/sym/pull/20) ([kigster](https://github.com/kigster))
 - CI: Update matrix [\#19](https://github.com/kigster/sym/pull/19) ([olleolleolle](https://github.com/olleolleolle))
 
 ## [v2.8.5](https://github.com/kigster/sym/tree/v2.8.5) (2018-10-13)
