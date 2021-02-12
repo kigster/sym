@@ -6,22 +6,24 @@ module Sym
 
       context 'basic initialization' do
         let(:opts) { { generate: true } }
-        let(:application) { Sym::Application.new(opts) }
+        let(:application) { described_class.new(opts) }
 
-        it 'should properly initialize' do
-          expect(application).to_not be_nil
-          expect(application.opts).to_not be_nil
+        it 'properlies initialize' do
+          expect(application).not_to be_nil
+          expect(application.opts).not_to be_nil
           expect(application.opts[:generate]).to be_truthy
           expect(application.command).to be_a_kind_of(Sym::App::Commands::GenerateKey)
         end
       end
 
       context 'negated option' do
-        RSpec.shared_examples :negated do
-          let(:cli_opts) { { negate: source_file } }
-          let(:application) { Sym::Application.new(cli_opts) }
+        RSpec.shared_examples 'negated' do
           subject(:opts) { application.opts }
-          it 'should properly initialize' do
+
+          let(:cli_opts) { { negate: source_file } }
+          let(:application) { described_class.new(cli_opts) }
+
+          it 'properlies initialize' do
             expect(opts.key?(:negate)).to eq(false)
             expect(opts[:file]).to eq(source_file)
             expect(opts[:output]).to eq(dest_file)
@@ -29,14 +31,15 @@ module Sym
           end
         end
         context 'negated encrypted file' do
-          it_behaves_like :negated do
+          it_behaves_like 'negated' do
             let(:action) { :decrypt }
             let(:source_file) { 'file.yml.enc' }
             let(:dest_file) { 'file.yml' }
           end
         end
+
         context 'negated unencrypted file' do
-          it_behaves_like :negated do
+          it_behaves_like 'negated' do
             let(:action) { :encrypt }
             let(:source_file) { 'file.yml' }
             let(:dest_file) { 'file.yml.enc' }
@@ -46,13 +49,13 @@ module Sym
 
       context 'editor' do
         let(:opts) { { help: true } }
-        let(:application) { Sym::Application.new(opts) }
+        let(:application) { described_class.new(opts) }
         let(:existing_editor) { 'exe/sym' }
         let(:non_existing_editor) { '/tmp/broohaha/vim' }
 
         RSpec.shared_examples 'editor detection' do
-          it 'should return the first valid editor from the list' do
-            expect(application).to_not be_nil
+          it 'returns the first valid editor from the list' do
+            expect(application).not_to be_nil
             expect(application).to receive(:editors_to_try).
               and_return([non_existing_editor, existing_editor])
             expect(application.editor).to eql(existing_editor)
@@ -68,21 +71,23 @@ module Sym
         end
       end
 
-      context '#initialize_key_source' do
-        include_examples :encryption
+      describe '#initialize_key_source' do
+        include_examples 'encryption'
 
         RSpec.shared_examples 'a private key detection' do
+          subject(:application) { described_class.new(opts) }
+
           let(:key_data) { private_key }
           let(:opts) { { encrypt: true, string: 'hello', key: key_data } }
-          subject(:application) { Sym::Application.new(opts) }
 
-          it 'should not have the default key' do
+          it 'does not have the default key' do
             expect(Sym.default_key?).to be(false)
           end
 
           context 'key supplied as a string' do
             before { application.send(:initialize_key_source) }
-            its(:key) { should eq(key) }
+
+            its(:key) { is_expected.to eq(key) }
           end
 
           context 'key supplied as a file path' do
@@ -95,35 +100,37 @@ module Sym
               application.send(:initialize_key_source)
             end
 
-            its(:key) { should eq(key) }
+            its(:key) { is_expected.to eq(key) }
 
-            it 'should have the key' do
+            it 'has the key' do
               expect(File.read(tempfile.path)).to eq(private_key)
             end
           end
 
           context 'key supplied as environment variable' do
             let(:key_data) { 'PRIVATE_KEY' }
+
             before do
               allow(ENV).to receive(:[]).with('MEMCACHE_USERNAME')
               allow(ENV).to receive(:[]).with('SYM_CACHE_TTL')
               expect(ENV).to receive(:[]).with(key_data).and_return(private_key)
               application.send(:initialize_key_source)
             end
-            its(:key) { should eq(key) }
+
+            its(:key) { is_expected.to eq(key) }
           end
 
           context 'default key exists' do
             let(:key_data) { nil }
 
             before do
-              expect(Sym).to receive(:default_key?).at_least(1).times.and_return(true)
-              expect(Sym).to receive(:default_key).at_least(1).times.and_return(private_key)
+              expect(Sym).to receive(:default_key?).at_least(:once).and_return(true)
+              expect(Sym).to receive(:default_key).at_least(:once).and_return(private_key)
               application.send(:initialize_key_source)
             end
 
-            its(:key) { should eq(key) }
-            its(:key_source) { should start_with('default_file://') }
+            its(:key) { is_expected.to eq(key) }
+            its(:key_source) { is_expected.to start_with('default_file://') }
           end
         end
 
@@ -137,8 +144,9 @@ module Sym
           it_behaves_like 'a private key detection' do
             before do
               allow(application.input_handler).to receive(:ask).at_least(10).times.and_return(password)
-              allow(ENV).to receive(:[]).with('SYM_PASSWORD').at_least(1).times.and_return(password)
+              allow(ENV).to receive(:[]).with('SYM_PASSWORD').at_least(:once).and_return(password)
             end
+
             let(:password) { 'pIA44z!w04DS' }
             let(:private_key) { test_instance.encr_password(key, password) }
           end

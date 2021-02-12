@@ -13,6 +13,7 @@ RSpec.describe Sym::App::Password::Cache do
 
   context 'cache provider' do
     subject { cache.provider }
+
     it { is_expected.to be_kind_of(Sym::App::Password::Providers::MemcachedProvider) }
   end
 
@@ -23,12 +24,12 @@ RSpec.describe Sym::App::Password::Cache do
     end
 
     context 'storing data' do
-      it 'should write and read data' do
+      it 'writes and read data' do
         if clear_memcached! # returns false if clearing memcached fails
           expect(cache['greeting']).to be_nil
           cache['greeting'] = 'hello'
           sleep 0.01
-          expect(cache.provider).to_not be_nil
+          expect(cache.provider).not_to be_nil
           expect(cache['greeting']).to eql('hello')
         end
       end
@@ -37,10 +38,12 @@ RSpec.describe Sym::App::Password::Cache do
 
   context 'cache disabled' do
     let(:enabled) { false }
-    it 'should properly set enabled to false' do
+
+    it 'properlies set enabled to false' do
       expect(cache.enabled).to be false
     end
-    it 'should not cache values' do
+
+    it 'does not cache values' do
       cache['foo'] = 'bar'
       expect(cache['foo']).to be_nil
     end

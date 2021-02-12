@@ -50,6 +50,7 @@ module Sym
         extend Forwardable
 
         attr_accessor :application
+
         def_delegators :@application, :opts, :opts_slop, :key, :stdin, :stdout, :stderr, :kernel
 
         def initialize(application)

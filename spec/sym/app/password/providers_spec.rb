@@ -6,41 +6,48 @@ module Sym
     module Password
 
       RSpec.describe Providers do
-        its(:providers) { should_not be_empty }
-        its(:providers) { should include Providers::MemcachedProvider }
-
-        before :each do
-          Providers.detected = nil
+        before do
+          described_class.detected = nil
         end
 
-        context '#provider_from_arguments' do
-          subject { Providers.send(:provider_from_argument, argument) }
+        its(:providers) { is_expected.not_to be_empty }
+        its(:providers) { is_expected.to include Providers::MemcachedProvider }
+
+
+        describe '#provider_from_arguments' do
+          subject { described_class.send(:provider_from_argument, argument) }
+
           context 'when unknown' do
             let(:argument) { :something }
-            it('should be nil') { is_expected.to be_nil }
+
+            it('is nil') { is_expected.to be_nil }
           end
+
           context 'when :memcached' do
             let(:argument) { :memcached }
+
             it('be Memcached') { is_expected.to be_kind_of(Providers::MemcachedProvider) }
           end
         end
 
-        context '#detect' do
+        describe '#detect' do
           before do
             allow_any_instance_of(Providers::MemcachedProvider).to receive(:alive?).and_return(true)
           end
-          its(:provider) { should eq(subject.detect) }
-          its(:provider) { should be_kind_of(Providers::MemcachedProvider) }
+
+          its(:provider) { is_expected.to eq(subject.detect) }
+          its(:provider) { is_expected.to be_kind_of(Providers::MemcachedProvider) }
         end
 
-        context '#detect' do
+        describe '#detect' do
           context 'none available' do
             before do
               subject.providers.each do |provider|
-                expect_any_instance_of(provider).to receive(:alive?).at_least(1).times.and_return(false)
+                expect_any_instance_of(provider).to receive(:alive?).at_least(:once).and_return(false)
               end
             end
-            its(:detect) { should be_nil }
+
+            its(:detect) { is_expected.to be_nil }
           end
 
           context 'all available' do
@@ -49,9 +56,10 @@ module Sym
                 allow_any_instance_of(provider).to receive(:alive?).and_return(true)
               end
             end
-            its(:detect) { should be_kind_of(subject.providers.first) }
-            its(:detect) { should be_kind_of(Providers::MemcachedProvider) }
-            its(:detect) { should respond_to(:read, :write, :alive?) }
+
+            its(:detect) { is_expected.to be_kind_of(subject.providers.first) }
+            its(:detect) { is_expected.to be_kind_of(Providers::MemcachedProvider) }
+            its(:detect) { is_expected.to respond_to(:read, :write, :alive?) }
           end
         end
       end

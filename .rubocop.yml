@@ -1,8 +1,15 @@
+inherit_from: .rubocop_todo.yml
+
 inherit_gem:
   relaxed-rubocop: .rubocop.yml
 
+require:
+  - rubocop-rspec
+  - rubocop-rake
+
 AllCops:
-  TargetRubyVersion: 2.3
+  NewCops: enable
+  TargetRubyVersion: 2.6
 
 Style/Alias:
   Enabled: false
@@ -46,6 +53,10 @@ Style/EndBlock:
 Style/FormatString:
   Enabled: false
   StyleGuide: https://relaxed.ruby.style/#styleformatstring
+
+Style/StringConcatenation:
+  Enabled: false
+
 
 Style/IfUnlessModifier:
   Enabled: false
@@ -223,7 +234,7 @@ Style/BarePercentLiterals:
 Style/FormatStringToken:
   Enabled: false
 
-Style/MethodMissingSuper:
+Lint/MissingSuper:
   Enabled: false
 
 Style/MissingRespondToMissing:
@@ -376,3 +387,8 @@ Style/HashTransformKeys:
 Style/HashTransformValues:
   Enabled: true
 
+Lint/ConstantDefinitionInBlock:
+  Enabled: false
+
+Lint/Debugger:
+  Enabled: false

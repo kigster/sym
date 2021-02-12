@@ -3,18 +3,20 @@ require 'singleton'
 module Sym
   module App
     RSpec.describe Sym::App::PrivateKey::Handler do
-      include_context :test_instance
+      subject { described_class.new(opts, input_handler, password_handler).key }
+
+      include_context 'test instance'
 
       let(:key) { test_class.create_private_key }
       let(:input_handler) { Sym::App::Input::Handler.new }
       let(:password_handler) { Sym::App::Password::Cache.instance.configure(enabled: false) }
 
-      subject { Sym::App::PrivateKey::Handler.new(opts, input_handler, password_handler).key }
 
       context 'in both cases, where the key is ' do
         context 'unencrypted' do
           let(:opts) { { key: key } }
-          let(:argv) { "-k #{key} ".split(' ') }
+          let(:argv) { "-k #{key} ".split }
+
           context 'shows unencrypted private keys' do
             it { is_expected.to eql(key) }
           end
@@ -28,6 +30,7 @@ module Sym
           before do
             expect(input_handler).to receive(:ask).once.and_return(password)
           end
+
           context 'shows the decrypted private keys' do
             it { is_expected.to eql(key) }
           end

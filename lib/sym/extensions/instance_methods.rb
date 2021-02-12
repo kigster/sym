@@ -72,7 +72,7 @@ module Sym
         key_len = cipher.key_len
         salt    ||= OpenSSL::Random.random_bytes 16
         iter    = 20_000
-        digest  = OpenSSL::Digest::SHA256.new
+        digest  = OpenSSL::Digest.new('SHA256')
         key     = OpenSSL::PKCS5.pbkdf2_hmac(password, salt, iter, key_len, digest)
         return key, salt
       end
@@ -85,7 +85,7 @@ module Sym
                                                   iv:          iv)
 
         block.call(cipher_struct) if block
-
+ 
         encrypted_data = update_cipher(cipher_struct.cipher, data)
         arguments      = { encrypted_data: encrypted_data,
                            iv:             cipher_struct.iv,
@@ -93,7 +93,7 @@ module Sym
                            salt:           cipher_struct.salt,
                            compress:       !compression_enabled }
         wrapper_struct = WrapperStruct.new(**arguments)
-        encode(wrapper_struct, false)
+        encode(wrapper_struct, compress: false)
       end
 
       # Expects key to be a base64 encoded key data
@@ -109,7 +109,7 @@ module Sym
 
       def encode_incoming_data(data)
         compression_enabled = !data.respond_to?(:size) || (data.size > 100 && encryption_config.compression_enabled)
-        data                = encode(data, compression_enabled)
+        data                = encode(data, compress: compression_enabled)
         [data, compression_enabled]
       end
 

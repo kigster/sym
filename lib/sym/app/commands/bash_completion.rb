@@ -50,7 +50,7 @@ module Sym
 
         def append_completion_script(file, script)
           File.open(file, 'a') do |fd|
-            fd.write(script + "\n")
+            fd.write("#{script}\n")
           end
         end
 

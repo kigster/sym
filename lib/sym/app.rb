@@ -16,15 +16,14 @@ module Sym
   #
   module App
     class << self
-      attr_accessor :exit_code
-      attr_accessor :stdin, :stdout, :stderr
+      attr_accessor :exit_code, :stdin, :stdout, :stderr
     end
 
     self.exit_code = 0
 
-    self.stdin     = STDIN
-    self.stdout    = STDOUT
-    self.stderr    = STDERR
+    self.stdin     = $stdin
+    self.stdout    = $stdout
+    self.stderr    = $stderr
 
     def self.out
       self.stderr
@@ -44,7 +43,7 @@ module Sym
 
       lines = []
 
-      error_type    = "#{(type || exception.class.name)}"
+      error_type    = "#{type || exception.class.name}"
       error_details = (details || exception.message)
 
       operation = command ? "to #{command.class.short_name.to_s.humanize.downcase}" : ''
@@ -55,7 +54,7 @@ module Sym
         lines << exception.backtrace.join("\n").red.bold if config[:trace]
         lines << "\n"
       else
-        lines << " ✖ Sym Error #{operation}:".bold.red + (reason ? " #{reason} ".red.italic: " #{error_details}")[0..70] + ' '.normal + "\n"
+        lines << "#{" ✖ Sym Error #{operation}:".bold.red}#{(reason ? " #{reason} ".red.italic: " #{error_details}")[0..70]}#{' '.normal}\n"
         lines << "#{comments}" if comments
       end
 

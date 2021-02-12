@@ -16,9 +16,8 @@ module Sym
         attr_accessor :name, :reducted, :input, :output
 
         def initialize(name:,
-                       reducted: false,
-                       input: ->(detector) { detector.opts[:key] },
-                       output:)
+                       output:, reducted: false,
+                       input: ->(detector) { detector.opts[:key] })
 
           self.name     = name
           self.reducted = reducted

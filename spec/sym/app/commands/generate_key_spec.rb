@@ -7,17 +7,20 @@ module Sym
 
         context 'new private key' do
 
-          include_context :run_command
+          include_context 'run command'
 
           let(:argv) { %w(-g -T) }
-          it 'should be generated' do
-            expect_command_to_have klass: GenerateKey,
+          let(:key) { program_output }
+          let(:key) { program_output }
+
+          it 'is generated' do
+            expect_command_to_have klass: described_class,
                                    output: [ %r([a-zA-Z0-9\-_=]{44,45}) ],
                                    option: :generate,
                                    value: true
           end
 
-          let(:key) { program_output }
+
           it_behaves_like 'a private key'
         end
       end
