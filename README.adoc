@@ -19,14 +19,15 @@ image:https://ruby-gem-downloads-badge.herokuapp.com/sym?extension=svg[Sym Downl
 image:https://codecov.io/gh/kigster/sym/branch/master/graphs/sunburst.svg[Coverage Map,link=https://codecov.io/gh/kigster/sym]
 ====
 
-Please checkout the following post — _http://kig.re/2017/03/10/dead-simple-encryption-with-sym.html[Dead Simple Encryption with Sym]_ — that announced the initial release of this library, and provides further in-depth discussion. Your donation of absolutely any amount is much appreciated but never required.
+NOTE: Please checkout the following post — _http://kig.re/2017/03/10/dead-simple-encryption-with-sym.html[Dead Simple Encryption with Sym]_ — that announced the initial release of this library, and provides further in-depth discussion. Your donation of absolutely any amount is much appreciated but never required.
 
 image:https://www.paypalobjects.com/en_US/i/btn/btn_donate_SM.gif[Donate,link=https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_id=FSFYYNEQ8RKWU]
+
+NOTE: You can read this README in the properly rendered for print format, by downloading the xref:README.pdf[PDF].
 
 == Introduction
 
 NOTE: *SYM* is an open source command line utility and a Ruby library, which makes it _trivial to encrypt your application secrets with mathematically proven models and ciphers offered in a much larger project — Open SSL.
-
 
 Unlike many existing encryption tools, *sym* focuses on narrowing the gap between convenience and security, by offering enhanced usability and a streamlined ruby API and a CLI. The primary goal of the library is to make encryption very easy and transparent. +
 
@@ -670,6 +671,5 @@ Please submit feature requests, bugs, or donations :)
 
 * link:http:/kig.re[Konstantin Gredeskoul] (primary developer)
 * https://github.com/bosswissam[Wissam Jarjoui] (testing, inspiration)
-* https://github.com/meganmmathews[Megan Mathews] (UX, CLI suggestions)
 * https://twitter.com/z3ndrag0n[Barry Anderson] (sanity checking, review)
 * https://github.com/JustinNazari[Justin Nazari] (bug fixes)
