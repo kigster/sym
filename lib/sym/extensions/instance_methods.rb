@@ -92,7 +92,7 @@ module Sym
                            cipher_name:    cipher_struct.cipher.name,
                            salt:           cipher_struct.salt,
                            compress:       !compression_enabled }
-        wrapper_struct = WrapperStruct.new(arguments)
+        wrapper_struct = WrapperStruct.new(**arguments)
         encode(wrapper_struct, false)
       end
 

@@ -6,7 +6,7 @@ module Sym
       let(:iv) { OpenSSL::Random.random_bytes 16 }
       let(:cipher_name) { Sym::Configuration.property(:data_cipher) }
       let(:args) { { encrypted_data: 1234, iv: iv, cipher_name: cipher_name, salt: 'Boo' } }
-      let(:ws) { WrapperStruct.new(args) }
+      let(:ws) { WrapperStruct.new(** args) }
 
       context 'WrapperStruct' do
 

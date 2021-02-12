@@ -1,4 +1,7 @@
-= *sym* — _Symmetric Encryption for Humans_
+= **Sym** — _Symmetric Encryption for Humans_
+:source-highlighter: rouge
+:rouge-style: base16.monokai
+:icons: font
 :toc:
 :sectnum:
 :toclevel: 4
@@ -46,6 +49,8 @@ Additionally, Sym comes with a helpful BASH wrapper `symit`.
 *Help screens for `sym` and `symit` are shown in full on another page -- xref:SYM-CLI.adoc[Sym Help Screens and Symit]. Please refer to it for complete help screens and the examples.*
 
 == Supported Ruby Versions
+
+NOTE: Ruby 3.0.0 is only supported by Sym version 3.0.1 and later.
 
 Sym currently builds and runs on the following ruby versions on Travis CI:
 
