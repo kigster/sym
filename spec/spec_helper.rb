@@ -22,9 +22,9 @@ require 'aruba'
 require 'rspec/its'
 
 if File.exist?(Sym::Constants.sym_key_file)
-  FileUtils.mv(Sym::Constants.sym_key_file, Sym::Constants.sym_key_file + '.bak')
+  FileUtils.mv(Sym::Constants.sym_key_file, "#{Sym::Constants.sym_key_file}.bak")
   Kernel.at_exit do
-    FileUtils.mv(Sym::Constants.sym_key_file + '.bak', Sym::Constants.sym_key_file)
+    FileUtils.mv("#{Sym::Constants.sym_key_file}.bak", Sym::Constants.sym_key_file)
   end
 end
 
@@ -49,4 +49,4 @@ end
 
 $LOAD_PATH.unshift File.expand_path('../../lib', __FILE__)
 
-::Dir.glob(::File.expand_path('../support/**/*.rb', __FILE__)).each { |f| require f }
+::Dir.glob(::File.expand_path('../support/**/*.rb', __FILE__)).sort.each { |f| require f }

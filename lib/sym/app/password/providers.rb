@@ -4,9 +4,7 @@ module Sym
       module Providers
 
         class << self
-          attr_accessor :registry
-          attr_accessor :providers
-          attr_accessor :detected
+          attr_accessor :registry, :providers, :detected
 
           def register(provider_class)
             self.registry                        ||= {}

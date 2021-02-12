@@ -35,10 +35,6 @@ module Sym
 
     # See file +lib/sym.rb+ where these values are defined.
 
-    attr_accessor :data_cipher, :password_cipher, :private_key_cipher
-    attr_accessor :compression_enabled, :compression_level
-    attr_accessor :password_cache_default_provider, :password_cache_timeout
-    attr_accessor :password_cache_arguments
-    attr_accessor :default_key_file, :encrypted_file_extension
+    attr_accessor :data_cipher, :password_cipher, :private_key_cipher, :compression_enabled, :compression_level, :password_cache_default_provider, :password_cache_timeout, :password_cache_arguments, :default_key_file, :encrypted_file_extension
   end
 end

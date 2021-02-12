@@ -21,14 +21,15 @@ module Sym
           it "variable #{variable} should be set to value #{value}" do
             expect(KeyChain.send(variable)).to eql(value)
           end
+
           it "variable #{variable} should not be nil" do
-            expect(KeyChain.send(variable)).to_not be_nil
+            expect(KeyChain.send(variable)).not_to be_nil
           end
         end
       end
 
-      context '#execute' do
-        it 'should run a command successfully' do
+      describe '#execute' do
+        it 'runs a command successfully' do
           expect(keychain.execute('echo hello')).to eql('hello')
         end
       end
@@ -46,7 +47,7 @@ module Sym
             keychain.stderr_on
           end
 
-          it 'should add a new key' do
+          it 'adds a new key' do
             sleep 0.1
             expect(keychain.find).to eql(password)
           end

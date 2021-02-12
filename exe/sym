@@ -3,7 +3,7 @@
 
 require_relative '../lib/ruby_warnings'
 
-lib_path = File.expand_path(File.dirname(__FILE__) + '/../lib')
+lib_path = File.expand_path("#{File.dirname(__FILE__)}/../lib")
 $LOAD_PATH << lib_path if File.exist?(lib_path) && !$LOAD_PATH.include?(lib_path)
 
 require 'sym'
@@ -13,9 +13,9 @@ require 'sym/app'
 begin
   exit ::Sym::App::CLI.new(ARGV.dup).execute
 rescue Interrupt => e
-  STDERR.flush
+  $stderr.flush
   warn "Interrupt, #{e.message}, exiting."
-  STDERR.flush
+  $stderr.flush
   exit 1
 end
 

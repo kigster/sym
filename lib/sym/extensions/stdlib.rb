@@ -13,8 +13,8 @@ class Object
   unless self.methods.include?(:present?)
     def present?
       return false if self.nil?
-      if self.is_a?(String)
-        return false if self == ''
+      if self.is_a?(String) && (self == '')
+        return false
       end
       true
     end

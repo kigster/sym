@@ -58,7 +58,7 @@ module Sym
 
       attr_accessor :opts, :application, :outputs, :stdin, :stdout, :stderr, :kernel, :args
 
-      def initialize(argv, stdin = STDIN, stdout = STDOUT, stderr = STDERR, kernel = nil)
+      def initialize(argv, stdin = $stdin, stdout = $stdout, stderr = $stderr, kernel = nil)
         self.args   = argv
         self.stdin  = stdin
         self.stdout = stdout
@@ -79,15 +79,13 @@ module Sym
           end
 
           # Deal with SYM_ARGS and -A
-          if opts[:sym_args]
-            if non_empty_array?(sym_args)
+          if opts[:sym_args] && non_empty_array?(sym_args)
               args << sym_args
               args.flatten!
               args.compact!
               args.delete('-A')
               args.delete('--sym-args')
               self.opts = parse(args)
-            end
           end
 
           # Disable coloring if requested, or if piping STDOUT
@@ -99,7 +97,7 @@ module Sym
         rescue StandardError => e
           log :error, "#{e.message}" if opts
           error exception: e
-          quit!(127) if stdin == STDIN
+          quit!(127) if stdin == $stdin
         end
 
         self.application = ::Sym::Application.new(self.opts, stdin, stdout, stderr, kernel)

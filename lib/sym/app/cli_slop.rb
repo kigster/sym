@@ -19,7 +19,7 @@ module Sym
           o.separator '      5) use -i to paste/type the key interactively'.dark
           o.separator '      6) default key file (if present) at '.dark + Sym.default_key_file.magenta.bold
           o.separator ' '
-          o.separator '       ' + key_spec + ' = -k/--key [ key | file | keychain | env variable name ]'.green.bold
+          o.separator "       #{key_spec}#{' = -k/--key [ key | file | keychain | env variable name ]'.green.bold}"
           o.separator         '                  -i/--interactive'.green.bold
           o.separator ''
           o.separator '   Encrypt/Decrypt from STDIN/file/args, to STDOUT/file:'.dark
@@ -48,7 +48,7 @@ module Sym
           o.separator 'Modes:'.yellow
           o.bool      '-e', '--encrypt',            '           encrypt mode'
           o.bool      '-d', '--decrypt',            '           decrypt mode'
-          o.string    '-t', '--edit',               '[file]  '.blue + '   edit encrypted file in an $EDITOR', default: nil
+          o.string    '-t', '--edit',               "#{'[file]  '.blue}   edit encrypted file in an $EDITOR", default: nil
           o.string    '-n', '--negate',             '[file]  '.blue + "   encrypts any regular #{'file'.green} into #{'file.enc'.green}" + "\n" +
                                      "                                    conversely decrypts #{'file.enc'.green} into #{'file'.green}."
           o.separator ' '
@@ -57,25 +57,25 @@ module Sym
           o.bool      '-p', '--password',           '           encrypt the key with a password'
 
           if Sym::App.osx?
-            o.string '-x', '--keychain',            '[key-name] '.blue + 'write the key to OS-X Keychain'
+            o.string '-x', '--keychain',            "#{'[key-name] '.blue}write the key to OS-X Keychain"
           end
 
           o.separator ' '
           o.separator 'Read existing private key from:'.yellow
-          o.string    '-k', '--key',                '[key-spec]'.blue + ' private key, key file, or keychain'
+          o.string    '-k', '--key',                "#{'[key-spec]'.blue} private key, key file, or keychain"
           o.bool      '-i', '--interactive',        '           Paste or type the key interactively'
 
           o.separator ' '
           o.separator 'Password Cache:'.yellow
           o.bool      '-c', '--cache-passwords',     '           enable password cache'
-          o.integer   '-z', '--cache-timeout',       '[seconds]'.blue + '  expire passwords after'
+          o.integer   '-z', '--cache-timeout',       "#{'[seconds]'.blue}  expire passwords after"
           o.string    '-r', '--cache-provider',      '[provider]'.blue + ' cache provider, one of ' + "#{Sym::App::Password::Providers.provider_list}"
 
           o.separator ' '
           o.separator 'Data to Encrypt/Decrypt:'.yellow
-          o.string    '-s', '--string',             '[string]'.blue + '   specify a string to encrypt/decrypt'
-          o.string    '-f', '--file',               '[file]  '.blue + '   filename to read from'
-          o.string    '-o', '--output',             '[file]  '.blue + '   filename to write to'
+          o.string    '-s', '--string',             "#{'[string]'.blue}   specify a string to encrypt/decrypt"
+          o.string    '-f', '--file',               "#{'[file]  '.blue}   filename to read from"
+          o.string    '-o', '--output',             "#{'[file]  '.blue}   filename to write to"
 
           o.separator ' '
           o.separator 'Flags:'.yellow
@@ -95,8 +95,7 @@ module Sym
                         "   user home available, you may need to force set user's home to any existing\n" +
                         "   directory using the #{'--user-home'.bold.blue} flag.\n"
 
-          o.string    '-B', '--bash-support',       '[file]'.blue + '     append bash completion & utils to a file'+ "\n" +
-            '                                    such as ~/.bash_profile or ~/.bashrc'
+          o.string    '-B', '--bash-support',       "#{'[file]'.blue}     append bash completion & utils to a file\n                                    such as ~/.bash_profile or ~/.bashrc"
           o.string    '-u', '--user-home',       '[DIR]'.blue + "      Overrides #{'${HOME}'.green} ==> supports AWS Lambda\n"
 
           o.separator ' '

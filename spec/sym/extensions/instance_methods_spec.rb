@@ -3,11 +3,13 @@ require 'sym/errors'
 module Sym
   module Extensions
     RSpec.describe Sym::Extensions::InstanceMethods do
-      include_context :encryption
       subject { instance }
+
+      include_context 'encryption'
+
       let(:extra_debug) { false }
 
-      context '#encr and #decr methods' do
+      describe '#encr and #decr methods' do
         it { is_expected.to respond_to(:encr) }
         it { is_expected.to respond_to(:decr) }
       end
@@ -15,7 +17,8 @@ module Sym
       context 'encrypting and decrypting a short strings' do
         let(:key) { instance.class.create_private_key }
         let(:data) { 'My girlfriend brings all the boys to the yard' }
-        it 'should be able to decrypt encrypted message' do
+
+        it 'is able to decrypt encrypted message' do
           data_encrypted = instance.encr(data, key)
           expect(instance.decr(data_encrypted, key)).to eql(data)
           expect(data_encrypted.length).to be > data.length
@@ -28,7 +31,8 @@ module Sym
         let(:file) { 'spec/fixtures/hamlet.txt' }
         let(:password) { 'Very secure password here' }
         let(:data) { File.read(file) }
-        it 'should be able to encrypt and decrypt with the password' do
+
+        it 'is able to encrypt and decrypt with the password' do
           data_encrypted = instance.encr(data, key)
           expect(instance.decr(data_encrypted, key)).to eql(data)
           expect(data_encrypted.length).to be < data.length
@@ -40,9 +44,10 @@ module Sym
         let(:file) { 'spec/fixtures/hamlet.txt' }
         let(:password) { 'Very secure password here' }
         let(:data) { File.read(file) }
-        it 'should be able to encrypt and decrypt with the password' do
+
+        it 'is able to encrypt and decrypt with the password' do
           data_encrypted = instance.encr_password(data, password)
-          expect(data_encrypted).to_not be_nil
+          expect(data_encrypted).not_to be_nil
           puts ">> [password file ] Encrypted: #{data_encrypted.length}, Original: #{data.length}" if extra_debug
           data_decrypted = instance.decr_password(data_encrypted, password)
           expect(data_decrypted).to eql(data)
@@ -51,7 +56,9 @@ module Sym
 
       context 'with nil or blank values' do
         subject(:i) { instance }
+
         let(:key) { i.class.create_private_key }
+
         it('#encr no data') { expect { i.encr(nil, key) }.to raise_error(::Sym::Errors::NoDataProvided) }
         it('#decr no data') { expect { i.decr(nil, key) }.to raise_error(::Sym::Errors::NoDataProvided) }
 

@@ -6,7 +6,7 @@ module Sym
       class Handler
         attr_accessor :stdin, :stdout, :stderr, :kernel
 
-        def initialize(stdin = STDIN, stdout = STDOUT, stderr = STDERR, kernel = nil)
+        def initialize(stdin = $stdin, stdout = $stdout, stderr = $stderr, kernel = nil)
           self.stdin  = stdin
           self.stdout = stdout
           self.stderr = stderr
@@ -27,7 +27,7 @@ module Sym
         end
 
         def prompt(message, color)
-          unless STDIN.isatty && STDIN.tty?
+          unless $stdin.isatty && $stdin.tty?
             raise Sym::Errors::CantReadPasswordNoTTY.new('key requires a password, however STDIN is not a TTY')
           end
           highline(message, color)

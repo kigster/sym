@@ -16,12 +16,12 @@ module Sym
                             result:  '75ngenJpB6zL47/8Wo7Ne6JN1pnOsqNEcIqblItpfg4='.green)
 
           output << example(comment: 'generate a new key with a cached password & save to the default key file',
-                            command: 'sym -gcpqo ' + Sym.default_key_file,
-                            echo:    'New Password     : ' + '••••••••••'.green,
-                            result:  'Confirm Password : ' + '••••••••••'.green)
+                            command: "sym -gcpqo #{Sym.default_key_file}",
+                            echo:    "New Password     : #{'••••••••••'.green}",
+                            result:  "Confirm Password : #{'••••••••••'.green}")
 
           output << example(comment: 'encrypt a plain text string with default key file, and immediately decrypt it',
-                            command: 'sym -es ' + '"secret string"'.bold.yellow + ' | sym -d',
+                            command: "sym -es #{'"secret string"'.bold.yellow} | sym -d",
                             result:  'secret string'.green)
 
           output << example(comment: 'encrypt secrets file using key in the environment, and --negate option:',
@@ -35,7 +35,7 @@ module Sym
                             result:  'secret string'.green)
 
           output << example(comment: 'encrypt/decrypt sym.yml using the default key file',
-                            command: 'sym -gcq > ' + Sym.default_key_file,
+                            command: "sym -gcq > #{Sym.default_key_file}",
                             echo:    'sym -n secrets.yml',
                             result:  'sym -df secrets.yml.enc',
           )

@@ -18,7 +18,7 @@ Gem::Specification.new do |spec|
   spec.bindir        = 'exe'
   spec.executables   = spec.files.grep(%r{^exe/}) { |f| File.basename(f) }
   spec.require_paths = ['lib']
-  spec.required_ruby_version = '>= 2.3'
+  spec.required_ruby_version = '>= 2.6'
   spec.post_install_message = <<~EOF
     
     Thank you for installing Sym! 
@@ -60,7 +60,9 @@ Gem::Specification.new do |spec|
   spec.add_development_dependency 'relaxed-rubocop'
   spec.add_development_dependency 'rspec', '~> 3'
   spec.add_development_dependency 'rspec-its'
-  spec.add_development_dependency 'rubocop', '0.81.0'
+  spec.add_development_dependency 'rubocop' # , '0.81.0'
+  spec.add_development_dependency 'rubocop-rspec' # , '0.81.0'
+  spec.add_development_dependency 'rubocop-rake' # , '0.81.0'
   spec.add_development_dependency 'simplecov'
   spec.add_development_dependency 'codecov'
   spec.add_development_dependency 'yard'

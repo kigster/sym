@@ -6,7 +6,7 @@ module Sym
 
         attr_accessor :opts, :stdin, :stdout, :stderr, :kernel
 
-        def initialize(opts, stdin = STDIN, stdout = STDOUT, stderr = STDERR, kernel = nil)
+        def initialize(opts, stdin = $stdin, stdout = $stdout, stderr = $stderr, kernel = nil)
           self.opts   = opts
           self.stdin  = stdin
           self.stdout = stdout

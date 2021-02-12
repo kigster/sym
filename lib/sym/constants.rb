@@ -53,7 +53,7 @@ module Sym
 
     module Log
       NIL = Logger.new(nil).freeze # empty logger
-      LOG = Logger.new(STDERR).freeze
+      LOG = Logger.new($stderr).freeze
     end
   end
 end

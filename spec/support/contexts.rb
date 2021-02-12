@@ -35,14 +35,14 @@ module Sym
   end
 end
 
-RSpec.shared_context :test_instance do
+RSpec.shared_context 'test instance' do
   let(:instance) { TestClass.new }
   let(:test_class) { TestClass }
   let(:test_instance) { instance }
   let(:key) { TestClass.create_private_key }
 end
 
-RSpec.shared_context :console do
+RSpec.shared_context 'console' do
   let(:console) { Sym::App::FakeTerminal.new }
   let(:program_output_lines) { console.lines }
   let(:program_output) { program_output_lines.join("\n") }
@@ -64,13 +64,13 @@ RSpec.shared_context :console do
   end
 end
 
-RSpec.shared_context :encryption do
-  include_context :test_instance
-  include_context :console
+RSpec.shared_context 'encryption' do
+  include_context 'test instance'
+  include_context 'console'
 end
 
-RSpec.shared_context :run_command do
-  include_context :encryption
+RSpec.shared_context 'run command' do
+  include_context 'encryption'
 
   let(:key) { TEST_KEY }
   let(:cli) { Sym::App::CLI.new(argv) }
@@ -105,15 +105,15 @@ RSpec.shared_context :run_command do
 end
 
 
-RSpec.shared_context :commands do
-  include_context :run_command
+RSpec.shared_context 'commands' do
+  include_context 'run command'
 
   def before_cli_runs
     expect(Sym::App::Commands).to receive(:find_command_class).and_return(command_class)
   end
 end
 
-RSpec.shared_context :abc_classes do
+RSpec.shared_context 'abc classes' do
   let(:c_private_key) { 'BOT+8SVzRKQSl5qecjB4tUW1ENakJQw8wojugYQnEHc=' }
   before do
     class AClass
