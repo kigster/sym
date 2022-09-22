@@ -1,5 +1,5 @@
 module Sym
-  VERSION     = '3.0.1'
+  VERSION     = '3.0.2'
   DESCRIPTION = <<~eof
 
      Sym is a ruby library (gem) that offers both the command line interface 
