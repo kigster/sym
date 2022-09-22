@@ -7,8 +7,9 @@
 :toclevel: 4
 
 ====
+
+image:https://github.com/kigster/sym/actions/workflows/ruby.yml/badge.svg[Ruby,link=https://github.com/kigster/sym/actions/workflows/ruby.yml]
 image:https://badge.fury.io/rb/sym.svg[Gem Version,link=https://badge.fury.io/rb/sym]
-image:https://travis-ci.org/kigster/sym.svg?branch=master[Build Status,link=https://travis-ci.org/kigster/sym]
 image:https://circleci.com/gh/kigster/sym.svg?style=shield[CircleCI,link=https://circleci.com/gh/kigster/sym?style=shield]
 image:https://api.codeclimate.com/v1/badges/4f1d1614ccaa61c974dd/maintainability[Maintainability,link=https://codeclimate.com/github/kigster/sym/maintainability]
 
