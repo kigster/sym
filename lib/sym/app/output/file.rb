@@ -9,7 +9,7 @@ module Sym
         def output_proc
           Sym::App.log :info, "writing to a file #{opts[:output]}"
           ->(data) {
-            ::File.open(opts[:output], 'w') { |f| f.write(data) }
+            ::File.write(opts[:output], data)
           }
         end
       end

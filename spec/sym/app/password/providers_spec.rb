@@ -26,7 +26,7 @@ module Sym
           context 'when :memcached' do
             let(:argument) { :memcached }
 
-            it('be Memcached') { is_expected.to be_kind_of(Providers::MemcachedProvider) }
+            it('be Memcached') { is_expected.to be_a(Providers::MemcachedProvider) }
           end
         end
 
@@ -36,7 +36,7 @@ module Sym
           end
 
           its(:provider) { is_expected.to eq(subject.detect) }
-          its(:provider) { is_expected.to be_kind_of(Providers::MemcachedProvider) }
+          its(:provider) { is_expected.to be_a(Providers::MemcachedProvider) }
         end
 
         describe '#detect' do
@@ -57,8 +57,8 @@ module Sym
               end
             end
 
-            its(:detect) { is_expected.to be_kind_of(subject.providers.first) }
-            its(:detect) { is_expected.to be_kind_of(Providers::MemcachedProvider) }
+            its(:detect) { is_expected.to be_a(subject.providers.first) }
+            its(:detect) { is_expected.to be_a(Providers::MemcachedProvider) }
             its(:detect) { is_expected.to respond_to(:read, :write, :alive?) }
           end
         end

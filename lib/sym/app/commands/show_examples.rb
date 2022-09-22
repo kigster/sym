@@ -76,7 +76,7 @@ Diff:
           out << command if command
           out << echo if echo
           out << result if result
-          out << '—'*80
+          out << ('—'*80)
         end
       end
     end

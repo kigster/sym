@@ -62,12 +62,12 @@ module Sym
 
             diff = compute_diff
 
-            File.open(opts[:file], 'w') { |f| f.write(encr(content_edited, key)) }
+            File.write(opts[:file], encr(content_edited, key))
 
             out = ''
             if opts[:verbose]
-              out << "Saved encrypted/compressed content to #{opts[:file].bold.blue}" +
-                      " (#{File.size(opts[:file]) / 1024}Kb), unencrypted size #{content.length / 1024}Kb."
+              out << ("Saved encrypted/compressed content to #{opts[:file].bold.blue}" +
+                      " (#{File.size(opts[:file]) / 1024}Kb), unencrypted size #{content.length / 1024}Kb.")
               out << (opts[:backup] ? ",\nbacked up the last version to #{backup_file.bold.blue}." : '.')
             end
             out << "\n\nDiff:\n#{diff}"

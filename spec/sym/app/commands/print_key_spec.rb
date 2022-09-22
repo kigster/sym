@@ -20,7 +20,7 @@ module Sym
             include_context 'run command'
 
             it 'prints the base64-encoded key itself' do
-              expect(application.command).to be_a_kind_of(command_class)
+              expect(application.command).to be_a(command_class)
               expect(program_output).to eql(key)
             end
           end

@@ -29,7 +29,7 @@ module Sym
 
       configure do
         self.kind        = 'sym'
-        self.user        = ENV['USER']
+        self.user        = ENV.fetch('USER', nil)
         self.sub_section = 'generic-password'
       end
 

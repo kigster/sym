@@ -141,7 +141,7 @@ module Sym
 
     def editors_to_try
       [
-        ENV['EDITOR'],
+        ENV.fetch('EDITOR', nil),
         '/usr/bin/vim',
         '/usr/local/bin/vim',
         '/bin/vim',
