@@ -28,7 +28,7 @@ RSpec.describe 'CLI execution', :type => :aruba do
       before { RESET_TEMP_FILE.call }
 
       before do
-        File.open(TEMP_FILE, 'w') { |f| f.write("#!/usr/bin/env bash\n") }
+        File.write(TEMP_FILE, "#!/usr/bin/env bash\n")
         run_command_and_stop command, fail_on_error: true
       end
 
@@ -53,7 +53,7 @@ RSpec.describe 'CLI execution', :type => :aruba do
       before do
         RESET_TEMP_FILE[outfile]
         FileUtils.mkdir_p(user_home)
-        File.open(outfile, 'w') { |f| f.write("#!/usr/bin/env bash\n") }
+        File.write(outfile, "#!/usr/bin/env bash\n")
         run_command_and_stop command, fail_on_error: true
       end
 

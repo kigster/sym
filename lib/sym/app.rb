@@ -49,8 +49,8 @@ module Sym
       operation = command ? "to #{command.class.short_name.to_s.humanize.downcase}" : ''
       reason    = exception.message if exception
 
-      if exception && (config && config[:trace] || reason == 'Unknown Error')
-        lines << "#{error_type.bold.red}:\n#{error_details.red.italic}\n" + ''.normal
+      if exception && ((config && config[:trace]) || reason == 'Unknown Error')
+        lines << ("#{error_type.bold.red}:\n#{error_details.red.italic}\n" + ''.normal)
         lines << exception.backtrace.join("\n").red.bold if config[:trace]
         lines << "\n"
       else

@@ -12,7 +12,7 @@ module Sym
       let(:password_handler) { Sym::App::Password::Cache.instance.configure(enabled: false) }
 
 
-      context 'in both cases, where the key is ' do
+      context 'in both cases, where the key is' do
         context 'unencrypted' do
           let(:opts) { { key: key } }
           let(:argv) { "-k #{key} ".split }

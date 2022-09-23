@@ -11,7 +11,7 @@ module Sym
       let(:password) { 'Sup4r!Secur3' }
 
       BASE_VARS = {
-        user:        ENV['USER'],
+        user:        ENV.fetch('USER', nil),
         kind:        'sym',
         sub_section: 'generic-password'
       }

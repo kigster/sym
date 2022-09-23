@@ -69,7 +69,7 @@ module Sym
 
           KeySourceCheck.new(
             name:   :env,
-            output: ->(*, value) { ENV[value] if value =~ /^[a-zA-Z0-9_]+$/ }
+            output: ->(*, value) { value =~ /^[a-zA-Z0-9_]+$/ ? ENV[value] : nil }
           ),
 
           KeySourceCheck.new(

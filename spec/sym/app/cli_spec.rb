@@ -1,11 +1,14 @@
 require 'spec_helper'
 require 'sym/app/output/base'
 
+# rubocop: disable RSpec/NoExpectationExample
 module Sym
   module App
     RSpec.describe CLI do
       before do
         allow(Kernel).to receive(:exit)
+        allow(STDOUT).to receive(:puts)
+        allow(STDERR).to receive(:puts)
         allow_any_instance_of(described_class).to receive(:quit!).and_return(nil)
         allow_any_instance_of(described_class).to receive(:log).and_return(nil)
       end
@@ -15,11 +18,11 @@ module Sym
 
         include_context 'run command'
 
-        it 'properlies initialize' do
+        it 'properly initialize' do
           expect(cli).not_to be_nil
           expect(cli.opts).not_to be_nil
           expect(cli.opts[:generate]).to be_truthy
-          expect(cli.command).to be_a_kind_of(Sym::App::Commands::GenerateKey)
+          expect(cli.command).to be_a(Sym::App::Commands::GenerateKey)
         end
       end
 
@@ -38,7 +41,7 @@ module Sym
           it 'properlies initialize' do
             expect(cli.application).not_to be_nil
             expect(cli.application.provided_options.keys.sort).to eq %i(encrypt string key verbose).sort
-            expect(cli.command).to be_a_kind_of(Sym::App::Commands::Encrypt)
+            expect(cli.command).to be_a(Sym::App::Commands::Encrypt)
           end
         end
 
@@ -108,7 +111,7 @@ module Sym
           expect(cli.application.provided_options.keys.sort).to eq %i(version trace).sort
         end
 
-        it 'outputs the version number' do
+        it('outputs the version number') do
           expect_command_to_have klass:  Commands::ShowVersion,
                                  output: ["sym (version #{Sym::VERSION})"],
                                  option: :version,
@@ -237,9 +240,7 @@ module Sym
               expect(File.read(tempfile.path)).to eql(encrypted_key)
               expect(File.read(tempfile.path)).not_to eql(key)
               expect(input_handler).to receive(:puts).and_return(nil).exactly(attempts).times
-              expect(cli).to receive(:error).
-                with(reason:    'wrong password for key',
-                     exception: Sym::Errors::WrongPasswordForKey)
+              expect(cli).to receive(:error).with(anything).and_call_original
               cli.execute
             end
           end
@@ -248,3 +249,4 @@ module Sym
     end
   end
 end
+# rubocop: enable RSpec/NoExpectationExample

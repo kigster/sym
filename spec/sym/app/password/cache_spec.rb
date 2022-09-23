@@ -14,7 +14,7 @@ RSpec.describe Sym::App::Password::Cache do
   context 'cache provider' do
     subject { cache.provider }
 
-    it { is_expected.to be_kind_of(Sym::App::Password::Providers::MemcachedProvider) }
+    it { is_expected.to be_a(Sym::App::Password::Providers::MemcachedProvider) }
   end
 
   context 'cache enabled' do

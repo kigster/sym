@@ -12,7 +12,7 @@ module Sym
           expect(application).not_to be_nil
           expect(application.opts).not_to be_nil
           expect(application.opts[:generate]).to be_truthy
-          expect(application.command).to be_a_kind_of(Sym::App::Commands::GenerateKey)
+          expect(application.command).to be_a(Sym::App::Commands::GenerateKey)
         end
       end
 
@@ -24,10 +24,10 @@ module Sym
           let(:application) { described_class.new(cli_opts) }
 
           it 'properlies initialize' do
-            expect(opts.key?(:negate)).to eq(false)
+            expect(opts.key?(:negate)).to be(false)
             expect(opts[:file]).to eq(source_file)
             expect(opts[:output]).to eq(dest_file)
-            expect(opts[action]).to eq(true)
+            expect(opts[action]).to be(true)
           end
         end
         context 'negated encrypted file' do

@@ -53,7 +53,7 @@ RSpec.shared_context 'console' do
 
   def expect_some_output(args = [])
     expect(program_output_lines).not_to be_nil
-    expect(program_output_lines).to be_kind_of(Array)
+    expect(program_output_lines).to be_a(Array)
     expect(program_output_lines.size).to be > 0
     if args
       args.each_with_index do |argument, index|
