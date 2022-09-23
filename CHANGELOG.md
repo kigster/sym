@@ -1,5 +1,13 @@
 # Changelog
 
+## [Unreleased](https://github.com/kigster/sym/tree/HEAD)
+
+[Full Changelog](https://github.com/kigster/sym/compare/v3.0.1...HEAD)
+
+**Merged pull requests:**
+
+- Adding github actions [\#33](https://github.com/kigster/sym/pull/33) ([kigster](https://github.com/kigster))
+
 ## [v3.0.1](https://github.com/kigster/sym/tree/v3.0.1) (2021-02-12)
 
 [Full Changelog](https://github.com/kigster/sym/compare/v3.0.0...v3.0.1)
@@ -79,13 +87,13 @@
 
 [Full Changelog](https://github.com/kigster/sym/compare/v2.8.0...v2.8.1)
 
-## [v2.8.0](https://github.com/kigster/sym/tree/v2.8.0) (2018-01-06)
-
-[Full Changelog](https://github.com/kigster/sym/compare/v2.7.0...v2.8.0)
-
 **Merged pull requests:**
 
 - Changing -t to expect a file argument; Version 2.7.0 [\#13](https://github.com/kigster/sym/pull/13) ([kigster](https://github.com/kigster))
+
+## [v2.8.0](https://github.com/kigster/sym/tree/v2.8.0) (2018-01-06)
+
+[Full Changelog](https://github.com/kigster/sym/compare/v2.7.0...v2.8.0)
 
 ## [v2.7.0](https://github.com/kigster/sym/tree/v2.7.0) (2017-06-23)
 
