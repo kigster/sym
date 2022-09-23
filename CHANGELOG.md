@@ -1,8 +1,8 @@
 # Changelog
 
-## [Unreleased](https://github.com/kigster/sym/tree/HEAD)
+## [v3.0.2](https://github.com/kigster/sym/tree/v3.0.2) (2022-09-23)
 
-[Full Changelog](https://github.com/kigster/sym/compare/v3.0.1...HEAD)
+[Full Changelog](https://github.com/kigster/sym/compare/v3.0.1...v3.0.2)
 
 **Merged pull requests:**
 
