@@ -6,6 +6,10 @@
 :sectnum:
 :toclevel: 4
 
+=== Please Donate!
+
+https://liberapay.com/kigster/donate[image:https://liberapay.com/assets/widgets/donate.svg[Donate using Liberapay,height=30]]   https://liberapay.com/kigster/donate[image:https://img.shields.io/liberapay/goal/kigster.svg?logo=liberapay[https://img.shields.io/liberapay/goal/kigster,height=30]]
+
 ====
 
 image:https://github.com/kigster/sym/actions/workflows/ruby.yml/badge.svg[Ruby,link=https://github.com/kigster/sym/actions/workflows/ruby.yml]
